@@ -41,3 +41,6 @@ website/vendor
 
 # sdk logs folder
 sdk-logs/
+
+# SonarQube folder
+.scannerwork/
