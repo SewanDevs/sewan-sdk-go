@@ -1,6 +1,4 @@
-%
-% Compilation of the examples from the TikZ-UML manual, v. 1.0b (2013-03-01)
-\documentclass[a4paper,12pt]{article}
+\documentclass[landscape,a4paper,12pt]{article}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -17,7 +15,6 @@
 \author{Sewan}
 
 \begin{document}
-\begin{landscape}
 
 \maketitle
 
@@ -26,7 +23,7 @@
     \begin{umlseqdiag}
 
     \umlactor[class=SysAdmin, x=-3]{admin}
-    \umlobject[class=Tfstate, x=0.5]{localstate}
+    \umlobject[class=TfstateTAT, x=0.5]{localstate}
     \umlobject[class=Terraform\&Plugin, x=6]{terraform}
     \umlobject[class=SewanSDK, x=11]{sdk}
     \umlobject[class=AirdrumAPI, x=15]{api}
@@ -62,7 +59,5 @@
     \end{umlseqdiag}
   \end{tikzpicture}
 \end{center}
-
-\end{landscape}
 
 \end{document}
