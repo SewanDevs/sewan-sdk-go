@@ -394,7 +394,7 @@ func TestUpdate_local_resource_state_AND_Read_element(t *testing.T) {
 			d,
 			&schemaTooler)
 		for key, value := range test_case.Vm_map {
-			if key != "id" {
+			if key != ID_FIELD {
 				if !reflect.DeepEqual(d.Get(key), value) {
 					t.Errorf("\n\nTC %d : Update of %s field failed :\n\rGot :%s\n\rWant :%s",
 						test_case.Id, key, d.Get(key), value)
