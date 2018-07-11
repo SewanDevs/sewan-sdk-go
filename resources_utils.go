@@ -9,10 +9,6 @@ import (
 	"strings"
 )
 
-const (
-	DELETION_FIELD = "deletion"
-)
-
 type Dynamic_field_struct struct {
 	Terraform_provisioned       bool          `json:"terraform_provisioned"`
 	Creation_template           string        `json:"creation_template"`
@@ -20,7 +16,7 @@ type Dynamic_field_struct struct {
 }
 
 type VDC_resource struct {
-	Resource string `json:"resource"`
+	Resource string `json:"vdc_resources"`
 	Used     int    `json:"used"`
 	Total    int    `json:"total"`
 	Slug     string `json:"slug"`
@@ -40,7 +36,6 @@ type VM_DISK struct {
 	Size          int    `json:"size"`
 	Storage_class string `json:"storage_class"`
 	Slug          string `json:"slug"`
-	V_disk        string `json:"v_disk,omitempty"`
 	Deletion      bool   `json:"deletion,omitempty"`
 }
 
@@ -69,8 +64,7 @@ type VM struct {
 	Disk_image    string        `json:"disk_image"`
 	Platform_name string        `json:"platform_name"`
 	Backup_size   int           `json:"backup_size"`
-	Comment       string        `json:"comment",omitempty`
-	Outsourcing   string        `json:"outsourcing,omitempty"`
+	Comment       string        `json:"comment,omitempty"`
 	Dynamic_field string        `json:"dynamic_field"`
 }
 
@@ -79,12 +73,12 @@ func vdcInstanceCreate(d *schema.ResourceData,
 	api *API) (VDC, error) {
 
 	return VDC{
-		Name:          d.Get("name").(string),
-		Enterprise:    d.Get("enterprise").(string),
-		Datacenter:    d.Get("datacenter").(string),
-		Vdc_resources: d.Get("vdc_resources").([]interface{}),
-		Slug:          d.Get("slug").(string),
-		Dynamic_field: d.Get("dynamic_field").(string),
+		Name:          d.Get(NAME_FIELD).(string),
+		Enterprise:    d.Get(ENTERPRISE_FIELD).(string),
+		Datacenter:    d.Get(DATACENTER_FIELD).(string),
+		Vdc_resources: d.Get(VDC_RESOURCE_FIELD).([]interface{}),
+		Slug:          d.Get(SLUG_FIELD).(string),
+		Dynamic_field: d.Get(DYNAMIC_FIELD).(string),
 	}, nil
 }
 
@@ -100,8 +94,8 @@ func vmInstanceCreate(d *schema.ResourceData,
 		fetch_template_from_list_error error                  = nil
 		instance_creation_error        error                  = nil
 		template                       map[string]interface{} = nil
-		template_name                  string                 = d.Get("template").(string)
-		enterprise                     string                 = d.Get("enterprise").(string)
+		template_name                  string                 = d.Get(TEMPLATE_FIELD).(string)
+		enterprise                     string                 = d.Get(ENTERPRISE_FIELD).(string)
 	)
 	logger := LoggerCreate("vminstanceCreate" + d.Id() + ".log")
 
@@ -133,35 +127,34 @@ func vmInstanceCreate(d *schema.ResourceData,
 	logger.Println("instance_creation_error = ", instance_creation_error)
 	if instance_creation_error == nil {
 		vm = VM{
-			Name:          d.Get("name").(string),
-			Enterprise:    d.Get("enterprise").(string),
-			State:         d.Get("state").(string),
-			OS:            d.Get("os").(string),
-			RAM:           d.Get("ram").(int),
-			CPU:           d.Get("cpu").(int),
-			Disks:         d.Get("disks").([]interface{}),
-			Nics:          d.Get("nics").([]interface{}),
-			Vdc:           d.Get("vdc").(string),
-			Boot:          d.Get("boot").(string),
-			Storage_class: d.Get("storage_class").(string),
-			Slug:          d.Get("slug").(string),
-			Token:         d.Get("token").(string),
-			Backup:        d.Get("backup").(string),
-			Disk_image:    d.Get("disk_image").(string),
-			Platform_name: d.Get("platform_name").(string),
-			Backup_size:   d.Get("backup_size").(int),
-			Outsourcing:   d.Get("outsourcing").(string),
-			Dynamic_field: d.Get("dynamic_field").(string),
+			Name:          d.Get(NAME_FIELD).(string),
+			Enterprise:    d.Get(ENTERPRISE_FIELD).(string),
+			State:         d.Get(STATE_FIELD).(string),
+			OS:            d.Get(OS_FIELD).(string),
+			RAM:           d.Get(RAM_FIELD).(int),
+			CPU:           d.Get(CPU_FIELD).(int),
+			Disks:         d.Get(DISKS_FIELD).([]interface{}),
+			Nics:          d.Get(NICS_FIELD).([]interface{}),
+			Vdc:           d.Get(VDC_FIELD).(string),
+			Boot:          d.Get(BOOT_FIELD).(string),
+			Storage_class: d.Get(STORAGE_CLASS_FIELD).(string),
+			Slug:          d.Get(SLUG_FIELD).(string),
+			Token:         d.Get(TOKEN_FIELD).(string),
+			Backup:        d.Get(BACKUP_FIELD).(string),
+			Disk_image:    d.Get(DISK_IMAGE_FIELD).(string),
+			Platform_name: d.Get(PLATFORM_NAME_FIELD).(string),
+			Backup_size:   d.Get(BACKUP_SIZE_FIELD).(int),
+			Dynamic_field: d.Get(DYNAMIC_FIELD).(string),
 		}
 		if d.Id() == "" {
-			vm.Template = d.Get("template").(string)
+			vm.Template = d.Get(TEMPLATE_FIELD).(string)
 			dynamic_field_struct := Dynamic_field_struct{
 				Terraform_provisioned:       true,
 				Creation_template:           vm.Template,
 				Disks_created_from_template: nil,
 			}
 			if template != nil {
-				dynamic_field_struct.Disks_created_from_template = template["disks"].([]interface{})
+				dynamic_field_struct.Disks_created_from_template = template[DISKS_FIELD].([]interface{})
 			}
 			dynamic_field_json, _ := json.Marshal(dynamic_field_struct)
 			vm.Dynamic_field = string(dynamic_field_json)
@@ -169,7 +162,7 @@ func vmInstanceCreate(d *schema.ResourceData,
 		} else {
 			vm.Template = ""
 			var update_disks_slices []interface{} = []interface{}{}
-			for _, disk := range d.Get(DISKS_PARAM).([]interface{}) {
+			for _, disk := range d.Get(DISKS_FIELD).([]interface{}) {
 				if disk.(map[string]interface{})[DELETION_FIELD] != true {
 					update_disks_slices = append(update_disks_slices, disk)
 				}
@@ -195,7 +188,7 @@ func (apier AirDrumResources_Apier) ResourceInstanceCreate(d *schema.ResourceDat
 	)
 
 	switch resourceType {
-	case "vdc":
+	case VDC_FIELD:
 		resourceInstance, instanceError = vdcInstanceCreate(d,
 			clientTooler,
 			api)
@@ -216,7 +209,7 @@ func (apier AirDrumResources_Apier) ValidateResourceType(resourceType string) er
 	var err error
 
 	switch resourceType {
-	case "vdc":
+	case VDC_FIELD:
 		err = nil
 	case "vm":
 		err = nil

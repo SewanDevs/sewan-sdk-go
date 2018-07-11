@@ -116,7 +116,7 @@ func TestCreate_resource(t *testing.T) {
 		resource_res = resource(test_case.ResourceType)
 		d = resource_res.TestResourceData()
 		d.SetId("UnitTest resource1")
-		d.Set("name", "Unit test resource")
+		d.Set(NAME_FIELD, "Unit test resource")
 		fake_client_tooler.Client = test_case.TC_clienter
 		err, resp_creation_map = apier.Create_resource(d,
 			&fake_client_tooler,
@@ -277,7 +277,7 @@ func TestRead_resource(t *testing.T) {
 		resource_res = resource(test_case.ResourceType)
 		d = resource_res.TestResourceData()
 		d.SetId("UnitTest resource1")
-		d.Set("name", "Unit test resource")
+		d.Set(NAME_FIELD, "Unit test resource")
 		fake_client_tooler.Client = test_case.TC_clienter
 		err, resp_creation_map, res_exists = Apier.Read_resource(d,
 			&fake_client_tooler,
@@ -422,7 +422,7 @@ func TestUpdate_resource(t *testing.T) {
 		resource_res = resource(test_case.ResourceType)
 		d = resource_res.TestResourceData()
 		d.SetId("UnitTest resource1")
-		d.Set("name", "Unit test resource")
+		d.Set(NAME_FIELD, "Unit test resource")
 		fake_client_tooler.Client = test_case.TC_clienter
 		err = Apier.Update_resource(d,
 			&fake_client_tooler,
@@ -546,7 +546,7 @@ func TestDelete_resource(t *testing.T) {
 		resource_res = resource(test_case.ResourceType)
 		d = resource_res.TestResourceData()
 		d.SetId("UnitTest resource1")
-		d.Set("name", "Unit test resource")
+		d.Set(NAME_FIELD, "Unit test resource")
 		fake_client_tooler.Client = test_case.TC_clienter
 		err = Apier.Delete_resource(d,
 			&fake_client_tooler,
