@@ -32,14 +32,14 @@ func (schemaer Schema_Schemaer) Update_local_resource_state(resource_state map[s
 		read_value  interface{}
 	)
 	logger := LoggerCreate("update_local_resource_state_" +
-		d.Get("name").(string) + ".log")
+		d.Get(NAME_FIELD).(string) + ".log")
 	for key, value := range resource_state {
 		read_value,
 			updateError = schemaTools.SchemaTools.Read_element(key,
 			value,
 			logger)
 		logger.Println("Set \"", key, "\" to \"", read_value, "\"")
-		if key == "id" {
+		if key == ID_FIELD {
 			var s_id string = ""
 			switch {
 			case reflect.TypeOf(value).Kind() == reflect.Float64:
@@ -47,7 +47,11 @@ func (schemaer Schema_Schemaer) Update_local_resource_state(resource_state map[s
 			case reflect.TypeOf(value).Kind() == reflect.Int:
 				s_id = strconv.Itoa(value.(int))
 			case reflect.TypeOf(value).Kind() == reflect.String:
-				s_id = value.(string)
+				if value == nil {
+					s_id = ""
+				} else {
+					s_id = value.(string)
+				}
 			default:
 				updateError = errors.New("Format of " + key + "(" +
 					reflect.TypeOf(value).Kind().String() + ") not handled.")

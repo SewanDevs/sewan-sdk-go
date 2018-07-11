@@ -24,7 +24,7 @@ func (apier AirDrumResources_Apier) Create_resource(d *schema.ResourceData,
 		created_resource               map[string]interface{}
 		resourceInstance               interface{}
 		responseBody                   string
-		instanceName                   string = d.Get("name").(string)
+		instanceName                   string = d.Get(NAME_FIELD).(string)
 		resource_json                  []byte
 		resp_body_reader               interface{}
 		bodyBytes                      []byte
@@ -136,7 +136,7 @@ func (apier AirDrumResources_Apier) Read_resource(d *schema.ResourceData,
 		responseBody                   string
 		resp_body_reader               interface{}
 		resource_exists                bool   = true
-		instanceName                   string = d.Get("name").(string)
+		instanceName                   string = d.Get(NAME_FIELD).(string)
 		bodyBytes                      []byte
 	)
 	req := &http.Request{}
@@ -236,7 +236,7 @@ func (apier AirDrumResources_Apier) Update_resource(d *schema.ResourceData,
 		update_resp_body_err           error = nil
 		resourceInstance               interface{}
 		responseBody                   string
-		instanceName                   string = d.Get("name").(string)
+		instanceName                   string = d.Get(NAME_FIELD).(string)
 		resource_json                  []byte
 		resp_body_reader               interface{}
 		bodyBytes                      []byte
@@ -336,7 +336,7 @@ func (apier AirDrumResources_Apier) Delete_resource(d *schema.ResourceData,
 		responseBody                   string
 		resp_body_reader               interface{}
 		bodyBytes                      []byte
-		instanceName                   string = d.Get("name").(string)
+		instanceName                   string = d.Get(NAME_FIELD).(string)
 	)
 	api_tools := APITooler{
 		Api: apier,

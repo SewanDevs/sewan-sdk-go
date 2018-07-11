@@ -64,34 +64,34 @@ func (templaterFake EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP_TemplaterFake) F
 	templateList []interface{}) (map[string]interface{}, error) {
 
 	return map[string]interface{}{
-		"id":         82,
-		"name":       "template1",
-		"slug":       "centos7-rd-dc1",
-		"ram":        1,
-		"cpu":        1,
-		"os":         "CentOS",
-		"enterprise": "unit test enterprise",
-		"disks": []interface{}{
-			map[string]interface{}{"name": "template1 disk1",
-				"size":          20,
-				"storage_class": "storage_enterprise",
-				"slug":          "template1 disk1 slug",
+		ID_FIELD:         82,
+		NAME_FIELD:       "template1",
+		SLUG_FIELD:       "centos7-rd-dc1",
+		RAM_FIELD:        1,
+		CPU_FIELD:        1,
+		OS_FIELD:         "CentOS",
+		ENTERPRISE_FIELD: "unit test enterprise",
+		DISKS_FIELD: []interface{}{
+			map[string]interface{}{NAME_FIELD: "template1 disk1",
+				SIZE_FIELD:          20,
+				STORAGE_CLASS_FIELD: "storage_enterprise",
+				SLUG_FIELD:          "template1 disk1 slug",
 			},
 		},
-		"datacenter": "dc1",
-		"nics": []interface{}{
-			map[string]interface{}{"vlan": "unit test vlan1",
-				"mac_address": "00:50:56:21:7c:ab",
-				"connected":   true,
+		DATACENTER_FIELD: "dc1",
+		NICS_FIELD: []interface{}{
+			map[string]interface{}{VLAN_NAME_FIELD: "unit test vlan1",
+				MAC_ADRESS_FIELD: "00:50:56:21:7c:ab",
+				CONNECTED_FIELD:  true,
 			},
-			map[string]interface{}{"vlan": "unit test vlan2",
-				"mac_address": "00:50:56:21:7c:ac",
-				"connected":   true,
+			map[string]interface{}{VLAN_NAME_FIELD: "unit test vlan2",
+				MAC_ADRESS_FIELD: "00:50:56:21:7c:ac",
+				CONNECTED_FIELD:  true,
 			},
 		},
-		"login":         "",
-		"password":      "",
-		"dynamic_field": "",
+		"login":       "",
+		"password":    "",
+		DYNAMIC_FIELD: "",
 	}, nil
 }
 func (templaterFake EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP_TemplaterFake) UpdateSchemaFromTemplate(d *schema.ResourceData,
@@ -99,21 +99,21 @@ func (templaterFake EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP_TemplaterFake) U
 	templatesTooler *TemplatesTooler,
 	schemaTooler *SchemaTooler) error {
 
-	d.Set("name", "Unit test template no disc add on vm resource")
-	d.Set("enterprise", "unit test enterprise")
-	d.Set("template", "template1")
-	d.Set("ram", 1)
-	d.Set("cpu", 1)
-	d.Set("disks",
+	d.Set(NAME_FIELD, "Unit test template no disc add on vm resource")
+	d.Set(ENTERPRISE_FIELD, "unit test enterprise")
+	d.Set(TEMPLATE_FIELD, "template1")
+	d.Set(RAM_FIELD, 1)
+	d.Set(CPU_FIELD, 1)
+	d.Set(DISKS_FIELD,
 		[]interface{}{
-			map[string]interface{}{"name": "template1 disk1",
-				"size":          20,
-				"storage_class": "storage_enterprise",
-				"slug":          "template1 disk1 slug",
+			map[string]interface{}{NAME_FIELD: "template1 disk1",
+				SIZE_FIELD:          20,
+				STORAGE_CLASS_FIELD: "storage_enterprise",
+				SLUG_FIELD:          "template1 disk1 slug",
 			},
 		},
 	)
-	d.Set("nics", []interface{}{})
+	d.Set(NICS_FIELD, []interface{}{})
 	return nil
 }
 func (templaterFake EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP_TemplaterFake) UpdateSchemaDisksFromTemplateDisks(d *schema.ResourceData,
@@ -134,34 +134,34 @@ func (templaterFake EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISK
 	templateList []interface{}) (map[string]interface{}, error) {
 
 	return map[string]interface{}{
-		"id":         82,
-		"name":       "template1",
-		"slug":       "centos7-rd-dc1",
-		"ram":        1,
-		"cpu":        1,
-		"os":         "CentOS",
-		"enterprise": "unit test enterprise",
-		"disks": []interface{}{
-			map[string]interface{}{"name": "template1 disk1",
-				"size":          20,
-				"storage_class": "storage_enterprise",
-				"slug":          "template1 disk1 slug",
+		ID_FIELD:         82,
+		NAME_FIELD:       "template1",
+		SLUG_FIELD:       "centos7-rd-dc1",
+		RAM_FIELD:        1,
+		CPU_FIELD:        1,
+		OS_FIELD:         "CentOS",
+		ENTERPRISE_FIELD: "unit test enterprise",
+		DISKS_FIELD: []interface{}{
+			map[string]interface{}{NAME_FIELD: "template1 disk1",
+				SIZE_FIELD:          20,
+				STORAGE_CLASS_FIELD: "storage_enterprise",
+				SLUG_FIELD:          "template1 disk1 slug",
 			},
 		},
-		"datacenter": "dc1",
-		"nics": []interface{}{
-			map[string]interface{}{"vlan": "unit test vlan1",
-				"mac_address": "00:50:56:21:7c:ab",
-				"connected":   true,
+		DATACENTER_FIELD: "dc1",
+		NICS_FIELD: []interface{}{
+			map[string]interface{}{VLAN_NAME_FIELD: "unit test vlan1",
+				MAC_ADRESS_FIELD: "00:50:56:21:7c:ab",
+				CONNECTED_FIELD:  true,
 			},
-			map[string]interface{}{"vlan": "unit test vlan2",
-				"mac_address": "00:50:56:21:7c:ac",
-				"connected":   true,
+			map[string]interface{}{VLAN_NAME_FIELD: "unit test vlan2",
+				MAC_ADRESS_FIELD: "00:50:56:21:7c:ac",
+				CONNECTED_FIELD:  true,
 			},
 		},
-		"login":         "",
-		"password":      "",
-		"dynamic_field": "",
+		"login":       "",
+		"password":    "",
+		DYNAMIC_FIELD: "",
 	}, nil
 }
 func (templaterFake EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISKS_VM_MAP_TemplaterFake) UpdateSchemaFromTemplate(d *schema.ResourceData,
@@ -169,43 +169,43 @@ func (templaterFake EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISK
 	templatesTooler *TemplatesTooler,
 	schemaTooler *SchemaTooler) error {
 
-	d.Set("name", "EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISKS_VM_MAP")
-	d.Set("enterprise", "unit test enterprise")
-	d.Set("template", "template1")
-	d.Set("ram", 8)
-	d.Set("cpu", 4)
-	d.Set("disks",
+	d.Set(NAME_FIELD, "EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISKS_VM_MAP")
+	d.Set(ENTERPRISE_FIELD, "unit test enterprise")
+	d.Set(TEMPLATE_FIELD, "template1")
+	d.Set(RAM_FIELD, 8)
+	d.Set(CPU_FIELD, 4)
+	d.Set(DISKS_FIELD,
 		[]interface{}{
 			map[string]interface{}{
-				"name":          "disk 1",
-				"size":          24,
-				"storage_class": "storage_enterprise",
-				"slug":          "",
+				NAME_FIELD:          "disk 1",
+				SIZE_FIELD:          24,
+				STORAGE_CLASS_FIELD: "storage_enterprise",
+				SLUG_FIELD:          "",
 			},
 			map[string]interface{}{
-				"name":          "template1 disk1",
-				"size":          25,
-				"storage_class": "storage_enterprise",
-				"slug":          "template1 disk1 slug",
+				NAME_FIELD:          "template1 disk1",
+				SIZE_FIELD:          25,
+				STORAGE_CLASS_FIELD: "storage_enterprise",
+				SLUG_FIELD:          "template1 disk1 slug",
 			},
 		},
 	)
-	d.Set("nics", []interface{}{
+	d.Set(NICS_FIELD, []interface{}{
 		map[string]interface{}{
-			"vlan":        "non template vlan 1",
-			"mac_address": "00:21:21:21:21:21",
-			"connected":   true,
+			VLAN_NAME_FIELD:  "non template vlan 1",
+			MAC_ADRESS_FIELD: "00:21:21:21:21:21",
+			CONNECTED_FIELD:  true,
 		},
 		map[string]interface{}{
-			"vlan":        "non template vlan 2",
-			"mac_address": "00:21:21:21:21:22",
-			"connected":   true,
+			VLAN_NAME_FIELD:  "non template vlan 2",
+			MAC_ADRESS_FIELD: "00:21:21:21:21:22",
+			CONNECTED_FIELD:  true,
 		},
 	},
 	)
-	d.Set("vdc:          ", "vdc")
+	d.Set("vdc:          ", VDC_FIELD)
 	d.Set("boot:         ", "on disk")
-	d.Set("storage_class:", "storage_enterprise")
+	d.Set(STORAGE_CLASS_FIELD, "storage_enterprise")
 	d.Set("slug:         ", "42")
 	d.Set("token:        ", "424242")
 	d.Set("backup:       ", "backup_no_backup")
@@ -213,7 +213,6 @@ func (templaterFake EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISK
 	d.Set("platform_name:", "42")
 	d.Set("backup_size:  ", 42)
 	d.Set("comment:      ", "42")
-	d.Set("outsourcing:  ", "42")
 	d.Set("dynamic_field:", "42")
 	return nil
 }
@@ -235,34 +234,34 @@ func (templaterFake EXISTING_TEMPLATE_WITH_DELETED_DISK_VM_MAP_TemplaterFake) Fe
 	templateList []interface{}) (map[string]interface{}, error) {
 
 	return map[string]interface{}{
-		"id":         82,
-		"name":       "template1",
-		"slug":       "template 1 slug",
-		"ram":        1,
-		"cpu":        1,
-		"os":         "CentOS",
-		"enterprise": "unit test enterprise",
-		"disks": []interface{}{
-			map[string]interface{}{"name": "template1 disk1",
-				"size":          20,
-				"storage_class": "storage_enterprise",
-				"slug":          "template1 disk1 slug",
+		ID_FIELD:         82,
+		NAME_FIELD:       "template1",
+		SLUG_FIELD:       "template 1 slug",
+		RAM_FIELD:        1,
+		CPU_FIELD:        1,
+		OS_FIELD:         "CentOS",
+		ENTERPRISE_FIELD: "unit test enterprise",
+		DISKS_FIELD: []interface{}{
+			map[string]interface{}{NAME_FIELD: "template1 disk1",
+				SIZE_FIELD:          20,
+				STORAGE_CLASS_FIELD: "storage_enterprise",
+				SLUG_FIELD:          "template1 disk1 slug",
 			},
 		},
-		"datacenter": "dc1",
-		"nics": []interface{}{
-			map[string]interface{}{"vlan": "unit test vlan1",
-				"mac_address": "00:50:56:21:7c:ab",
-				"connected":   true,
+		DATACENTER_FIELD: "dc1",
+		NICS_FIELD: []interface{}{
+			map[string]interface{}{VLAN_NAME_FIELD: "unit test vlan1",
+				MAC_ADRESS_FIELD: "00:50:56:21:7c:ab",
+				CONNECTED_FIELD:  true,
 			},
-			map[string]interface{}{"vlan": "unit test vlan2",
-				"mac_address": "00:50:56:21:7c:ac",
-				"connected":   true,
+			map[string]interface{}{VLAN_NAME_FIELD: "unit test vlan2",
+				MAC_ADRESS_FIELD: "00:50:56:21:7c:ac",
+				CONNECTED_FIELD:  true,
 			},
 		},
-		"login":         "",
-		"password":      "",
-		"dynamic_field": "",
+		"login":       "",
+		"password":    "",
+		DYNAMIC_FIELD: "",
 	}, nil
 }
 func (templaterFake EXISTING_TEMPLATE_WITH_DELETED_DISK_VM_MAP_TemplaterFake) UpdateSchemaFromTemplate(d *schema.ResourceData,
@@ -270,31 +269,31 @@ func (templaterFake EXISTING_TEMPLATE_WITH_DELETED_DISK_VM_MAP_TemplaterFake) Up
 	templatesTooler *TemplatesTooler,
 	schemaTooler *SchemaTooler) error {
 
-	d.Set("name", "EXISTING_TEMPLATE_WITH_DELETED_DISK_VM_MAP")
-	d.Set("enterprise", "unit test enterprise")
-	d.Set("template", "template1")
-	d.Set("ram", 8)
-	d.Set("cpu", 4)
-	d.Set("disks",
+	d.Set(NAME_FIELD, "EXISTING_TEMPLATE_WITH_DELETED_DISK_VM_MAP")
+	d.Set(ENTERPRISE_FIELD, "unit test enterprise")
+	d.Set(TEMPLATE_FIELD, "template1")
+	d.Set(RAM_FIELD, 8)
+	d.Set(CPU_FIELD, 4)
+	d.Set(DISKS_FIELD,
 		[]interface{}{
 			map[string]interface{}{
-				"name":          "disk 1",
-				"size":          24,
-				"storage_class": "storage_enterprise",
-				"slug":          "",
+				NAME_FIELD:          "disk 1",
+				SIZE_FIELD:          24,
+				STORAGE_CLASS_FIELD: "storage_enterprise",
+				SLUG_FIELD:          "",
 			},
 			map[string]interface{}{
-				"name":          "template1 disk1",
-				"size":          24,
-				"storage_class": "storage_class",
-				"deletion":      true,
+				NAME_FIELD:          "template1 disk1",
+				SIZE_FIELD:          24,
+				STORAGE_CLASS_FIELD: "storage_enterprise",
+				DELETION_FIELD:      true,
 			},
 		},
 	)
-	d.Set("nics", []interface{}{})
-	d.Set("vdc:          ", "vdc")
+	d.Set(NICS_FIELD, []interface{}{})
+	d.Set("vdc:          ", VDC_FIELD)
 	d.Set("boot:         ", "on disk")
-	d.Set("storage_class:", "storage_enterprise")
+	d.Set(STORAGE_CLASS_FIELD, "storage_enterprise")
 	d.Set("slug:         ", "42")
 	d.Set("token:        ", "424242")
 	d.Set("backup:       ", "backup_no_backup")

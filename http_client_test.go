@@ -50,7 +50,7 @@ func TestGetTemplatesList(t *testing.T) {
 	client_tooler.Client = HttpClienter{}
 	fake_client_tooler := ClientTooler{}
 	apiTooler := APITooler{}
-	api := apiTooler.New("token", "url")
+	api := apiTooler.New(TOKEN_FIELD, "url")
 
 	for _, test_case := range test_cases {
 		fake_client_tooler.Client = test_case.TC_clienter
