@@ -4,7 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/hashicorp/terraform/helper/schema"
+	"io/ioutil"
+	"os"
 	"reflect"
+	"strings"
 )
 
 type TemplatesTooler struct {
@@ -17,13 +20,33 @@ type Templater interface {
 		template map[string]interface{},
 		templatesTooler *TemplatesTooler,
 		schemaTools *SchemaTooler) error
-	UpdateSchemaDisksFromTemplateDisks(d *schema.ResourceData,
-		disks []interface{},
-		schemaTools *SchemaTooler) error
-	UpdateSchemaDisksFromTemplateNics(d *schema.ResourceData) error
+	CreateTemplateOverrideConfig(d *schema.ResourceData, template map[string]interface{}) error
 }
 
 type Template_Templater struct{}
+
+type Disk_modifiable_fields struct {
+	Name          string `json:"name"`
+	Size          int    `json:"size"`
+	Storage_class string `json:"storage_class"`
+}
+
+type Nic_modifiable_fields struct {
+	Vlan      string `json:"vlan"`
+	Connected bool   `json:"connected"`
+}
+
+type Template_created_VM_override struct {
+	OS        string           `json:"os"`
+	RAM        int           `json:"ram"`
+	CPU        int           `json:"cpu"`
+	Disks      []interface{} `json:"disks,omitempty"`
+	Nics       []interface{} `json:"nics,omitempty"`
+	Vdc        string        `json:"vdc"`
+	Boot       string        `json:"boot"`
+	Backup     string        `json:"backup"`
+	Disk_image string        `json:"disk_image"`
+}
 
 func (templater Template_Templater) FetchTemplateFromList(template_name string,
 	templateList []interface{}) (map[string]interface{}, error) {
@@ -57,14 +80,7 @@ func (templater Template_Templater) UpdateSchemaFromTemplate(d *schema.ResourceD
 	template map[string]interface{},
 	templatesTooler *TemplatesTooler,
 	schemaTools *SchemaTooler) error {
-
 	var template_handle_err error = nil
-	logger := LoggerCreate("UpdateSchemaFromTemplate" + d.Get(NAME_FIELD).(string) + ".log")
-	logger.Println("d.Get(\"disks\").([]interface{}) = ",
-		d.Get(DISKS_FIELD).([]interface{}))
-	logger.Println("d.Get(\"nics\").([]interface{}) = ",
-		d.Get(NICS_FIELD).([]interface{}))
-
 	for template_param_name, template_param_value := range template {
 		if reflect.ValueOf(template_param_name).IsValid() && reflect.ValueOf(template_param_value).IsValid() {
 			logger.Println("--")
@@ -78,8 +94,8 @@ func (templater Template_Templater) UpdateSchemaFromTemplate(d *schema.ResourceD
 				logger.Println("case String : ", template_param_name)
 				if d.Id() == "" {
 					switch {
-					case s_template_param_name == OS_FIELD:
-						logger.Println("Case os")
+					case s_template_param_name == OS_FIELD && d.Id()=="":
+						logger.Println("Case name")
 					case s_template_param_name == NAME_FIELD:
 						logger.Println("Case name")
 					default:
@@ -93,10 +109,8 @@ func (templater Template_Templater) UpdateSchemaFromTemplate(d *schema.ResourceD
 					switch {
 					case s_template_param_name == NAME_FIELD:
 						logger.Println("Case template name")
-
 						data := &Dynamic_field_struct{}
 						dynamicfield_read_err := json.Unmarshal([]byte(d.Get(DYNAMIC_FIELD).(string)), data)
-
 						if dynamicfield_read_err == nil {
 							if s_template_param_value != data.Creation_template {
 								if data.Creation_template == "" {
@@ -123,80 +137,41 @@ func (templater Template_Templater) UpdateSchemaFromTemplate(d *schema.ResourceD
 						}
 					}
 				}
-
 			case reflect.Float64:
 				logger.Println("case float 64 : ", template_param_name, " = ",
 					d.Get(s_template_param_name))
-				if d.Id() == "" {
-					switch {
-					case s_template_param_name == ID_FIELD:
-						logger.Println("2, d.Id() = ", d.Id())
-					default:
-						if d.Get(s_template_param_name).(int) == 0 {
-							logger.Println("3, val to set = ",
-								int(interface_template_name.(float64)))
-							d.Set(s_template_param_name,
-								int(interface_template_name.(float64)))
-						}
-					}
-				} else {
-					switch {
-					case s_template_param_name == ID_FIELD:
-						logger.Println("2, d.Id() = ", d.Id())
-					default:
-						if d.Get(s_template_param_name) == 0 {
-							if d.Get(s_template_param_name).(int) == 0 {
-								logger.Println("3, val to set = ",
-									int(interface_template_name.(float64)))
-								d.Set(s_template_param_name,
-									int(interface_template_name.(float64)))
-							}
-						}
+				switch {
+				case s_template_param_name == ID_FIELD:
+					logger.Println("2, d.Id() = ", d.Id())
+				default:
+					if d.Get(s_template_param_name).(int) == 0 {
+						logger.Println("3, val to set = ",
+							int(interface_template_name.(float64)))
+						d.Set(s_template_param_name,
+							int(interface_template_name.(float64)))
 					}
 				}
 			case reflect.Int:
 				logger.Println("case Int : ", template_param_name, " = ",
 					d.Get(s_template_param_name))
-				if d.Id() == "" {
-					switch {
-					case s_template_param_name == ID_FIELD:
-						logger.Println("2")
-					default:
-						if d.Get(s_template_param_name).(int) == 0 {
-							logger.Println("3, val to set = ",
-								int(interface_template_name.(int)))
-							d.Set(s_template_param_name,
-								int(interface_template_name.(int)))
-						}
-					}
-				} else {
-					switch {
-					case s_template_param_name == ID_FIELD:
-						logger.Println("2")
-					default:
-						if d.Get(s_template_param_name).(int) == 0 {
-							logger.Println("3, val to set = ",
-								int(interface_template_name.(int)))
-							d.Set(s_template_param_name,
-								int(interface_template_name.(int)))
-						}
+				switch {
+				case s_template_param_name == ID_FIELD:
+					logger.Println("2")
+				default:
+					if d.Get(s_template_param_name).(int) == 0 {
+						logger.Println("3, val to set = ",
+							int(interface_template_name.(int)))
+						d.Set(s_template_param_name,
+							int(interface_template_name.(int)))
 					}
 				}
 			case reflect.Slice:
 				logger.Println("case Slice : ", template_param_name, " = ",
 					d.Get(s_template_param_name))
 				switch {
-				case template_param_name == NICS_FIELD:
-					templatesTooler.TemplatesTools.UpdateSchemaDisksFromTemplateNics(d)
-				case template_param_name == DISKS_FIELD:
-					template_handle_err = templatesTooler.TemplatesTools.UpdateSchemaDisksFromTemplateDisks(d,
-						template_param_value.([]interface{}),
-						schemaTools)
+				case template_param_name == DISKS_FIELD && d.Id()=="":
 				default:
-					template_handle_err = errors.New("Handle_template_and_set_schema :" +
-						" Format of " + template_param_name + "(" +
-						reflect.TypeOf(template_param_value).Kind().String() +
-						") not handled.")
+					d.Set(s_template_param_name, template_param_value.([]interface{}))
 				}
 				if template_handle_err != nil {
 					logger.Println(template_param_name, "=",
@@ -208,73 +183,68 @@ func (templater Template_Templater) UpdateSchemaFromTemplate(d *schema.ResourceD
 			}
 		}
 	}
-	logger.Println("d.Get(\"disks\").([]interface{}) = ", d.Get(DISKS_FIELD).([]interface{}))
-	logger.Println("d.Get(\"nics\").([]interface{}) = ", d.Get(NICS_FIELD).([]interface{}))
 	return template_handle_err
 }
 
-func (templater Template_Templater) UpdateSchemaDisksFromTemplateDisks(d *schema.ResourceData,
-	disks []interface{},
-	schemaTools *SchemaTooler) error {
-
+func (templater Template_Templater) CreateTemplateOverrideConfig(d *schema.ResourceData,
+	template map[string]interface{}) error {
+	vm := Template_created_VM_override{
+		OS:        template[OS_FIELD].(string),
+		RAM:        d.Get(RAM_FIELD).(int),
+		CPU:        d.Get(CPU_FIELD).(int),
+		Vdc:        d.Get(VDC_FIELD).(string),
+		Boot:       d.Get(BOOT_FIELD).(string),
+		Backup:     d.Get(BACKUP_FIELD).(string),
+		Disk_image: d.Get(DISK_IMAGE_FIELD).(string),
+	}
 	var (
-		template_name = d.Get(TEMPLATE_FIELD).(string)
-		schema_slice  []interface{}
-		disks_err     error = nil
+		schemaer                Schema_Schemaer
+		write_override_file_err error = nil
+		read_list_value         []interface{}
+		list_item               interface{}
+		override_file           strings.Builder
 	)
-	logger := LoggerCreate("UpdateSchemaDisksFromTemplateDisks" + d.Get(NAME_FIELD).(string) + ".log")
-	logger.Println("case disks")
-	if d.Id() != "" {
-		if len(d.Get(DISKS_FIELD).([]interface{})) == 0 {
-			for _, template_slice_element := range disks {
-				logger.Println("template_slice_element = ", template_slice_element)
-				schema_slice = append(schema_slice,
-					template_slice_element.(map[string]interface{}))
-			}
-			err := d.Set(reflect.ValueOf(template_name).String(), schema_slice)
-			logger.Println("set err = ", err)
-			logger.Println("set val = ", d.Get(DISKS_FIELD))
-
-		} else {
-			schema_slice = d.Get(DISKS_FIELD).([]interface{})
-			logger.Println("schema_slice init=", schema_slice)
-			for _, template_slice_element := range disks {
-				var (
-					elem_already_in_list = false
-				)
-				for schema_slice_index, schema_slice_element := range schema_slice {
-					if template_slice_element.(map[string]interface{})[NAME_FIELD] == schema_slice_element.(map[string]interface{})[NAME_FIELD] {
-						for map_key, map_value := range schema_slice_element.(map[string]interface{}) {
-							logger.Println("map_key, map_value =", map_key, map_value)
-							map_item,
-								_ := schemaTools.SchemaTools.Read_element(map_key,
-								map_value,
-								logger)
-							logger.Println("schema_slice[", schema_slice_index,
-								"].(map[string]interface{})[", map_key, "] = ", map_item)
-							schema_slice[schema_slice_index].(map[string]interface{})[map_key] = map_item
-						}
-						elem_already_in_list = true
-					}
+	if d.Get(TEMPLATE_FIELD) != "" {
+		override_file.WriteString(d.Get(TEMPLATE_FIELD).(string))
+		override_file.WriteString("_template_override.tf.json")
+		if _, err := os.Stat(override_file.String()); os.IsNotExist(err) {
+			logger := LoggerCreate("CreateTemplateOverrideConfig_" +
+				d.Get(TEMPLATE_FIELD).(string) + "_.log")
+			for list_key, list_value := range template[DISKS_FIELD].([]interface{}) {
+				list_item, _ = schemaer.Read_element(list_key,
+					list_value,
+					logger)
+				disk := Disk_modifiable_fields{
+					Name:          list_item.(map[string]interface{})["name"].(string),
+					Size:          list_item.(map[string]interface{})["size"].(int),
+					Storage_class: list_item.(map[string]interface{})["storage_class"].(string),
 				}
-				if elem_already_in_list == false {
-					schema_slice = append(schema_slice,
-						template_slice_element.(map[string]interface{}))
-				}
+				read_list_value = append(read_list_value, disk)
 			}
+			vm.Disks = read_list_value
+			read_list_value = []interface{}{}
+			for list_key, list_value := range d.Get(NICS_FIELD).([]interface{}) {
+				list_item, _ = schemaer.Read_element(list_key,
+					list_value,
+					logger)
+				nic := Nic_modifiable_fields{
+					Vlan:      list_item.(map[string]interface{})["vlan"].(string),
+					Connected: list_item.(map[string]interface{})["connected"].(bool),
+				}
+				read_list_value = append(read_list_value, nic)
+			}
+			vm.Nics = read_list_value
+			vm_fields_map := map[string]interface{}{"template-server": vm}
+			vm_map := map[string]interface{}{"sewan_clouddc_vm": vm_fields_map}
+			resources_map := map[string]interface{}{"resource": vm_map}
+			vm_json, _ := json.Marshal(resources_map)
+			write_override_file_err = ioutil.WriteFile(override_file.String(),
+				vm_json, 0644)
 		}
 	} else {
-		if len(d.Get(DISKS_FIELD).([]interface{})) != 0 {
-			disks_err = errors.New("On VM creation with template, additional disks" +
-				" are not accepted. However, they can be added after creation.")
-		}
+		write_override_file_err = errors.New("Template field is empty, " +
+			"can not create a template override configuration.")
 	}
-	logger.Println("schema_slice =", schema_slice)
-	d.Set(DISKS_FIELD, schema_slice)
-	return disks_err
-}
 
-func (templater Template_Templater) UpdateSchemaDisksFromTemplateNics(d *schema.ResourceData) error {
-
-	return nil
+	return write_override_file_err
 }
