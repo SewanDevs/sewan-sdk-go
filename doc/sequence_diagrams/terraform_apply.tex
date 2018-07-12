@@ -4,8 +4,6 @@
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
 \usepackage{fullpage}
-\usepackage{lscape}
-
 \usepackage{tikz-uml}
 
 \sloppy
@@ -15,6 +13,7 @@
 \author{Sewan}
 
 \begin{document}
+\pagenumbering{gobble} %switch off page numbering display
 
 \maketitle
 
@@ -29,36 +28,35 @@
     \umlobject[class=Terraform\&Plugin, x=6]{terraform}
     \umlobject[class=SewanSDK, x=11]{sdk}
     \umlobject[class=AirdrumAPI, x=15]{api}
+    \umlobject[class=ResourceSchema,x=20]{schema}
 
-    \begin{umlcall}[op=1.\ terraform\ refresh(), type=synchron, return=resources\_diff\_list]{admin}{terraform}
-    
+    \begin{umlcall}[op=1.\ terraform\ refresh(), type=synchron, return=local\_state\_changes\_list]{admin}{terraform}
       \begin{umlcall}[op=2.\ plan(), type=asynchron]{terraform}{terraform}
       \end{umlcall}
-    
       \begin{umlfragment}[type=loop, label=resource\_in\_plan, name=loop, inner xsep=15,fill=blue!15]
-
-	\begin{umlfragment}[type=alt, label=resource\_exists, name=if, inner xsep=18,fill=white]
-	  \begin{umlcall}[op=3.\ resource\_update(), type=synchron, return=resource\_state]{terraform}{sdk}
-	    \begin{umlcall}[op=4.\ HTTP\_PUT(), type=synchron, return=HTTP.resp]{sdk}{api}
+	\begin{umlfragment}[type=alt, label=resource\_exists, name=if,fill=white]
+	  \begin{umlcall}[op=3.\ create(plan\_resource\_state), type=asynchron]{terraform}{schema}
+	    \begin{umlcall}[op=4.\ resource\_update(), type=synchron, return=distant\_resource\_state]{terraform}{sdk}
+	      \begin{umlcall}[op=5.\ HTTP\_PUT(), type=synchron, return=HTTP.resp]{sdk}{api}
+	      \end{umlcall}
+	    \end{umlcall}
+	    \begin{umlcall}[op=6.\ update(distant\_resource\_state), type=asynchron]{terraform}{schema}
+	    \end{umlcall}
+	    \begin{umlcall}[op=7.\ update(schema), type=synchron, return=OK]{terraform}{localstate}
 	    \end{umlcall}
 	  \end{umlcall}
-
   	\umlfpart[!\ resource\_exists]
-
-  	\begin{umlcall}[op=3.\ resource\_create(), type=synchron, return=resource\_state]{terraform}{sdk}
-	  \begin{umlcall}[op=4.\ HTTP\_POST(), type=synchron, return=HTTP.resp]{sdk}{api}
-	  \end{umlcall}
-	\end{umlcall}
-
+	    \begin{umlcall}[op=3.\ resource\_create(), type=synchron, return=distant\_resource\_state]{terraform}{sdk}
+	      \begin{umlcall}[op=4.\ HTTP\_POST(), type=synchron, return=HTTP.resp]{sdk}{api}
+	      \end{umlcall}
+	    \end{umlcall}
+	    \begin{umlcall}[op=5.\ create(distant\_resource\_state), type=asynchron]{terraform}{schema}
+	      \begin{umlcall}[op=6.\ update(schema), type=synchron, return=OK]{terraform}{localstate}
+	      \end{umlcall}
+	    \end{umlcall}
 	\end{umlfragment}
-
       \end{umlfragment}[name=loop]
-      
-      \begin{umlcall}[op=5.\ update(), type=synchron, return=OK]{terraform}{localstate}
-      \end{umlcall}
-
     \end{umlcall}
-
   \end{umlseqdiag}
   \end{tikzpicture}
 
@@ -66,25 +64,28 @@
   \section{VM resource creation from template}
   \begin{tikzpicture}
     \begin{umlseqdiag}
-    \umlactor[class=SysAdmin, x=-3]{admin}
-    \umlobject[class=Terraform\&Plugin, x=2]{terraform}
-    \umlobject[class=SewanSDK, x=8]{sdk}
-    \umlobject[class=AirdrumAPI, x=13]{api}
+    \umlobject[class=Terraform\&Plugin, x=-5]{terraform}
+    \umlobject[class=TFplan,x=0]{tfplan}
+    \umlobject[class=SewanSDK, x=4]{sdk}
+    \umlobject[class=AirdrumAPI, x=12]{api}
+    \umlobject[class=ResourceSchema,x=16]{schema}
 
-    \begin{umlcall}[op=1.\ resource\_create\_from\_template(template), type=synchron, return=resource\_state]{terraform}{sdk}
-      \begin{umlcall}[op=2.\ HTTP\_GET\_AVAILABLE\_TEMPLATES\_LIST(), type=synchron, return=HTTP.resp]{sdk}{api}
+    \begin{umlcall}[op=1.\ resource\_create\_from\_template(template), type=synchron, return=distant\_state]{terraform}{sdk}
+      \begin{umlcall}[op=2.\ HTTP\_GET\_AVAILABLE\_TEMPLATES(), type=synchron, return=HTTP.resp\ with\ templatesList]{sdk}{api}
       \end{umlcall}
 
       \begin{umlcall}[op=3.\ is\_template\_in\_list(), type=asynchron, return=HTTP.resp]{sdk}{sdk}
       \end{umlcall}
 
       \begin{umlfragment}[type=alt, label=template\_in\_list, name=if, inner xsep=18,fill=blue!15]
-	\begin{umlcall}[op=4.\ update\_plan\_from\_template(), type=asynchron, return=HTTP.resp]{sdk}{sdk}
-	\end{umlcall}
-	\begin{umlcall}[op=4.\ HTTP\_PUT(), type=synchron, return=HTTP.resp]{sdk}{api}
+	\begin{umlcall}[op=4.\ create\_from\_template\_and\_schema(), type=asynchron, return=HTTP.resp]{sdk}{schema}
+	  \begin{umlcall}[op=5. update(), type=asynchron]{sdk}{tfplan}
+	  \end{umlcall}
+	  \begin{umlcall}[op=6.\ HTTP\_POST(schema\_json), type=synchron, return=HTTP.resp\ with\ distant\_state]{sdk}{api}
+	  \end{umlcall}
 	\end{umlcall}
       \umlfpart[!\ template\_in\_list]
-	\begin{umlcall}[op=4.\ nullify\_plan()\ +\ resource\_state:error, type=asynchron, return=HTTP.resp]{sdk}{sdk}
+	\begin{umlcall}[op=4.\ nullify\_plan()\ +\ distant\_state:error, type=asynchron, return=HTTP.resp]{sdk}{sdk}
 	\end{umlcall}
       \end{umlfragment}[name=template]
 
@@ -92,25 +93,31 @@
     
     \end{umlseqdiag}
   \end{tikzpicture}
+  
+   \paragraph{NB about step 5 ("update() tfplan")}
+   Version 11.7 of terraform doesn't support CRUD operation on config plan file.\n
+   \subtitle{Behavior to implement when terraform will support CRUD operation on config plan file.}
+   As clouddc templates provide most of a vm resource paramaters, theses templates provided paramater should be added to 
+   the config file to prevent them from beeing removed in post-creation vm updates as they are not provided in the config plan file.\n
+   \end
+
 
   
   \section{VM resource update  from template}
   \begin{tikzpicture}
     \begin{umlseqdiag}
-    \umlactor[class=SysAdmin, x=-3]{admin}
-    \umlobject[class=Terraform\&Plugin, x=2]{terraform}
-    \umlobject[class=SewanSDK, x=8]{sdk}
-    \umlobject[class=AirdrumAPI, x=13]{api}
+    \umlobject[class=Terraform\&Plugin, x=-5]{terraform}
+    \umlobject[class=SewanSDK, x=2]{sdk}
+    \umlobject[class=AirdrumAPI, x=9]{api}
+    \umlobject[class=ResourceSchema,x=14]{schema}
 
-    \begin{umlcall}[op=1.\ resource\_update\_from\_creation\_template\_data(), type=synchron, return=resource\_state]{terraform}{sdk}
-
-	\begin{umlcall}[op=2.\ update\_plan\_from\_creation\_template\_data(), type=asynchron, return=HTTP.resp]{sdk}{sdk}
+    \begin{umlcall}[op=1.\ resource\_update(), type=synchron, return=distant\_state]{terraform}{sdk}
+      \begin{umlcall}[op=2.\ update\_from\_template\_and\_schema(), type=asynchron, return=HTTP.resp]{sdk}{schema}
+	\begin{umlcall}[op=3.\ HTTP\_PUT(schema\_json), type=synchron, return=HTTP.resp\ with\ distant\_state]{sdk}{api}
 	\end{umlcall}
-	\begin{umlcall}[op=3.\ HTTP\_POST(), type=synchron, return=HTTP.resp]{sdk}{api}
-	\end{umlcall}
-
+      \end{umlcall}
     \end{umlcall}
-    
+
     \end{umlseqdiag}
   \end{tikzpicture}
   

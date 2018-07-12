@@ -4,7 +4,6 @@
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
 \usepackage{fullpage}
-\usepackage{lscape}
 
 \usepackage{tikz-uml}
 
@@ -35,14 +34,14 @@
       \end{umlcall}
 
       \begin{umlfragment}[type=loop, label=resource\_in\_resources\_list, name=loop, inner xsep=10,fill=blue!15]
-	\begin{umlcall}[op=4.\ create\_schema(local\_resource\_state), type=asynchron]{terraform}{schema}
-	  \begin{umlcall}[op=3.\ resource\_read(), type=synchron, return=distant\_resource\_state]{terraform}{sdk}
-	    \begin{umlcall}[op=4.\ HTTP\_GET(), type=synchron, return=HTTP.resp]{sdk}{api}
+	\begin{umlcall}[op=3.\ create\_schema(local\_resource\_state), type=asynchron]{terraform}{schema}
+	  \begin{umlcall}[op=4.\ resource\_read(), type=synchron, return=distant\_resource\_state]{terraform}{sdk}
+	    \begin{umlcall}[op=5.\ HTTP\_GET(), type=synchron, return=HTTP.resp]{sdk}{api}
 	    \end{umlcall}
 	  \end{umlcall}
-	  \begin{umlcall}[op=4.\ update\_schema(distant\_resource\_state), type=synchron, return=HTTP.resp]{terraform}{schema}
+	  \begin{umlcall}[op=6.\ update\_schema(distant\_resource\_state), type=asynchron]{terraform}{schema}
 	  \end{umlcall}
-	  \begin{umlcall}[op=5.\ update\_resource(schema), type=synchron, return=OK]{terraform}{localstate}
+	  \begin{umlcall}[op=7.\ update\_resource(schema), type=synchron, return=OK]{terraform}{localstate}
 	  \end{umlcall}
 	\end{umlcall}
       \end{umlfragment}
