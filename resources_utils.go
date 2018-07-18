@@ -10,9 +10,9 @@ import (
 )
 
 type Dynamic_field_struct struct {
-	Terraform_provisioned       bool          `json:"terraform_provisioned"`
-	Creation_template           string        `json:"creation_template"`
-	Disks_created_from_template []interface{} `json:"disks_created_from_template"`
+	Terraform_provisioned      bool          `json:"terraform_provisioned"`
+	Creation_template          string        `json:"creation_template"`
+	Template_disks_on_creation []interface{} `json:"Template_disks_on_creation"`
 }
 
 type VDC_resource struct {
@@ -36,7 +36,7 @@ type VM_DISK struct {
 	Size          int    `json:"size"`
 	Storage_class string `json:"storage_class"`
 	Slug          string `json:"slug"`
-	Deletion      bool   `json:"deletion,omitempty"`
+	V_disk        string `json:"v_disk,omitempty"`
 }
 
 type VM_NIC struct {
@@ -66,6 +66,7 @@ type VM struct {
 	Backup_size   int           `json:"backup_size"`
 	Comment       string        `json:"comment,omitempty"`
 	Dynamic_field string        `json:"dynamic_field"`
+	Outsourcing   string        `json:"outsourcing"`
 }
 
 func vdcInstanceCreate(d *schema.ResourceData,
@@ -99,10 +100,9 @@ func vmInstanceCreate(d *schema.ResourceData,
 	)
 	logger := LoggerCreate("vminstanceCreate" + d.Id() + ".log")
 
-	if template_name != "" {
+	if template_name != "" && d.Id()=="" {
 		vm = VM{}
 		var templateList []interface{}
-
 		templateList,
 			get_templates_list_error = clientTooler.Client.GetTemplatesList(clientTooler,
 			enterprise, api)
@@ -123,7 +123,6 @@ func vmInstanceCreate(d *schema.ResourceData,
 			instance_creation_error = get_templates_list_error
 		}
 	}
-
 	logger.Println("instance_creation_error = ", instance_creation_error)
 	if instance_creation_error == nil {
 		vm = VM{
@@ -147,27 +146,21 @@ func vmInstanceCreate(d *schema.ResourceData,
 			Dynamic_field: d.Get(DYNAMIC_FIELD).(string),
 		}
 		if d.Id() == "" {
-			vm.Template = d.Get(TEMPLATE_FIELD).(string)
 			dynamic_field_struct := Dynamic_field_struct{
-				Terraform_provisioned:       true,
-				Creation_template:           vm.Template,
-				Disks_created_from_template: nil,
+				Terraform_provisioned:      true,
+				Creation_template:          d.Get(TEMPLATE_FIELD).(string),
+				Template_disks_on_creation: nil,
 			}
 			if template != nil {
-				dynamic_field_struct.Disks_created_from_template = template[DISKS_FIELD].([]interface{})
+				dynamic_field_struct.Template_disks_on_creation = template[DISKS_FIELD].([]interface{})
+				override_err := templatesTooler.TemplatesTools.CreateTemplateOverrideConfig(d,template)
+				if override_err != nil {
+					instance_creation_error = override_err
+				}
+				vm.Template = d.Get(TEMPLATE_FIELD).(string)
 			}
 			dynamic_field_json, _ := json.Marshal(dynamic_field_struct)
 			vm.Dynamic_field = string(dynamic_field_json)
-
-		} else {
-			vm.Template = ""
-			var update_disks_slices []interface{} = []interface{}{}
-			for _, disk := range d.Get(DISKS_FIELD).([]interface{}) {
-				if disk.(map[string]interface{})[DELETION_FIELD] != true {
-					update_disks_slices = append(update_disks_slices, disk)
-				}
-			}
-			vm.Disks = update_disks_slices
 		}
 	}
 	logger.Println("vm = ", vm)

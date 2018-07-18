@@ -14,9 +14,9 @@ const (
 	RAM_FIELD           = "ram"
 	CPU_FIELD           = "cpu"
 	DISKS_FIELD         = "disks"
+	V_DISK_FIELD        = "v_disk"
 	SIZE_FIELD          = "size"
 	STORAGE_CLASS_FIELD = "storage_class"
-	DELETION_FIELD      = "deletion"
 	NICS_FIELD          = "nics"
 	VLAN_NAME_FIELD     = "vlan"
 	MAC_ADRESS_FIELD    = "mac_address"
@@ -32,4 +32,5 @@ const (
 	TEMPLATE_FIELD      = "template"
 	ID_FIELD            = "id"
 	DYNAMIC_FIELD       = "dynamic_field"
+	OUTSOURCING_FIELD   = "outsourcing"
 )

@@ -176,45 +176,6 @@ var (
 		BACKUP_SIZE_FIELD:   42,
 		COMMENT_FIELD:       "42",
 	}
-	EXISTING_TEMPLATE_WITH_MODIFIED_NIC_AND_DISK_VM_MAP = map[string]interface{}{
-		NAME_FIELD:       "EXISTING_TEMPLATE_WITH_MODIFIED_NIC_AND_DISK_VM_MAP",
-		ENTERPRISE_FIELD: "unit test enterprise",
-		TEMPLATE_FIELD:   "template1",
-		STATE_FIELD:      "UP",
-		OS_FIELD:         "Debian",
-		RAM_FIELD:        8,
-		CPU_FIELD:        4,
-		DISKS_FIELD: []interface{}{
-			map[string]interface{}{
-				NAME_FIELD:          "template1 disk1",
-				SIZE_FIELD:          24,
-				STORAGE_CLASS_FIELD: "storage_enterprise",
-				SLUG_FIELD:          "template1 disk1 slug",
-			},
-		},
-		NICS_FIELD: []interface{}{
-			map[string]interface{}{
-				MAC_ADRESS_FIELD: "00:21:21:21:21:22",
-				CONNECTED_FIELD:  true,
-				VLAN_NAME_FIELD:  "unit test vlan1",
-			},
-			map[string]interface{}{
-				VLAN_NAME_FIELD:  "unit test vlan2",
-				MAC_ADRESS_FIELD: "00:21:21:21:21:21",
-				CONNECTED_FIELD:  true,
-			},
-		},
-		VDC_FIELD:           VDC_FIELD,
-		BOOT_FIELD:          "on disk",
-		STORAGE_CLASS_FIELD: "storage_enterprise",
-		SLUG_FIELD:          "42",
-		TOKEN_FIELD:         "424242",
-		BACKUP_FIELD:        "backup_no_backup",
-		DISK_IMAGE_FIELD:    "",
-		PLATFORM_NAME_FIELD: "42",
-		BACKUP_SIZE_FIELD:   42,
-		COMMENT_FIELD:       "42",
-	}
 	EXISTING_TEMPLATE_WITH_DELETED_DISK_VM_MAP = map[string]interface{}{
 		ID_FIELD:         "EXISTING_TEMPLATE_AND_VM_INSTANCE_WITH_DELETED_DISK_VM_MAP",
 		NAME_FIELD:       "EXISTING_TEMPLATE_WITH_DELETED_DISK_VM_MAP",
@@ -229,7 +190,6 @@ var (
 				NAME_FIELD:          "template1 disk1",
 				SIZE_FIELD:          24,
 				STORAGE_CLASS_FIELD: "storage_enterprise",
-				DELETION_FIELD:      true,
 			},
 			map[string]interface{}{
 				NAME_FIELD:          "disk 1",
@@ -248,7 +208,7 @@ var (
 		PLATFORM_NAME_FIELD: "42",
 		BACKUP_SIZE_FIELD:   42,
 		COMMENT_FIELD:       "42",
-		DYNAMIC_FIELD:       "{\"terraform_provisioned\":true,\"creation_template\":\"template1\",\"disks_created_from_template\":null}",
+		DYNAMIC_FIELD:       "{\"terraform_provisioned\":true,\"creation_template\":\"template1\",\"Template_disks_on_creation\":null}",
 	}
 	NON_EXISTING_TEMPLATE_VM_MAP = map[string]interface{}{
 		NAME_FIELD:          "windows95 vm",
@@ -443,15 +403,12 @@ var (
 				SIZE_FIELD:          42,
 				STORAGE_CLASS_FIELD: "STORAGE_CLASS_FIELD update",
 				SLUG_FIELD:          "slug update",
-				DELETION_FIELD:      false,
 			},
 			map[string]interface{}{
 				NAME_FIELD:          "disk 2 update",
 				SIZE_FIELD:          42,
 				STORAGE_CLASS_FIELD: "STORAGE_CLASS_FIELD update",
 				SLUG_FIELD:          "slug update",
-
-				DELETION_FIELD: false,
 			},
 		},
 		NICS_FIELD: []interface{}{
@@ -485,16 +442,12 @@ var (
 				SIZE_FIELD:          42,
 				STORAGE_CLASS_FIELD: "STORAGE_CLASS_FIELD update",
 				SLUG_FIELD:          "slug update",
-
-				DELETION_FIELD: false,
 			},
 			map[string]interface{}{
 				NAME_FIELD:          "disk 2 update",
 				SIZE_FIELD:          42,
 				STORAGE_CLASS_FIELD: "STORAGE_CLASS_FIELD update",
 				SLUG_FIELD:          "slug update",
-
-				DELETION_FIELD: false,
 			},
 		},
 		NICS_FIELD: []interface{}{
@@ -528,16 +481,12 @@ var (
 				SIZE_FIELD:          42,
 				STORAGE_CLASS_FIELD: "STORAGE_CLASS_FIELD update",
 				SLUG_FIELD:          "slug update",
-
-				DELETION_FIELD: false,
 			},
 			map[string]interface{}{
 				NAME_FIELD:          "disk 2 update",
 				SIZE_FIELD:          42,
 				STORAGE_CLASS_FIELD: "STORAGE_CLASS_FIELD update",
 				SLUG_FIELD:          "slug update",
-
-				DELETION_FIELD: false,
 			},
 		},
 		NICS_FIELD: []interface{}{
@@ -633,10 +582,6 @@ func resource_vm_disk() *schema.Resource {
 			SLUG_FIELD: &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
-			},
-			DELETION_FIELD: &schema.Schema{
-				Type:     schema.TypeBool,
-				Optional: true,
 			},
 		},
 	}
@@ -835,8 +780,6 @@ func vmInstanceNO_TEMPLATE_VM_MAP() VM {
 				SIZE_FIELD:          24,
 				STORAGE_CLASS_FIELD: "storage_enterprise",
 				SLUG_FIELD:          "",
-
-				DELETION_FIELD: false,
 			},
 		},
 		Nics: []interface{}{
@@ -861,7 +804,7 @@ func vmInstanceNO_TEMPLATE_VM_MAP() VM {
 		Platform_name: "42",
 		Backup_size:   42,
 		Comment:       "",
-		Dynamic_field: "{\"terraform_provisioned\":true,\"creation_template\":\"\",\"disks_created_from_template\":null}",
+		Dynamic_field: "{\"terraform_provisioned\":true,\"creation_template\":\"\",\"Template_disks_on_creation\":null}",
 	}
 }
 
@@ -879,7 +822,6 @@ func Fake_vmInstance_EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP() VM {
 				SIZE_FIELD:          20,
 				STORAGE_CLASS_FIELD: "storage_enterprise",
 				SLUG_FIELD:          "template1 disk1 slug",
-				DELETION_FIELD:      false,
 			},
 		},
 		Nics:          []interface{}{},
@@ -889,7 +831,7 @@ func Fake_vmInstance_EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP() VM {
 		Slug:          "42",
 		Token:         "424242",
 		Backup:        "backup_no_backup",
-		Dynamic_field: "{\"terraform_provisioned\":true,\"creation_template\":\"template1\",\"disks_created_from_template\":[{\"name\":\"template1 disk1\",\"size\":20,\"slug\":\"template1 disk1 slug\",\"storage_class\":\"storage_enterprise\"}]}",
+		Dynamic_field: "{\"terraform_provisioned\":true,\"creation_template\":\"template1\",\"Template_disks_on_creation\":[{\"name\":\"template1 disk1\",\"size\":20,\"slug\":\"template1 disk1 slug\",\"storage_class\":\"storage_enterprise\"}]}",
 	}
 }
 
@@ -908,16 +850,12 @@ func Fake_vmInstance_EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DIS
 				SIZE_FIELD:          24,
 				STORAGE_CLASS_FIELD: "storage_enterprise",
 				SLUG_FIELD:          "",
-
-				DELETION_FIELD: false,
 			},
 			map[string]interface{}{
 				NAME_FIELD:          "template1 disk1",
 				SIZE_FIELD:          25,
 				STORAGE_CLASS_FIELD: "storage_enterprise",
 				SLUG_FIELD:          "template1 disk1 slug",
-
-				DELETION_FIELD: false,
 			},
 		},
 		Nics: []interface{}{
@@ -942,52 +880,7 @@ func Fake_vmInstance_EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DIS
 		Platform_name: "42",
 		Backup_size:   42,
 		Comment:       "",
-		Dynamic_field: "{\"terraform_provisioned\":true,\"creation_template\":\"template1\",\"disks_created_from_template\":[{\"name\":\"template1 disk1\",\"size\":20,\"slug\":\"template1 disk1 slug\",\"storage_class\":\"storage_enterprise\"}]}",
-	}
-}
-
-func Fake_vmInstance_EXISTING_TEMPLATE_WITH_MODIFIED_NIC_AND_DISK_VM_MAP() VM {
-	return VM{
-		Name:       "EXISTING_TEMPLATE_WITH_MODIFIED_NIC_AND_DISK_VM_MAP",
-		Enterprise: "unit test enterprise",
-		Template:   "template1",
-		State:      "UP",
-		OS:         "Debian",
-		RAM:        8,
-		CPU:        4,
-		Disks: []interface{}{
-			map[string]interface{}{
-				NAME_FIELD:          "template1 disk1",
-				SIZE_FIELD:          24,
-				STORAGE_CLASS_FIELD: "storage_enterprise",
-				SLUG_FIELD:          "template1 disk1 slug",
-
-				DELETION_FIELD: false,
-			},
-		},
-		Nics: []interface{}{
-			map[string]interface{}{
-				VLAN_NAME_FIELD:  "unit test vlan1",
-				MAC_ADRESS_FIELD: "00:21:21:21:21:22",
-				CONNECTED_FIELD:  true,
-			},
-			map[string]interface{}{
-				VLAN_NAME_FIELD:  "unit test vlan2",
-				MAC_ADRESS_FIELD: "00:21:21:21:21:21",
-				CONNECTED_FIELD:  true,
-			},
-		},
-		Vdc:           VDC_FIELD,
-		Boot:          "on disk",
-		Storage_class: "storage_enterprise",
-		Slug:          "42",
-		Token:         "424242",
-		Backup:        "backup_no_backup",
-		Disk_image:    "",
-		Platform_name: "42",
-		Backup_size:   42,
-		Comment:       "",
-		Dynamic_field: "{\"terraform_provisioned\":true,\"creation_template\":\"template1\",\"disks_created_from_template\":null}",
+		Dynamic_field: "{\"terraform_provisioned\":true,\"creation_template\":\"template1\",\"Template_disks_on_creation\":[{\"name\":\"template1 disk1\",\"size\":20,\"slug\":\"template1 disk1 slug\",\"storage_class\":\"storage_enterprise\"}]}",
 	}
 }
 
@@ -1006,8 +899,6 @@ func Fake_vmInstance_EXISTING_TEMPLATE_WITH_DELETED_DISK_VM_MAP() VM {
 				SIZE_FIELD:          24,
 				STORAGE_CLASS_FIELD: "storage_enterprise",
 				SLUG_FIELD:          "",
-
-				DELETION_FIELD: false,
 			},
 		},
 		Nics:          []interface{}{},
@@ -1021,7 +912,7 @@ func Fake_vmInstance_EXISTING_TEMPLATE_WITH_DELETED_DISK_VM_MAP() VM {
 		Platform_name: "42",
 		Backup_size:   42,
 		Comment:       "",
-		Dynamic_field: "{\"terraform_provisioned\":true,\"creation_template\":\"template1\",\"disks_created_from_template\":null}",
+		Dynamic_field: "{\"terraform_provisioned\":true,\"creation_template\":\"template1\",\"Template_disks_on_creation\":null}",
 	}
 }
 

@@ -48,15 +48,6 @@ func TestResourceInstanceCreate(t *testing.T) {
 		},
 		{
 			4,
-			vm_schema_init(EXISTING_TEMPLATE_WITH_MODIFIED_NIC_AND_DISK_VM_MAP),
-			GetTemplatesList_Success_HttpClienterFake{},
-			TemplaterDummy{},
-			VM_RESOURCE_TYPE,
-			nil,
-			Fake_vmInstance_EXISTING_TEMPLATE_WITH_MODIFIED_NIC_AND_DISK_VM_MAP(),
-		},
-		{
-			5,
 			vm_schema_init(NON_EXISTING_TEMPLATE_VM_MAP),
 			GetTemplatesList_Success_HttpClienterFake{},
 			Unexisting_template_TemplaterFake{},
@@ -65,7 +56,7 @@ func TestResourceInstanceCreate(t *testing.T) {
 			VM{},
 		},
 		{
-			6,
+			5,
 			vdc_schema_init(VDC_CREATION_MAP),
 			nil,
 			TemplaterDummy{},
@@ -74,7 +65,7 @@ func TestResourceInstanceCreate(t *testing.T) {
 			Fake_vdcInstance_VDC_CREATION_MAP(),
 		},
 		{
-			7,
+			6,
 			vdc_schema_init(VDC_CREATION_MAP),
 			GetTemplatesList_Success_HttpClienterFake{},
 			TemplaterDummy{},
@@ -86,22 +77,13 @@ func TestResourceInstanceCreate(t *testing.T) {
 			nil,
 		},
 		{
-			8,
+			7,
 			vm_schema_init(NON_EXISTING_TEMPLATE_VM_MAP),
 			GetTemplatesList_Failure_HttpClienterFake{},
 			Unexisting_template_TemplaterFake{},
 			VM_RESOURCE_TYPE,
 			errors.New("GetTemplatesList() error"),
 			VM{},
-		},
-		{
-			9,
-			vm_schema_init(EXISTING_TEMPLATE_WITH_DELETED_DISK_VM_MAP),
-			GetTemplatesList_Success_HttpClienterFake{},
-			EXISTING_TEMPLATE_WITH_DELETED_DISK_VM_MAP_TemplaterFake{},
-			VM_RESOURCE_TYPE,
-			nil,
-			Fake_vmInstance_EXISTING_TEMPLATE_WITH_DELETED_DISK_VM_MAP(),
 		},
 	}
 
