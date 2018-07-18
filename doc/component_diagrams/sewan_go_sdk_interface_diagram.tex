@@ -1,0 +1,53 @@
+\documentclass[landscape,a4paper,12pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{fullpage}
+\usepackage{tikz-uml}
+
+\sloppy
+\hyphenpenalty 10000000
+
+\title{Sewan\_go\_sdk package interfaces diagram}
+\author{Sewan}
+
+\begin{document}
+\pagenumbering{gobble} %switch off page numbering display
+
+\maketitle
+
+\begin{center}
+  \begin{tikzpicture}
+    \begin{umlpackage}{sdk}
+      \umlbasiccomponent[x=-10,y=-0]{<<Apier>>}
+      \umlbasiccomponent[x=-1,y=4]{<<Templater>>}
+      \umlbasiccomponent[x=-1,y=-0]{<<Schemaer>>}
+      \umlbasiccomponent[x=-1,y=-4]{<<Clienter>>}
+      %\umlrequiredinterface[interface=tata,with port]{<<Apier>>}
+      %\umlprovidedinterface[interface=tata,with port]{<<Clienter>>}
+      %\umlrequiredinterface[interface=tata,with port]{<<Clienter>>}
+      %\umlprovidedinterface[interface=tata,with port]{<<Templater>>}
+      %\umlprovidedinterface[interface=tata,with port]{<<Schemaer>>}
+      \umlassemblyconnector[interface=use interface,with port]{<<Apier>>-east-port}{<<Schemaer>>-west-port}
+      \umlassemblyconnector[interface=use interface,with port]{<<Apier>>-east-port}{<<Templater>>}
+      \umlassemblyconnector[interface=use interface,with port]{<<Apier>>-east-port}{<<Clienter>>}
+      \umlassemblyconnector[interface=use interface,with port]{<<Templater>>-south-port}{<<Schemaer>>-north-port}
+      %\umlHVassemblyconnector[with port]{<<Apier>>}{<<Templater>>}
+      \umlnote[x=-15,y=4,width=15em]{<<Apier>>-west-port}{Responsibilities :\newline
+      * resources CRUD operations\newline
+      * validate api state\newline
+      * handle api URLs}
+      \umlnote[x=4.5,y=7,width=13em]{<<Templater>>-east-port}{Responsibilities :\newline
+      * handle vm resource template logic (getTemplateList, create vm from template, create configuration override file etc.)}
+      \umlnote[x=4.5,y=0.5,width=13em]{<<Schemaer>>-east-port}{Responsibilities :\newline
+      * hashicorp/helper/schema object handle (this object store the status of a resource 
+      after a read on configuration plan file or CRUD operation on distant resource, 
+      it is too used as a media before updating resource state file.tfstate)\newline
+      * handle resource dynamic field logic}
+      \umlnote[x=4.5,y=-5,width=13em]{<<Clienter>>-east-port}{Responsibilities :\newline
+      * HTTP request and response creation/emission/reception}
+    \end{umlpackage}
+  \end{tikzpicture}  
+\end{center}
+\end{document}
