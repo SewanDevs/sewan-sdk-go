@@ -73,14 +73,29 @@ func vdcInstanceCreate(d *schema.ResourceData,
 	clientTooler *ClientTooler,
 	api *API) (VDC, error) {
 
-	return VDC{
+	var (
+		vdc           VDC
+		resource_name strings.Builder
+	)
+	vdc = VDC{
 		Name:          d.Get(NAME_FIELD).(string),
 		Enterprise:    d.Get(ENTERPRISE_FIELD).(string),
 		Datacenter:    d.Get(DATACENTER_FIELD).(string),
 		Vdc_resources: d.Get(VDC_RESOURCE_FIELD).([]interface{}),
 		Slug:          d.Get(SLUG_FIELD).(string),
 		Dynamic_field: d.Get(DYNAMIC_FIELD).(string),
-	}, nil
+	}
+
+	for index, resource := range vdc.Vdc_resources {
+		resource_name.Reset()
+		resource_name.WriteString(vdc.Enterprise)
+		resource_name.WriteString(MONO_FIELD)
+		resource_name.WriteString(resource.(map[string]interface{})["resource"].(string))
+		resource.(map[string]interface{})["resource"] = resource_name.String()
+		vdc.Vdc_resources[index] = resource
+	}
+
+	return vdc, nil
 }
 
 func vmInstanceCreate(d *schema.ResourceData,
@@ -100,7 +115,7 @@ func vmInstanceCreate(d *schema.ResourceData,
 	)
 	logger := LoggerCreate("vminstanceCreate" + d.Id() + ".log")
 
-	if template_name != "" && d.Id()=="" {
+	if template_name != "" && d.Id() == "" {
 		vm = VM{}
 		var templateList []interface{}
 		templateList,
@@ -153,7 +168,7 @@ func vmInstanceCreate(d *schema.ResourceData,
 			}
 			if template != nil {
 				dynamic_field_struct.Template_disks_on_creation = template[DISKS_FIELD].([]interface{})
-				override_err := templatesTooler.TemplatesTools.CreateTemplateOverrideConfig(d,template)
+				override_err := templatesTooler.TemplatesTools.CreateTemplateOverrideConfig(d, template)
 				if override_err != nil {
 					instance_creation_error = override_err
 				}

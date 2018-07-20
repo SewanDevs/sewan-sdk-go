@@ -37,7 +37,7 @@ type Nic_modifiable_fields struct {
 }
 
 type Template_created_VM_override struct {
-	OS        string           `json:"os"`
+	OS         string        `json:"os"`
 	RAM        int           `json:"ram"`
 	CPU        int           `json:"cpu"`
 	Disks      []interface{} `json:"disks,omitempty"`
@@ -83,7 +83,6 @@ func (templater Template_Templater) UpdateSchemaFromTemplate(d *schema.ResourceD
 	var template_handle_err error = nil
 	for template_param_name, template_param_value := range template {
 		if reflect.ValueOf(template_param_name).IsValid() && reflect.ValueOf(template_param_value).IsValid() {
-			logger.Println("--")
 			var (
 				s_template_param_name   string      = reflect.ValueOf(template_param_name).String()
 				interface_template_name interface{} = reflect.ValueOf(template_param_value).Interface()
@@ -91,16 +90,12 @@ func (templater Template_Templater) UpdateSchemaFromTemplate(d *schema.ResourceD
 			)
 			switch reflect.TypeOf(template_param_value).Kind() {
 			case reflect.String:
-				logger.Println("case String : ", template_param_name)
 				if d.Id() == "" {
 					switch {
-					case s_template_param_name == OS_FIELD && d.Id()=="":
-						logger.Println("Case name")
+					case s_template_param_name == OS_FIELD && d.Id() == "":
 					case s_template_param_name == NAME_FIELD:
-						logger.Println("Case name")
 					default:
 						if d.Get(s_template_param_name) == "" {
-							logger.Println("Case : ", s_template_param_name)
 							d.Set(s_template_param_name,
 								s_template_param_value)
 						}
@@ -108,7 +103,6 @@ func (templater Template_Templater) UpdateSchemaFromTemplate(d *schema.ResourceD
 				} else {
 					switch {
 					case s_template_param_name == NAME_FIELD:
-						logger.Println("Case template name")
 						data := &Dynamic_field_struct{}
 						dynamicfield_read_err := json.Unmarshal([]byte(d.Get(DYNAMIC_FIELD).(string)), data)
 						if dynamicfield_read_err == nil {
@@ -131,52 +125,36 @@ func (templater Template_Templater) UpdateSchemaFromTemplate(d *schema.ResourceD
 						}
 					default:
 						if d.Get(s_template_param_name) == "" {
-							logger.Println("3a : ", s_template_param_name)
 							d.Set(s_template_param_name,
 								s_template_param_value)
 						}
 					}
 				}
 			case reflect.Float64:
-				logger.Println("case float 64 : ", template_param_name, " = ",
-					d.Get(s_template_param_name))
 				switch {
 				case s_template_param_name == ID_FIELD:
-					logger.Println("2, d.Id() = ", d.Id())
 				default:
 					if d.Get(s_template_param_name).(int) == 0 {
-						logger.Println("3, val to set = ",
-							int(interface_template_name.(float64)))
 						d.Set(s_template_param_name,
 							int(interface_template_name.(float64)))
 					}
 				}
 			case reflect.Int:
-				logger.Println("case Int : ", template_param_name, " = ",
-					d.Get(s_template_param_name))
 				switch {
 				case s_template_param_name == ID_FIELD:
-					logger.Println("2")
 				default:
 					if d.Get(s_template_param_name).(int) == 0 {
-						logger.Println("3, val to set = ",
-							int(interface_template_name.(int)))
 						d.Set(s_template_param_name,
 							int(interface_template_name.(int)))
 					}
 				}
 			case reflect.Slice:
-				logger.Println("case Slice : ", template_param_name, " = ",
-					d.Get(s_template_param_name))
 				switch {
-				case template_param_name == DISKS_FIELD && d.Id()=="":
+				case template_param_name == DISKS_FIELD && d.Id() == "":
 				default:
 					d.Set(s_template_param_name, template_param_value.([]interface{}))
 				}
 				if template_handle_err != nil {
-					logger.Println(template_param_name, "=",
-						d.Get(s_template_param_name),
-						"error :", template_handle_err)
 					break
 				}
 			default:
@@ -189,7 +167,7 @@ func (templater Template_Templater) UpdateSchemaFromTemplate(d *schema.ResourceD
 func (templater Template_Templater) CreateTemplateOverrideConfig(d *schema.ResourceData,
 	template map[string]interface{}) error {
 	vm := Template_created_VM_override{
-		OS:        template[OS_FIELD].(string),
+		OS:         template[OS_FIELD].(string),
 		RAM:        d.Get(RAM_FIELD).(int),
 		CPU:        d.Get(CPU_FIELD).(int),
 		Vdc:        d.Get(VDC_FIELD).(string),
