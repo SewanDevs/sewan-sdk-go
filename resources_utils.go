@@ -108,6 +108,7 @@ func vmInstanceCreate(d *schema.ResourceData,
 		vm                             VM
 		get_templates_list_error       error                  = nil
 		fetch_template_from_list_error error                  = nil
+		template_format_error          error                  = nil
 		instance_creation_error        error                  = nil
 		template                       map[string]interface{} = nil
 		template_name                  string                 = d.Get(TEMPLATE_FIELD).(string)
@@ -125,14 +126,15 @@ func vmInstanceCreate(d *schema.ResourceData,
 			template,
 				fetch_template_from_list_error = templatesTooler.TemplatesTools.FetchTemplateFromList(template_name,
 				templateList)
+			template_format_error = templatesTooler.TemplatesTools.ValidateTemplate(template)
 			switch {
 			case fetch_template_from_list_error != nil:
 				instance_creation_error = fetch_template_from_list_error
+			case template_format_error != nil:
+				instance_creation_error = template_format_error
 			default:
-				instance_creation_error = templatesTooler.TemplatesTools.UpdateSchemaFromTemplate(d,
-					template,
-					templatesTooler,
-					schemaTools)
+				instance_creation_error = templatesTooler.TemplatesTools.UpdateSchemaFromTemplateOnResourceCreation(d,
+					template)
 			}
 		} else {
 			instance_creation_error = get_templates_list_error
@@ -168,7 +170,7 @@ func vmInstanceCreate(d *schema.ResourceData,
 			}
 			if template != nil {
 				dynamic_field_struct.Template_disks_on_creation = template[DISKS_FIELD].([]interface{})
-				override_err := templatesTooler.TemplatesTools.CreateTemplateOverrideConfig(d, template)
+				override_err, _ := templatesTooler.TemplatesTools.CreateTemplateOverrideConfig(d, template)
 				if override_err != nil {
 					instance_creation_error = override_err
 				}

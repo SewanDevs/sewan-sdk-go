@@ -85,6 +85,21 @@ func TestResourceInstanceCreate(t *testing.T) {
 			errors.New("GetTemplatesList() error"),
 			VM{},
 		},
+		{
+			8,
+			vm_schema_init(EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP),
+			GetTemplatesList_Success_HttpClienterFake{},
+			Template_Format_error_TemplaterFake{},
+			VM_RESOURCE_TYPE,
+			errors.New("Template missing fields : " + "\"" + NAME_FIELD + "\" " +
+				"\"" + OS_FIELD + "\" " +
+				"\"" + RAM_FIELD + "\" " +
+				"\"" + CPU_FIELD + "\" " +
+				"\"" + ENTERPRISE_FIELD + "\" " +
+				"\"" + DISKS_FIELD + "\" " +
+				"\"" + DATACENTER_FIELD + "\" "),
+			VM{},
+		},
 	}
 
 	var (
@@ -120,9 +135,8 @@ func TestResourceInstanceCreate(t *testing.T) {
 			} else {
 				switch {
 				case !reflect.DeepEqual(test_case.VmInstance, instance):
-					t.Errorf("\n\nTC %d : Wrong ResourceInstanceCreate() created instance,"+
-						"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-						test_case.Id, instance, test_case.VmInstance)
+					t.Errorf("\n\nTC %d : Wrong ResourceInstanceCreate() "+
+						"created instance.", test_case.Id)
 					v := reflect.ValueOf(instance)
 					v2 := reflect.ValueOf(test_case.VmInstance)
 					for i := 0; i < v.NumField(); i++ {

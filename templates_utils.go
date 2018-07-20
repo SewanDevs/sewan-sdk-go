@@ -16,11 +16,11 @@ type TemplatesTooler struct {
 type Templater interface {
 	FetchTemplateFromList(template_name string,
 		templateList []interface{}) (map[string]interface{}, error)
-	UpdateSchemaFromTemplate(d *schema.ResourceData,
-		template map[string]interface{},
-		templatesTooler *TemplatesTooler,
-		schemaTools *SchemaTooler) error
-	CreateTemplateOverrideConfig(d *schema.ResourceData, template map[string]interface{}) error
+	ValidateTemplate(template map[string]interface{}) error
+	UpdateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
+		template map[string]interface{}) error
+	CreateTemplateOverrideConfig(d *schema.ResourceData,
+		template map[string]interface{}) (error, string)
 }
 
 type Template_Templater struct{}
@@ -52,8 +52,8 @@ func (templater Template_Templater) FetchTemplateFromList(template_name string,
 	templateList []interface{}) (map[string]interface{}, error) {
 
 	var (
-		template            map[string]interface{} = nil
-		template_list_valid error                  = nil
+		template          map[string]interface{} = nil
+		template_list_err error                  = nil
 	)
 	for i := 0; i < len(templateList); i++ {
 		switch reflect.TypeOf(templateList[i]).Kind() {
@@ -64,110 +64,125 @@ func (templater Template_Templater) FetchTemplateFromList(template_name string,
 				break
 			}
 		default:
-			template_list_valid = errors.New("Wrong template list format.\n" +
-				"got :" + reflect.TypeOf(templateList[i]).Kind().String() +
-				"want :" + reflect.Map.String())
+			template_list_err = errors.New("One of the fetch template " +
+				"has a wrong format." +
+				"\ngot : " + reflect.TypeOf(templateList[i]).Kind().String() +
+				"\nwant : " + reflect.Map.String())
+			break
 		}
 	}
-	if template == nil {
-		template_list_valid = errors.New("Template \"" + template_name +
+	if template == nil && template_list_err == nil {
+		template_list_err = errors.New("Template \"" + template_name +
 			"\" does not exists, please validate it's name.")
 	}
-	return template, template_list_valid
+	return template, template_list_err
 }
 
-func (templater Template_Templater) UpdateSchemaFromTemplate(d *schema.ResourceData,
-	template map[string]interface{},
-	templatesTooler *TemplatesTooler,
-	schemaTools *SchemaTooler) error {
-	var template_handle_err error = nil
-	for template_param_name, template_param_value := range template {
-		if reflect.ValueOf(template_param_name).IsValid() && reflect.ValueOf(template_param_value).IsValid() {
-			var (
-				s_template_param_name   string      = reflect.ValueOf(template_param_name).String()
-				interface_template_name interface{} = reflect.ValueOf(template_param_value).Interface()
-				s_template_param_value  string      = reflect.ValueOf(template_param_value).String()
-			)
-			switch reflect.TypeOf(template_param_value).Kind() {
-			case reflect.String:
-				if d.Id() == "" {
-					switch {
-					case s_template_param_name == OS_FIELD && d.Id() == "":
-					case s_template_param_name == NAME_FIELD:
-					default:
-						if d.Get(s_template_param_name) == "" {
-							d.Set(s_template_param_name,
-								s_template_param_value)
-						}
-					}
-				} else {
-					switch {
-					case s_template_param_name == NAME_FIELD:
-						data := &Dynamic_field_struct{}
-						dynamicfield_read_err := json.Unmarshal([]byte(d.Get(DYNAMIC_FIELD).(string)), data)
-						if dynamicfield_read_err == nil {
-							if s_template_param_value != data.Creation_template {
-								if data.Creation_template == "" {
-									template_handle_err = errors.New("This resource has not been " +
-										"created with a template. Please remove template field from" +
-										"the configuration file.")
-								} else {
-									template_handle_err = errors.New("This resource has been " +
-										"created with \"" + data.Creation_template +
-										"\" template. This value can not be changed, please set it back.")
-								}
-							}
-						} else {
-							template_handle_err = errors.New(d.Get(NAME_FIELD).(string) +
-								"'s resource dynamic field is not a valid json, please make sure" +
-								" this resource is modified only by a terraform session, \n" +
-								"json error :" + dynamicfield_read_err.Error())
-						}
-					default:
-						if d.Get(s_template_param_name) == "" {
-							d.Set(s_template_param_name,
-								s_template_param_value)
-						}
-					}
-				}
-			case reflect.Float64:
-				switch {
-				case s_template_param_name == ID_FIELD:
-				default:
-					if d.Get(s_template_param_name).(int) == 0 {
-						d.Set(s_template_param_name,
-							int(interface_template_name.(float64)))
-					}
-				}
-			case reflect.Int:
-				switch {
-				case s_template_param_name == ID_FIELD:
-				default:
-					if d.Get(s_template_param_name).(int) == 0 {
-						d.Set(s_template_param_name,
-							int(interface_template_name.(int)))
-					}
-				}
-			case reflect.Slice:
-				switch {
-				case template_param_name == DISKS_FIELD && d.Id() == "":
-				default:
-					d.Set(s_template_param_name, template_param_value.([]interface{}))
-				}
-				if template_handle_err != nil {
-					break
-				}
-			default:
+func (templater Template_Templater) ValidateTemplate(template map[string]interface{}) error {
+	var (
+		template_error                error
+		template_required_field_slice []string = []string{NAME_FIELD, OS_FIELD, RAM_FIELD,
+			CPU_FIELD, ENTERPRISE_FIELD, DISKS_FIELD}
+		missing_fields_list strings.Builder
+	)
+	for _, elem := range template_required_field_slice {
+		if _, ok := template[elem]; !ok {
+			missing_fields_list.WriteString("\"")
+			missing_fields_list.WriteString(elem)
+			missing_fields_list.WriteString("\" ")
+		}
+	}
+	if missing_fields_list.String() != "" {
+		template_error = errors.New("Template missing fields : " +
+			missing_fields_list.String())
+	} else {
+		if _, ok := template[NICS_FIELD]; ok {
+			if reflect.TypeOf(template[NICS_FIELD]).Kind() != reflect.Slice {
+				template_error = errors.New("Template " + NICS_FIELD +
+					" is not a list as required but a " +
+					reflect.TypeOf(template[NICS_FIELD]).Kind().String())
 			}
 		}
+	}
+	return template_error
+}
+
+func (templater Template_Templater) UpdateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
+	template map[string]interface{}) error {
+	var template_handle_err error = nil
+	if d.Id() == "" {
+		for template_param_name, template_param_value := range template {
+			if reflect.ValueOf(template_param_name).IsValid() && reflect.ValueOf(template_param_value).IsValid() {
+				var (
+					s_template_param_name   string      = reflect.ValueOf(template_param_name).String()
+					interface_template_name interface{} = reflect.ValueOf(template_param_value).Interface()
+					s_template_param_value  string      = reflect.ValueOf(template_param_value).String()
+				)
+				switch reflect.TypeOf(template_param_value).Kind() {
+				case reflect.String:
+					switch {
+					case s_template_param_name == ID_FIELD:
+					case s_template_param_name == OS_FIELD:
+					case s_template_param_name == NAME_FIELD:
+					case s_template_param_name == DATACENTER_FIELD:
+					default:
+						if d.Get(s_template_param_name) == "" {
+							d.Set(s_template_param_name,
+								s_template_param_value)
+						}
+					}
+				case reflect.Int:
+					switch {
+					case s_template_param_name == ID_FIELD:
+					default:
+						if d.Get(s_template_param_name).(int) == 0 {
+							d.Set(s_template_param_name,
+								int(interface_template_name.(int)))
+						}
+					}
+				case reflect.Slice:
+					switch {
+					case template_param_name == DISKS_FIELD:
+					case template_param_name == NICS_FIELD:
+						var (
+							nic_map           map[string]interface{}
+							schema_nics_slice []interface{}
+						)
+						for _, nic := range template_param_value.([]interface{}) {
+							nic_map = map[string]interface{}{}
+							for nicParamName, nicParamValue := range nic.(map[string]interface{}) {
+								switch nicParamName {
+								case VLAN_NAME_FIELD:
+									nic_map[nicParamName] = nicParamValue
+								case CONNECTED_FIELD:
+									nic_map[nicParamName] = nicParamValue
+								default:
+								}
+							}
+							schema_nics_slice = append(schema_nics_slice, nic_map)
+						}
+						for _, nic := range d.Get(s_template_param_name).([]interface{}) {
+							schema_nics_slice = append(schema_nics_slice,
+								nic.(map[string]interface{}))
+						}
+						d.Set(s_template_param_name, schema_nics_slice)
+					default:
+					}
+				default:
+				}
+			}
+		}
+	} else {
+		template_handle_err = errors.New("Template field should not be set on " +
+			"an existing resource, please review the configuration field." +
+			"\n : The resource schema has not been updated.")
 	}
 	return template_handle_err
 }
 
 func (templater Template_Templater) CreateTemplateOverrideConfig(d *schema.ResourceData,
-	template map[string]interface{}) error {
+	template map[string]interface{}) (error, string) {
 	vm := Template_created_VM_override{
-		OS:         template[OS_FIELD].(string),
 		RAM:        d.Get(RAM_FIELD).(int),
 		CPU:        d.Get(CPU_FIELD).(int),
 		Vdc:        d.Get(VDC_FIELD).(string),
@@ -182,12 +197,21 @@ func (templater Template_Templater) CreateTemplateOverrideConfig(d *schema.Resou
 		list_item               interface{}
 		override_file           strings.Builder
 	)
-	if d.Get(TEMPLATE_FIELD) != "" {
+	switch {
+	case d.Get(TEMPLATE_FIELD) == "":
+		write_override_file_err = errors.New("Schema \"Template\" field is empty, " +
+			"can not create a template override configuration.")
+	default:
 		override_file.WriteString(d.Get(TEMPLATE_FIELD).(string))
 		override_file.WriteString("_template_override.tf.json")
+		vm.OS = template[OS_FIELD].(string)
+		logger := LoggerCreate("CreateTemplateOverrideConfig_" +
+			d.Get(TEMPLATE_FIELD).(string) + "_.log")
+		res1, err := os.Stat(override_file.String())
+		logger.Println("os.Stat(override_file.String()),res1 = ", res1)
+		logger.Println("os.Stat(override_file.String()),err = ", err)
+		logger.Println("os.IsNotExist(err) = ", os.IsNotExist(err))
 		if _, err := os.Stat(override_file.String()); os.IsNotExist(err) {
-			logger := LoggerCreate("CreateTemplateOverrideConfig_" +
-				d.Get(TEMPLATE_FIELD).(string) + "_.log")
 			for list_key, list_value := range template[DISKS_FIELD].([]interface{}) {
 				list_item, _ = schemaer.Read_element(list_key,
 					list_value,
@@ -212,17 +236,13 @@ func (templater Template_Templater) CreateTemplateOverrideConfig(d *schema.Resou
 				read_list_value = append(read_list_value, nic)
 			}
 			vm.Nics = read_list_value
-			vm_fields_map := map[string]interface{}{"template-server": vm}
+			vm_fields_map := map[string]interface{}{d.Get(NAME_FIELD).(string): vm}
 			vm_map := map[string]interface{}{"sewan_clouddc_vm": vm_fields_map}
 			resources_map := map[string]interface{}{"resource": vm_map}
 			vm_json, _ := json.Marshal(resources_map)
 			write_override_file_err = ioutil.WriteFile(override_file.String(),
 				vm_json, 0644)
 		}
-	} else {
-		write_override_file_err = errors.New("Template field is empty, " +
-			"can not create a template override configuration.")
 	}
-
-	return write_override_file_err
+	return write_override_file_err, override_file.String()
 }
