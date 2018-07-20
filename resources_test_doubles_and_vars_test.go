@@ -26,7 +26,7 @@ const (
 var (
 	VDC_CREATION_MAP = map[string]interface{}{
 		NAME_FIELD:       "Unit test vdc resource",
-		ENTERPRISE_FIELD: "unit test enterprise",
+		ENTERPRISE_FIELD: "enterprise",
 		DATACENTER_FIELD: "dc1",
 		VDC_RESOURCE_FIELD: []interface{}{
 			map[string]interface{}{
@@ -698,35 +698,35 @@ func resource_vm() *schema.Resource {
 func Fake_vdcInstance_VDC_CREATION_MAP() VDC {
 	return VDC{
 		Name:       "Unit test vdc resource",
-		Enterprise: "unit test enterprise",
+		Enterprise: "enterprise",
 		Datacenter: "dc1",
 		Vdc_resources: []interface{}{
 			map[string]interface{}{
-				RESOURCE_FIELD: RAM_FIELD,
+				RESOURCE_FIELD: "enterprise-mono-ram",
 				USED_FIELD:     0,
 				TOTAL_FIELD:    20,
 				SLUG_FIELD:     "",
 			},
 			map[string]interface{}{
-				RESOURCE_FIELD: CPU_FIELD,
+				RESOURCE_FIELD: "enterprise-mono-cpu",
 				USED_FIELD:     0,
 				TOTAL_FIELD:    1,
 				SLUG_FIELD:     "",
 			},
 			map[string]interface{}{
-				RESOURCE_FIELD: "storage_enterprise",
+				RESOURCE_FIELD: "enterprise-mono-storage_enterprise",
 				USED_FIELD:     0,
 				TOTAL_FIELD:    10,
 				SLUG_FIELD:     "",
 			},
 			map[string]interface{}{
-				RESOURCE_FIELD: "storage_performance",
+				RESOURCE_FIELD: "enterprise-mono-storage_performance",
 				USED_FIELD:     0,
 				TOTAL_FIELD:    10,
 				SLUG_FIELD:     "",
 			},
 			map[string]interface{}{
-				RESOURCE_FIELD: "storage_high_performance",
+				RESOURCE_FIELD: "enterprise-mono-storage_high_performance",
 				USED_FIELD:     0,
 				TOTAL_FIELD:    10,
 				SLUG_FIELD:     "",

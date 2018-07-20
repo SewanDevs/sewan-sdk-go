@@ -33,4 +33,5 @@ const (
 	ID_FIELD            = "id"
 	DYNAMIC_FIELD       = "dynamic_field"
 	OUTSOURCING_FIELD   = "outsourcing"
+	MONO_FIELD          = "-mono-"
 )
