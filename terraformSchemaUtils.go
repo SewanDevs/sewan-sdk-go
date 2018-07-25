@@ -12,19 +12,19 @@ type SchemaTooler struct {
 	SchemaTools Schemaer
 }
 type Schemaer interface {
-	Delete_terraform_resource(d *schema.ResourceData)
-	Update_local_resource_state(resource_state map[string]interface{},
+	DeleteTerraformResource(d *schema.ResourceData)
+	UpdateLocalResourceState(resource_state map[string]interface{},
 		d *schema.ResourceData, schemaTools *SchemaTooler) error
-	Read_element(key interface{}, value interface{},
+	ReadElement(key interface{}, value interface{},
 		logger *log.Logger) (interface{}, error)
 }
 type Schema_Schemaer struct{}
 
-func (schemaer Schema_Schemaer) Delete_terraform_resource(d *schema.ResourceData) {
+func (schemaer Schema_Schemaer) DeleteTerraformResource(d *schema.ResourceData) {
 	d.SetId("")
 }
 
-func (schemaer Schema_Schemaer) Update_local_resource_state(resource_state map[string]interface{},
+func (schemaer Schema_Schemaer) UpdateLocalResourceState(resource_state map[string]interface{},
 	d *schema.ResourceData, schemaTools *SchemaTooler) error {
 
 	var (
@@ -35,7 +35,7 @@ func (schemaer Schema_Schemaer) Update_local_resource_state(resource_state map[s
 		d.Get(NAME_FIELD).(string) + ".log")
 	for key, value := range resource_state {
 		read_value,
-			updateError = schemaTools.SchemaTools.Read_element(key,
+			updateError = schemaTools.SchemaTools.ReadElement(key,
 			value,
 			logger)
 		logger.Println("Set \"", key, "\" to \"", read_value, "\"")
@@ -65,7 +65,7 @@ func (schemaer Schema_Schemaer) Update_local_resource_state(resource_state map[s
 	return updateError
 }
 
-func (schemaer Schema_Schemaer) Read_element(key interface{}, value interface{},
+func (schemaer Schema_Schemaer) ReadElement(key interface{}, value interface{},
 	logger *log.Logger) (interface{}, error) {
 
 	var (
@@ -87,7 +87,7 @@ func (schemaer Schema_Schemaer) Read_element(key interface{}, value interface{},
 		var map_item interface{}
 		for map_key, map_value := range value_type {
 			map_item,
-				readError = schemaer.Read_element(map_key,
+				readError = schemaer.ReadElement(map_key,
 				map_value,
 				logger)
 			read_map_value[map_key] = map_item
@@ -98,7 +98,7 @@ func (schemaer Schema_Schemaer) Read_element(key interface{}, value interface{},
 		var list_item interface{}
 		for list_key, list_value := range value_type {
 			list_item,
-				readError = schemaer.Read_element(list_key,
+				readError = schemaer.ReadElement(list_key,
 				list_value,
 				logger)
 			read_list_value = append(read_list_value, list_item)

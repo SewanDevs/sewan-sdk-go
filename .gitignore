@@ -1,9 +1,7 @@
 # source : https://github.com/hashicorp/terraform/blob/master/.gitignore
-
 *.dll
 *.exe
 .DS_Store
-example.tf
 terraform.tfplan
 terraform.tfstate
 bin/
@@ -22,7 +20,6 @@ website/node_modules
 *~
 .*.swp
 .idea
-*.iml
 *.test
 *.iml
 

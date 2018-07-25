@@ -1,0 +1,67 @@
+\documentclass[landscape,a4paper,12pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{fullpage}
+\usepackage{tikz-uml}
+
+\sloppy
+\hyphenpenalty 10000000
+
+\title{Terraform/sewan-provider-plugin/sdk/clouddc system component diagram}
+\author{Sewan}
+
+\begin{document}
+\pagenumbering{gobble} %switch off page numbering display
+
+\maketitle
+
+\begin{center}
+  \begin{tikzpicture}
+    \umlactor[x=-3,y=5,scale=1.5]{terraform user}
+    \begin{umlcomponent}[x=8,y=4.4]{configuration-tf}
+      \umlbasiccomponent[x=0,y=0,fill=white]{resourceA}
+      \umlbasiccomponent[x=0.1,y=0.1,fill=white]{resourceB}
+      \umlbasiccomponent[x=0.2,y=0.2,fill=white]{resourceN}
+    \end{umlcomponent}
+    \begin{umlcomponent}[x=-2,y=-9]{terraform-tfstate}
+      \umlbasiccomponent[x=0,y=0,fill=white]{resourceAstate}
+      \umlbasiccomponent[x=0.1,y=0.1,fill=white]{resourceBstate}
+      \umlbasiccomponent[x=0.2,y=0.2,fill=white]{resourceNstate}
+    \end{umlcomponent}
+    \begin{umlpackage}[x=0,y=-4]{terraform}
+      \begin{umlpackage}[x=0,y=0,fill=white]{terraform-provider-sewan}
+      \end{umlpackage}
+      \begin{umlpackage}[x=0,y=3,fill=white]{/helper/schema}
+      \end{umlpackage}
+    \end{umlpackage}
+    \begin{umlpackage}[x=11,y=0]{sewan-go-sdk}
+      \umlbasiccomponent[x=0,y=0]{<<Apier>>}
+      \umlbasiccomponent[x=7,y=0]{<<Templater>>}
+      \umlbasiccomponent[x=7,y=-4]{<<Schemaer>>}
+      \umlbasiccomponent[x=0,y=-4]{<<Clienter>>}
+      \umlassemblyconnector[interface=consume]{<<Apier>>-east-port}{<<Schemaer>>-west-port}
+      \umlassemblyconnector[interface=consume]{<<Apier>>-east-port}{<<Templater>>}
+      \umlassemblyconnector[interface=consume]{<<Apier>>-south-port}{<<Clienter>>-north-port}
+      \umlassemblyconnector[interface=consume]{<<Templater>>-south-port}{<<Schemaer>>-north-port}
+    \end{umlpackage}
+    \begin{umlpackage}[x=12,y=-9]{SewanCloudDataCenter}
+      \begin{umlpackage}[x=0,y=0]{AirdrumAPI}
+      \end{umlpackage}
+      \umlbasiccomponent[x=6,y=0,fill=white]{hostedResourceA}
+      \umlbasiccomponent[x=6.1,y=0.1,fill=white]{hostedResourceB}
+      \umlbasiccomponent[x=6.2,y=0.2,fill=white]{hostedResourceN}
+    \end{umlpackage}
+    \umltrans[pos=0.2,arg=terraform init/plan/refresh/show/apply/destroy,anchor1=-100,anchor2=100]{terraform user}{terraform}
+    \umltrans[pos=0.5,arg=CRUD]{terraform user}{configuration-tf-west-port}
+    \umltrans[pos=0.4,arg=read,anchor1=40]{terraform}{resourceN-west-port}
+    \umltrans[pos=0.4,arg=update(schema),anchor1=-90,anchor2=90]{terraform-provider-sewan}{terraform-tfstate}
+    \umltrans[pos=0.7,arg=use]{terraform-provider-sewan}{/helper/schema}
+    \umlassemblyconnector[interface=consume,anchor1=0,anchor2=180]{terraform-provider-sewan}{<<Apier>>}
+    \umltrans[pos=0.8,arg=HTTP,geometry=|-|]{<<Clienter>>}{AirdrumAPI}
+    \umltrans[pos=0.8,arg=manage]{AirdrumAPI}{hostedResourceN}
+    \umlnote[x=6,y=-6,width=10em]{terraform-provider-sewan}{This plugin is used only with Sewan clouddc (CloudDataCenter) hosted resources}
+  \end{tikzpicture}
+\end{center}
+\end{document}

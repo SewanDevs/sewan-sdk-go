@@ -1,13 +1,9 @@
-%
-% Compilation of the examples from the TikZ-UML manual, v. 1.0b (2013-03-01)
-\documentclass[a4paper,12pt]{article}
+\documentclass[landscape,a4paper,12pt]{article}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
 \usepackage{fullpage}
-\usepackage{lscape}
-
 \usepackage{tikz-uml}
 
 \sloppy
@@ -17,11 +13,13 @@
 \author{Sewan}
 
 \begin{document}
-\begin{landscape}
+\pagenumbering{gobble} %switch off page numbering display
 
 \maketitle
 
 \begin{center}
+
+  \section{Infrastructure plan apply}
   \begin{tikzpicture}
     \begin{umlseqdiag}
 
@@ -30,39 +28,73 @@
     \umlobject[class=Terraform\&Plugin, x=6]{terraform}
     \umlobject[class=SewanSDK, x=11]{sdk}
     \umlobject[class=AirdrumAPI, x=15]{api}
+    \umlobject[class=ResourceSchema,x=20]{schema}
 
-    \begin{umlcall}[op=1.\ terraform\ refresh(), type=synchron, return=resources\_diff\_list]{admin}{terraform}
-    
+    \begin{umlcall}[op=1.\ terraform\ refresh(), type=synchron, return=local\_state\_changes\_list]{admin}{terraform}
       \begin{umlcall}[op=2.\ plan(), type=asynchron]{terraform}{terraform}
       \end{umlcall}
-    
       \begin{umlfragment}[type=loop, label=resource\_in\_plan, name=loop, inner xsep=15,fill=blue!15]
-
-	\begin{umlfragment}[type=alt, label=resource\_exists, name=if, inner xsep=18,fill=white]
-	  \begin{umlcall}[op=3.\ resource\_update(), type=synchron, return=resource\_state]{terraform}{sdk}
-	    \begin{umlcall}[op=4.\ HTTP\_PUT(), type=synchron, return=HTTP.resp]{sdk}{api}
+	\begin{umlfragment}[type=alt, label=resource\_exists, name=if,fill=white]
+	  \begin{umlcall}[op=3.\ create(plan\_resource\_state), type=asynchron]{terraform}{schema}
+	    \begin{umlcall}[op=4.\ resource\_update(), type=synchron, return=distant\_resource\_state]{terraform}{sdk}
+	      \begin{umlcall}[op=5.\ HTTP\_PUT(), type=synchron, return=HTTP.resp]{sdk}{api}
+	      \end{umlcall}
+	    \end{umlcall}
+	    \begin{umlcall}[op=6.\ update(distant\_resource\_state), type=asynchron]{terraform}{schema}
+	    \end{umlcall}
+	    \begin{umlcall}[op=7.\ update(schema), type=synchron, return=OK]{terraform}{localstate}
 	    \end{umlcall}
 	  \end{umlcall}
-	\end{umlfragment}[name=if]
-
-	\begin{umlfragment}[type=alt, label=resource\_not\_exists, name=else, inner xsep=18,fill=white]
-	  \begin{umlcall}[op=3.\ resource\_create(), type=synchron, return=resource\_state]{terraform}{sdk}
-	    \begin{umlcall}[op=4.\ HTTP\_POST(), type=synchron, return=HTTP.resp]{sdk}{api}
+  	\umlfpart[!\ resource\_exists]
+	    \begin{umlcall}[op=3.\ resource\_create(), type=synchron, return=distant\_resource\_state]{terraform}{sdk}
+	      \begin{umlcall}[op=4.\ HTTP\_POST(), type=synchron, return=HTTP.resp]{sdk}{api}
+	      \end{umlcall}
 	    \end{umlcall}
-	  \end{umlcall}
-	\end{umlfragment}[name=else]
-
+	    \begin{umlcall}[op=5.\ create(distant\_resource\_state), type=asynchron]{terraform}{schema}
+	      \begin{umlcall}[op=6.\ update(schema), type=synchron, return=OK]{terraform}{localstate}
+	      \end{umlcall}
+	    \end{umlcall}
+	\end{umlfragment}
       \end{umlfragment}[name=loop]
-      
-      \begin{umlcall}[op=5.\ update(), type=synchron, return=OK]{terraform}{localstate}
+    \end{umlcall}
+  \end{umlseqdiag}
+  \end{tikzpicture}
+
+
+  \section{VM resource creation from template}
+  \begin{tikzpicture}
+    \begin{umlseqdiag}
+    \umlobject[class=Terraform\&Plugin, x=-5]{terraform}
+    \umlobject[class=SewanSDK, x=4]{sdk}
+    \umlobject[class=AirdrumAPI, x=12]{api}
+    \umlobject[class=ResourceSchema,x=16]{schema}
+
+    \begin{umlcall}[op=1.\ resource\_create\_from\_template(template), type=synchron, return=distant\_state]{terraform}{sdk}
+      \begin{umlcall}[op=2.\ HTTP\_GET\_AVAILABLE\_TEMPLATES(), type=synchron, return=HTTP.resp\ with\ templatesList]{sdk}{api}
       \end{umlcall}
 
+      \begin{umlcall}[op=3.\ is\_template\_in\_list(), type=asynchron, return=HTTP.resp]{sdk}{sdk}
+      \end{umlcall}
+
+      \begin{umlfragment}[type=alt, label=template\_in\_list, name=if, inner xsep=1,fill=blue!15]
+	\begin{umlcall}[op=4.\ create\_from\_template\_and\_configuration(), type=asynchron, return=HTTP.resp]{sdk}{schema}
+	  \begin{umlcall}[op=5.\ HTTP\_POST(schema\_json), type=synchron, return=HTTP.resp\ with\ distant\_state]{sdk}{api}
+	  \end{umlcall}
+	  \begin{umlcall}[op=6.\ update(distant\_state), type=asynchron, return=HTTP.resp]{sdk}{schema}
+	  \end{umlcall}
+	  \umlcreatecall[class=\_override.tf.json, x=-1.5]{sdk}{resource}
+	  \begin{umlcall}[op=6.\ set\_configuration(schema), type=synchron, return=HTTP.resp]{sdk}{resource}
+	  \end{umlcall}
+	\end{umlcall}
+      \umlfpart[!\ template\_in\_list]
+	\begin{umlcall}[op=7.\ nullify\_plan()\ +\ distant\_state:error, type=asynchron, return=HTTP.resp]{sdk}{sdk}
+	\end{umlcall}
+      \end{umlfragment}[name=template]
+
     \end{umlcall}
-
+    
     \end{umlseqdiag}
-  \end{tikzpicture}
+  \end{tikzpicture}  
+
 \end{center}
-
-\end{landscape}
-
 \end{document}

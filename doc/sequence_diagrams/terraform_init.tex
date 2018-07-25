@@ -1,10 +1,9 @@
-\documentclass[a4paper,12pt]{article}
+\documentclass[landscape,a4paper,12pt]{article}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
 \usepackage{fullpage}
-\usepackage{lscape}
 
 \usepackage{tikz-uml}
 
@@ -15,7 +14,6 @@
 \author{Sewan}
 
 \begin{document}
-\begin{landscape}
 
 \maketitle
 
@@ -24,20 +22,26 @@
     \begin{umlseqdiag}
 
     \umlactor[class=SysAdmin]{admin}
-    \umlobject[class=Tfstate]{localstate}
-    \umlobject[class=Terraform\&Plugin, x=5]{terraform}
+    \umlobject[class=TFplan,x=3]{tfplan}
+    \umlobject[class=Terraform, x=9]{terraform}
 
 
-    \begin{umlcall}[op=1.\ terraform\ init(), type=synchron return=init\ status]{admin}{terraform}
-      \begin{umlcall}[op=2.\ getProvidersPlugins(), type=asynchron]{terraform}{terraform}
-      \end{umlcall}
-      \umlcreatecall[class=Tfstate, x=11]{terraform}{localstate}
+    \begin{umlcall}[op=1.\ terraform\ init(), type=synchron, return=init\ status]{admin}{terraform}
+      \begin{umlcall}[op=2.\ getProvidersPlugins(), type=synchron, return=providers\_list]{terraform}{tfplan}
+      \end{umlcall}	
+      \begin{umlfragment}[type=loop, label=provider\_in\_providers\_list, name=loop, inner xsep=1,fill=blue!15]
+	\begin{umlcall}[op=3.\ Validate\_plugin\_installation(), type=synchron]{terraform}{terraform}
+	\end{umlcall}
+	\begin{umlfragment}[type=alt, label=plugin\_not\_installed, name=if, inner xsep=19,fill=white]
+	  \begin{umlcall}[op=4.\ get\_and\_install\_plugin\_from\_official\_terraform\_plugins\_repo(), type=synchron]{terraform}{terraform}
+	  \end{umlcall}
+	\end{umlfragment}
+      \end{umlfragment}
+      \umlcreatecall[class=Tfstate, x=15]{terraform}{localstate}
     \end{umlcall}
     
     \end{umlseqdiag}
   \end{tikzpicture}
 \end{center}
-
-\end{landscape}
 
 \end{document}

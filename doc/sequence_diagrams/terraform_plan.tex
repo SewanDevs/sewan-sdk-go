@@ -1,10 +1,9 @@
-\documentclass[a4paper,12pt]{article}
+\documentclass[landscape,a4paper,12pt]{article}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
 \usepackage{fullpage}
-\usepackage{lscape}
 
 \usepackage{tikz-uml}
 
@@ -15,7 +14,6 @@
 \author{Sewan}
 
 \begin{document}
-\begin{landscape}
 
 \maketitle
 
@@ -24,19 +22,17 @@
     \begin{umlseqdiag}
 
     \umlactor[class=SysAdmin, x=-3]{admin}
-    \umlobject[class=Tfstate, x=0.5]{localstate}
-    \umlobject[class=TFplan, x=3.5]{tfplan}
-    \umlobject[class=Terraform\&Plugin, x=8]{terraform}
-    \umlobject[class=SewanSDK, x=13]{sdk}
-    \umlobject[class=AirdrumAPI, x=17]{api}
+    \umlobject[class=Tfstate, x=1]{localstate}
+    \umlobject[class=TFplan, x=5]{tfplan}
+    \umlobject[class=Terraform\&Plugin, x=11]{terraform}
 
-    \begin{umlcall}[op=1.\ terraform\ refresh(), type=synchron, return=resources\_diff\_list]{admin}{terraform}
+    \begin{umlcall}[op=1.\ terraform\ refresh(), type=synchron, return=display(resources\_diff\_list)]{admin}{terraform}
     
       \begin{umlcall}[op=2.\ refresh(), type=asynchron]{terraform}{terraform}
       \end{umlcall}
     
       \begin{umlfragment}[type=loop, label=resource\_in\_plan, name=loop, inner xsep=15,fill=blue!15]
-	\begin{umlcall}[op=3.\ getDiffWithPlan(), type=synchron, return=diffs,fill=white]{terraform}{tfplan}
+	\begin{umlcall}[op=3.\ getDiffWithPlan(localstate), type=synchron, return=diffs,fill=white]{terraform}{tfplan}
 	\end{umlcall}
      \end{umlfragment}
     \end{umlcall}
@@ -44,7 +40,5 @@
     \end{umlseqdiag}
   \end{tikzpicture}
 \end{center}
-
-\end{landscape}
 
 \end{document}

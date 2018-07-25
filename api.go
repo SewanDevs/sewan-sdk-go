@@ -18,13 +18,13 @@ type APITooler struct {
 	Api APIer
 }
 type APIer interface {
-	Get_resource_creation_url(api *API,
+	GetResourceCreationUrl(api *API,
 		resourceType string) string
-	Get_resource_url(api *API,
+	GetResourceUrl(api *API,
 		resourceType string,
 		id string) string
 	ValidateResourceType(resourceType string) error
-	Validate_status(api *API,
+	ValidateStatus(api *API,
 		resourceType string,
 		client ClientTooler) error
 	ResourceInstanceCreate(d *schema.ResourceData,
@@ -34,14 +34,14 @@ type APIer interface {
 		resourceType string,
 		api *API) (error,
 		interface{})
-	Create_resource(d *schema.ResourceData,
+	CreateResource(d *schema.ResourceData,
 		clientTooler *ClientTooler,
 		templatesTooler *TemplatesTooler,
 		schemaTools *SchemaTooler,
 		resourceType string,
 		sewan *API) (error,
 		map[string]interface{})
-	Read_resource(d *schema.ResourceData,
+	ReadResource(d *schema.ResourceData,
 		clientTooler *ClientTooler,
 		templatesTooler *TemplatesTooler,
 		schemaTools *SchemaTooler,
@@ -49,13 +49,13 @@ type APIer interface {
 		sewan *API) (error,
 		map[string]interface{},
 		bool)
-	Update_resource(d *schema.ResourceData,
+	UpdateResource(d *schema.ResourceData,
 		clientTooler *ClientTooler,
 		templatesTooler *TemplatesTooler,
 		schemaTools *SchemaTooler,
 		resourceType string,
 		sewan *API) error
-	Delete_resource(d *schema.ResourceData,
+	DeleteResource(d *schema.ResourceData,
 		clientTooler *ClientTooler,
 		templatesTooler *TemplatesTooler,
 		schemaTools *SchemaTooler,
@@ -64,7 +64,7 @@ type APIer interface {
 }
 type AirDrumResources_Apier struct{}
 
-func (api_tools *APITooler) New(token string, url string) *API {
+func (apiTools *APITooler) New(token string, url string) *API {
 	return &API{
 		Token:  token,
 		URL:    url,
@@ -72,9 +72,9 @@ func (api_tools *APITooler) New(token string, url string) *API {
 	}
 }
 
-func (api_tools *APITooler) CheckStatus(api *API) error {
+func (apiTools *APITooler) CheckStatus(api *API) error {
 	var apiClientErr error
 	clientTooler := ClientTooler{Client: HttpClienter{}}
-	apiClientErr = api_tools.Api.Validate_status(api, DEFAULT_RESOURCE_TYPE, clientTooler)
+	apiClientErr = apiTools.Api.ValidateStatus(api, DEFAULT_RESOURCE_TYPE, clientTooler)
 	return apiClientErr
 }
