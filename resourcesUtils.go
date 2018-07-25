@@ -233,7 +233,7 @@ func (apier AirDrumResources_Apier) ValidateResourceType(resourceType string) er
 	return err
 }
 
-func (apier AirDrumResources_Apier) Get_resource_creation_url(api *API,
+func (apier AirDrumResources_Apier) GetResourceCreationUrl(api *API,
 	resourceType string) string {
 
 	var resource_url strings.Builder
@@ -243,32 +243,32 @@ func (apier AirDrumResources_Apier) Get_resource_creation_url(api *API,
 	return resource_url.String()
 }
 
-func (apier AirDrumResources_Apier) Get_resource_url(api *API,
+func (apier AirDrumResources_Apier) GetResourceUrl(api *API,
 	resourceType string,
 	resource_id string) string {
 
 	var resource_url strings.Builder
-	api_tools := APITooler{
+	apiTools := APITooler{
 		Api: apier,
 	}
-	s_create_url := api_tools.Api.Get_resource_creation_url(api, resourceType)
+	s_create_url := apiTools.Api.GetResourceCreationUrl(api, resourceType)
 	resource_url.WriteString(s_create_url)
 	resource_url.WriteString(resource_id)
 	resource_url.WriteString("/")
 	return resource_url.String()
 }
 
-func (apier AirDrumResources_Apier) Validate_status(api *API,
+func (apier AirDrumResources_Apier) ValidateStatus(api *API,
 	resourceType string,
 	clientTooler ClientTooler) error {
 
 	var apiErr error
 	var responseBody string
-	api_tools := APITooler{
+	apiTools := APITooler{
 		Api: apier,
 	}
 	req, _ := http.NewRequest("GET",
-		api_tools.Api.Get_resource_creation_url(api, resourceType),
+		apiTools.Api.GetResourceCreationUrl(api, resourceType),
 		nil)
 	req.Header.Add("authorization", "Token "+api.Token)
 	resp, apiErr := clientTooler.Client.Do(api, req)

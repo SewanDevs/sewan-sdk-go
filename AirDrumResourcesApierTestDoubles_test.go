@@ -7,7 +7,7 @@ import (
 
 type FakeAirDrumResource_APIer struct{}
 
-func (apier FakeAirDrumResource_APIer) Validate_status(api *API,
+func (apier FakeAirDrumResource_APIer) ValidateStatus(api *API,
 	resourceType string,
 	client ClientTooler) error {
 
@@ -37,20 +37,20 @@ func (apier FakeAirDrumResource_APIer) ResourceInstanceCreate(d *schema.Resource
 	return nil, ""
 }
 
-func (apier FakeAirDrumResource_APIer) Get_resource_creation_url(api *API,
+func (apier FakeAirDrumResource_APIer) GetResourceCreationUrl(api *API,
 	resourceType string) string {
 
 	return ""
 }
 
-func (apier FakeAirDrumResource_APIer) Get_resource_url(api *API,
+func (apier FakeAirDrumResource_APIer) GetResourceUrl(api *API,
 	resourceType string,
 	id string) string {
 
 	return ""
 }
 
-func (apier FakeAirDrumResource_APIer) Create_resource(d *schema.ResourceData,
+func (apier FakeAirDrumResource_APIer) CreateResource(d *schema.ResourceData,
 	clientTooler *ClientTooler,
 	templatesTooler *TemplatesTooler,
 	schemaTools *SchemaTooler,
@@ -59,7 +59,7 @@ func (apier FakeAirDrumResource_APIer) Create_resource(d *schema.ResourceData,
 
 	return nil, nil
 }
-func (apier FakeAirDrumResource_APIer) Read_resource(d *schema.ResourceData,
+func (apier FakeAirDrumResource_APIer) ReadResource(d *schema.ResourceData,
 	clientTooler *ClientTooler,
 	templatesTooler *TemplatesTooler,
 	schemaTools *SchemaTooler,
@@ -68,7 +68,7 @@ func (apier FakeAirDrumResource_APIer) Read_resource(d *schema.ResourceData,
 
 	return nil, nil, true
 }
-func (apier FakeAirDrumResource_APIer) Update_resource(d *schema.ResourceData,
+func (apier FakeAirDrumResource_APIer) UpdateResource(d *schema.ResourceData,
 	clientTooler *ClientTooler,
 	templatesTooler *TemplatesTooler,
 	schemaTools *SchemaTooler,
@@ -77,7 +77,7 @@ func (apier FakeAirDrumResource_APIer) Update_resource(d *schema.ResourceData,
 
 	return nil
 }
-func (apier FakeAirDrumResource_APIer) Delete_resource(d *schema.ResourceData,
+func (apier FakeAirDrumResource_APIer) DeleteResource(d *schema.ResourceData,
 	clientTooler *ClientTooler,
 	templatesTooler *TemplatesTooler,
 	schemaTools *SchemaTooler,

@@ -169,7 +169,7 @@ func TestUpdateSchemaFromTemplateOnResourceCreation(t *testing.T) {
 	}{
 		{
 			1,
-			vm_schema_init(NON_EXISTING_ERROR_VM_SCHEMA_MAP),
+			vmSchemaInit(NON_EXISTING_ERROR_VM_SCHEMA_MAP),
 			TEMPLATE2_MAP,
 			NON_EXISTING_ERROR_VM_SCHEMA_MAP,
 			errors.New("Template field should not be set on " +
@@ -178,7 +178,7 @@ func TestUpdateSchemaFromTemplateOnResourceCreation(t *testing.T) {
 		},
 		{
 			2,
-			vm_schema_init(VM_SCHEMA_MAP_PRE_UPDATE_FROM_TEMPLATE),
+			vmSchemaInit(VM_SCHEMA_MAP_PRE_UPDATE_FROM_TEMPLATE),
 			LAST_TEMPLATE_IN_LIST,
 			VM_SCHEMA_MAP_POST_UPDATE_FROM_TEMPLATE,
 			nil,
@@ -239,7 +239,7 @@ func TestCreateTemplateOverrideConfig(t *testing.T) {
 	}{
 		{
 			1,
-			vm_schema_init(NO_TEMPLATE_VM_MAP),
+			vmSchemaInit(NO_TEMPLATE_VM_MAP),
 			map[string]interface{}{},
 			"",
 			map[string]interface{}{},
@@ -248,7 +248,7 @@ func TestCreateTemplateOverrideConfig(t *testing.T) {
 		},
 		{
 			2,
-			vm_schema_init(VM_CREATION_FROM_TEMPLATE1_SCHEMA),
+			vmSchemaInit(VM_CREATION_FROM_TEMPLATE1_SCHEMA),
 			TEMPLATE1_MAP_BIS,
 			"template1_template_override.tf.json",
 			RESOURCE_OVERRIDE_JSON_MAP,

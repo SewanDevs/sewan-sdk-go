@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestCreate_resource(t *testing.T) {
+func TestCreateResource(t *testing.T) {
 	test_cases := []struct {
 		Id               int
 		TC_clienter      Clienter
@@ -119,7 +119,7 @@ func TestCreate_resource(t *testing.T) {
 		d.SetId("UnitTest resource1")
 		d.Set(NAME_FIELD, "Unit test resource")
 		fake_client_tooler.Client = test_case.TC_clienter
-		err, resp_creation_map = apier.Create_resource(d,
+		err, resp_creation_map = apier.CreateResource(d,
 			&fake_client_tooler,
 			&fake_templates_tooler,
 			&fake_schema_tooler,
@@ -159,13 +159,13 @@ func TestCreate_resource(t *testing.T) {
 }
 
 //------------------------------------------------------------------------------
-func TestRead_resource(t *testing.T) {
+func TestReadResource(t *testing.T) {
 	test_cases := []struct {
 		Id              int
 		TC_clienter     Clienter
 		ResourceType    string
 		Read_Err        error
-		Read_resource   map[string]interface{}
+		ReadResource    map[string]interface{}
 		Resource_exists bool
 	}{
 		{
@@ -280,13 +280,13 @@ func TestRead_resource(t *testing.T) {
 		d.SetId("UnitTest resource1")
 		d.Set(NAME_FIELD, "Unit test resource")
 		fake_client_tooler.Client = test_case.TC_clienter
-		err, resp_creation_map, res_exists = Apier.Read_resource(d,
+		err, resp_creation_map, res_exists = Apier.ReadResource(d,
 			&fake_client_tooler,
 			&fake_templates_tooler,
 			&fake_schema_tooler,
 			test_case.ResourceType,
 			sewan)
-		diffs = cmp.Diff(test_case.Read_resource, resp_creation_map)
+		diffs = cmp.Diff(test_case.ReadResource, resp_creation_map)
 		switch {
 		case err == nil || test_case.Read_Err == nil:
 			if !((err == nil) && (test_case.Read_Err == nil)) {
@@ -308,7 +308,7 @@ func TestRead_resource(t *testing.T) {
 				t.Errorf("\n\nTC %d : Wrong created resource map,"+
 					" it should be nil as error is not nil,"+
 					"\n\rgot map: \n\r\"%s\"\n\rwant map: \n\r\"%s\"\n\r",
-					test_case.Id, resp_creation_map, test_case.Read_resource)
+					test_case.Id, resp_creation_map, test_case.ReadResource)
 			}
 			if err.Error() != test_case.Read_Err.Error() {
 				t.Errorf("\n\nTC %d : resource read error was incorrect,"+
@@ -327,7 +327,7 @@ func TestRead_resource(t *testing.T) {
 }
 
 //------------------------------------------------------------------------------
-func TestUpdate_resource(t *testing.T) {
+func TestUpdateResource(t *testing.T) {
 	test_cases := []struct {
 		Id           int
 		TC_clienter  Clienter
@@ -423,7 +423,7 @@ func TestUpdate_resource(t *testing.T) {
 		d.SetId("UnitTest resource1")
 		d.Set(NAME_FIELD, "Unit test resource")
 		fake_client_tooler.Client = test_case.TC_clienter
-		err = Apier.Update_resource(d,
+		err = Apier.UpdateResource(d,
 			&fake_client_tooler,
 			&fake_templates_tooler,
 			&fake_schema_tooler,
@@ -445,7 +445,7 @@ func TestUpdate_resource(t *testing.T) {
 }
 
 ////------------------------------------------------------------------------------
-func TestDelete_resource(t *testing.T) {
+func TestDeleteResource(t *testing.T) {
 	test_cases := []struct {
 		Id           int
 		TC_clienter  Clienter
@@ -547,7 +547,7 @@ func TestDelete_resource(t *testing.T) {
 		d.SetId("UnitTest resource1")
 		d.Set(NAME_FIELD, "Unit test resource")
 		fake_client_tooler.Client = test_case.TC_clienter
-		err = Apier.Delete_resource(d,
+		err = Apier.DeleteResource(d,
 			&fake_client_tooler,
 			&fake_templates_tooler,
 			&fake_schema_tooler,

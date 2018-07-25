@@ -667,7 +667,7 @@ var (
 	}
 )
 
-func resource_vdc_resource() *schema.Resource {
+func resourceVdcResource() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			RESOURCE_FIELD: &schema.Schema{
@@ -690,7 +690,7 @@ func resource_vdc_resource() *schema.Resource {
 	}
 }
 
-func resource_vdc() *schema.Resource {
+func resourceVdc() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			NAME_FIELD: &schema.Schema{
@@ -708,7 +708,7 @@ func resource_vdc() *schema.Resource {
 			VDC_RESOURCE_FIELD: &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
-				Elem:     resource_vdc_resource(),
+				Elem:     resourceVdcResource(),
 			},
 			SLUG_FIELD: &schema.Schema{
 				Type:     schema.TypeString,
@@ -853,7 +853,7 @@ func resource_vm() *schema.Resource {
 	}
 }
 
-func Fake_vdcInstance_VDC_CREATION_MAP() VDC {
+func FakeVdcInstance_VDC_CREATION_MAP() VDC {
 	return VDC{
 		Name:       "Unit test vdc resource",
 		Enterprise: "enterprise",
@@ -965,7 +965,7 @@ func vmInstanceNO_TEMPLATE_VM_MAP() VM {
 	}
 }
 
-func Fake_vmInstance_EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP() VM {
+func FakeVmInstance_EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP() VM {
 	return VM{
 		Name:       "Unit test template no disc add on vm resource",
 		Enterprise: "unit test enterprise",
@@ -992,7 +992,7 @@ func Fake_vmInstance_EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP() VM {
 	}
 }
 
-func Fake_vmInstance_EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISKS_VM_MAP() VM {
+func FakeVmInstance_EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISKS_VM_MAP() VM {
 	return VM{
 		Name:       "EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISKS_VM_MAP",
 		Enterprise: "unit test enterprise",
@@ -1041,7 +1041,7 @@ func Fake_vmInstance_EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DIS
 	}
 }
 
-func Fake_vmInstance_EXISTING_TEMPLATE_WITH_DELETED_DISK_VM_MAP() VM {
+func FakeVmInstance_EXISTING_TEMPLATE_WITH_DELETED_DISK_VM_MAP() VM {
 	return VM{
 		Name:       "EXISTING_TEMPLATE_WITH_DELETED_DISK_VM_MAP",
 		Enterprise: "unit test enterprise",
@@ -1119,24 +1119,24 @@ func vmInstanceNoTemplateFake() VM {
 	}
 }
 
-func vdc_schema_init(vdc map[string]interface{}) *schema.ResourceData {
-	d := resource_vdc().TestResourceData()
+func vdcSchemaInit(vdc map[string]interface{}) *schema.ResourceData {
+	d := resourceVdc().TestResourceData()
 
 	schemaTooler := SchemaTooler{
 		SchemaTools: Schema_Schemaer{},
 	}
-	schemaTooler.SchemaTools.Update_local_resource_state(vdc, d, &schemaTooler)
+	schemaTooler.SchemaTools.UpdateLocalResourceState(vdc, d, &schemaTooler)
 
 	return d
 }
 
-func vm_schema_init(vm map[string]interface{}) *schema.ResourceData {
+func vmSchemaInit(vm map[string]interface{}) *schema.ResourceData {
 	d := resource_vm().TestResourceData()
 
 	schemaTooler := SchemaTooler{
 		SchemaTools: Schema_Schemaer{},
 	}
-	schemaTooler.SchemaTools.Update_local_resource_state(vm, d, &schemaTooler)
+	schemaTooler.SchemaTools.UpdateLocalResourceState(vm, d, &schemaTooler)
 
 	return d
 }
@@ -1146,7 +1146,7 @@ func resource(resourceType string) *schema.Resource {
 	resource := &schema.Resource{}
 	switch resourceType {
 	case VDC_FIELD:
-		resource = resource_vdc()
+		resource = resourceVdc()
 	case "vm":
 		resource = resource_vm()
 	default:
