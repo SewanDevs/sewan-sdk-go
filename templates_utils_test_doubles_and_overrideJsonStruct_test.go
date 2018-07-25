@@ -3,11 +3,10 @@ package sewan_go_sdk
 import (
 	"encoding/json"
 	"errors"
+	"github.com/google/go-cmp/cmp"
 	"github.com/hashicorp/terraform/helper/schema"
 	"io/ioutil"
 	"os"
-	//"reflect"
-	"github.com/google/go-cmp/cmp"
 )
 
 //------------------------------------------------------------------------------
@@ -27,7 +26,6 @@ func CompareJsonAndMap(jsonFile string,
 		err = json.Unmarshal(jsonData, &dataStruct)
 		if err == nil {
 			diffs = cmp.Diff(fileDataMap, dataStruct)
-
 		}
 	}
 	return err, diffs

@@ -2,9 +2,9 @@ package sewan_go_sdk
 
 import (
 	"errors"
+	"github.com/google/go-cmp/cmp"
 	"github.com/hashicorp/terraform/helper/schema"
 	"net/http"
-	"reflect"
 	"testing"
 )
 
@@ -106,6 +106,7 @@ func TestResourceInstanceCreate(t *testing.T) {
 		sewan    *API
 		err      error = nil
 		instance interface{}
+		diffs    string
 	)
 	api_tools := APITooler{
 		Api: AirDrumResources_Apier{},
@@ -126,6 +127,7 @@ func TestResourceInstanceCreate(t *testing.T) {
 			&fake_schema_tooler,
 			test_case.Resource_type,
 			sewan)
+		diffs = cmp.Diff(instance, test_case.VmInstance)
 		switch {
 		case err == nil || test_case.Error == nil:
 			if !(err == nil && test_case.Error == nil) {
@@ -134,28 +136,18 @@ func TestResourceInstanceCreate(t *testing.T) {
 					test_case.Id, err, test_case.Error)
 			} else {
 				switch {
-				case !reflect.DeepEqual(test_case.VmInstance, instance):
+				case diffs != "":
 					t.Errorf("\n\nTC %d : Wrong ResourceInstanceCreate() "+
-						"created instance.", test_case.Id)
-					v := reflect.ValueOf(instance)
-					v2 := reflect.ValueOf(test_case.VmInstance)
-					for i := 0; i < v.NumField(); i++ {
-						if !reflect.DeepEqual(v.Field(i).Interface(), v2.Field(i).Interface()) {
-							t.Log("Got field difference(s) :",
-								"\ngot :", v.Field(i).Interface(),
-								"(", reflect.TypeOf(v.Field(i).Interface()), ")",
-								"\nwant :", v2.Field(i).Interface(),
-								"(", reflect.TypeOf(v2.Field(i).Interface()), ")")
-						}
-					}
+						"created instance (-got +want) :\n%s",
+						test_case.Id, diffs)
 				}
 			}
 		case err != nil && test_case.Error != nil:
 			switch {
-			case !reflect.DeepEqual(instance, test_case.VmInstance):
-				t.Errorf("\n\nTC %d : Wrong ResourceInstanceCreate() created instance,"+
-					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-					test_case.Id, instance, test_case.VmInstance)
+			case diffs != "":
+				t.Errorf("\n\nTC %d : Wrong ResourceInstanceCreate() "+
+					"created instance (-got +want) :\n%s",
+					test_case.Id, diffs)
 			case err.Error() != test_case.Error.Error():
 				t.Errorf("\n\nTC %d : resource creation error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
@@ -380,7 +372,10 @@ func TestUpdate_local_resource_state_AND_Read_element(t *testing.T) {
 			"1212",
 		},
 	}
-	var d *schema.ResourceData
+	var (
+		d     *schema.ResourceData
+		diffs string
+	)
 	schemaTooler := SchemaTooler{
 		SchemaTools: Schema_Schemaer{},
 	}
@@ -390,12 +385,14 @@ func TestUpdate_local_resource_state_AND_Read_element(t *testing.T) {
 			d,
 			&schemaTooler)
 		for key, value := range test_case.Vm_map {
-			if key != ID_FIELD {
-				if !reflect.DeepEqual(d.Get(key), value) {
-					t.Errorf("\n\nTC %d : Update of %s field failed :\n\rGot :%s\n\rWant :%s",
-						test_case.Id, key, d.Get(key), value)
+			diffs = cmp.Diff(d.Get(key), value)
+			switch {
+			case key != ID_FIELD:
+				if diffs != "" {
+					t.Errorf("\n\nTC %d : Update of %s field failed (-got +want) :\n%s",
+						test_case.Id, key, diffs)
 				}
-			} else {
+			default:
 				if d.Id() != test_case.Vm_Id_string {
 					t.Errorf("\n\nTC %d : Update of Id reserved field failed :\n\rGot :%s\n\rWant :%s",
 						test_case.Id, d.Id(), test_case.Vm_Id_string)
