@@ -2,8 +2,8 @@ package sewan_go_sdk
 
 import (
 	"errors"
+	"github.com/google/go-cmp/cmp"
 	"github.com/hashicorp/terraform/helper/schema"
-	"reflect"
 	"testing"
 )
 
@@ -47,7 +47,7 @@ func TestFetchTemplateFromList(t *testing.T) {
 			5,
 			"template 42",
 			WRONG_TEMPLATES_LIST,
-			map[string]interface{}{},
+			map[string]interface{}{"intin":"toutou"},
 			errors.New("One of the fetch template " +
 				"has a wrong format." +
 				"\ngot : string" +
@@ -57,6 +57,7 @@ func TestFetchTemplateFromList(t *testing.T) {
 	var (
 		err      error
 		template map[string]interface{}
+		diffs    string
 	)
 	fake_templates_tooler := TemplatesTooler{
 		TemplatesTools: Template_Templater{},
@@ -64,6 +65,7 @@ func TestFetchTemplateFromList(t *testing.T) {
 	for _, test_case := range test_cases {
 		template, err = fake_templates_tooler.TemplatesTools.FetchTemplateFromList(test_case.Template_name,
 			test_case.TemplateList)
+		diffs = cmp.Diff(test_case.Template, template)
 		switch {
 		case err == nil || test_case.Error == nil:
 			if !(err == nil && test_case.Error == nil) {
@@ -71,30 +73,15 @@ func TestFetchTemplateFromList(t *testing.T) {
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
 					test_case.Id, err, test_case.Error)
 			}
-			switch {
-			case !reflect.DeepEqual(test_case.Template, template):
-				t.Errorf("\n\nTC %d : Wrong FetchTemplateFromList() template,"+
-					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-					test_case.Id, template, test_case.Template)
-				v := reflect.ValueOf(template)
-				v2 := reflect.ValueOf(test_case.Template)
-				for i := 0; i < v.NumField(); i++ {
-					if !reflect.DeepEqual(v.Field(i).Interface(), v2.Field(i).Interface()) {
-						t.Log("Got field difference(s) :",
-							"\ngot :", v.Field(i).Interface(),
-							"(", reflect.TypeOf(v.Field(i).Interface()), ")",
-							"\nwant :", v2.Field(i).Interface(),
-							"(", reflect.TypeOf(v2.Field(i).Interface()), ")")
-					}
-				}
+			if diffs != "" {
+				t.Errorf("\n\nTC %d : Wrong FetchTemplateFromList() template"+
+					" (-got +want) :\n%s", test_case.Id, diffs)
 			}
 		case err != nil && test_case.Error != nil:
-			switch {
-			case err.Error() != test_case.Error.Error():
+			if err.Error() != test_case.Error.Error() {
 				t.Errorf("\n\nTC %d : FetchTemplateFromList() error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
 					test_case.Id, err.Error(), test_case.Error.Error())
-			default:
 			}
 		}
 	}
@@ -182,6 +169,7 @@ func TestUpdateSchemaFromTemplateOnResourceCreation(t *testing.T) {
 		err          error
 		test_val     interface{}
 		expected_val interface{}
+		diffs        string
 	)
 	fake_templates_tooler := TemplatesTooler{
 		TemplatesTools: Template_Templater{},
@@ -189,6 +177,7 @@ func TestUpdateSchemaFromTemplateOnResourceCreation(t *testing.T) {
 	for _, test_case := range test_cases {
 		err = fake_templates_tooler.TemplatesTools.UpdateSchemaFromTemplateOnResourceCreation(test_case.Dinit,
 			test_case.Template)
+		diffs = cmp.Diff(test_val, expected_val)
 		switch {
 		case err == nil || test_case.Error == nil:
 			if !(err == nil && test_case.Error == nil) {
@@ -203,13 +192,9 @@ func TestUpdateSchemaFromTemplateOnResourceCreation(t *testing.T) {
 					test_val = test_case.Dinit.Get(fieldName)
 				}
 				expected_val = fieldValue
-				if !reflect.DeepEqual(test_val, expected_val) {
-					t.Errorf("TC %d : Schema update error.", test_case.Id)
-					t.Log("Got difference(s) with field \"", fieldName, "\":",
-						"\ngot :", test_val,
-						"(", reflect.TypeOf(test_val), ")",
-						"\nwant :", expected_val,
-						"(", reflect.TypeOf(expected_val), ")")
+				if diffs != "" {
+					t.Errorf("TC %d : Schema update error  (-got +want) :\n%s",
+						test_case.Id, diffs)
 				}
 			}
 		case err != nil && test_case.Error != nil:

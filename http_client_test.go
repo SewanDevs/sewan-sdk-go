@@ -2,8 +2,8 @@ package sewan_go_sdk
 
 import (
 	"errors"
+	"github.com/google/go-cmp/cmp"
 	"net/http"
-	"reflect"
 	"testing"
 )
 
@@ -45,6 +45,7 @@ func TestGetTemplatesList(t *testing.T) {
 	var (
 		templates_list []interface{}
 		err            error
+		diffs          string
 	)
 	client_tooler := ClientTooler{}
 	client_tooler.Client = HttpClienter{}
@@ -63,11 +64,11 @@ func TestGetTemplatesList(t *testing.T) {
 				t.Errorf("\n\nTC %d : GetTemplatesList() error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"", test_case.Id, err, test_case.Error)
 			} else {
+				diffs = cmp.Diff(test_case.TemplateList, templates_list)
 				switch {
-				case !reflect.DeepEqual(test_case.TemplateList, templates_list):
-					t.Errorf("\n\nTC %d : Wrong template list,"+
-						"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-						test_case.Id, templates_list, test_case.TemplateList)
+				case diffs != "":
+					t.Errorf("\n\nTC %d : Wrong template list (-got +want) :\n%s",
+						test_case.Id, diffs)
 				}
 			}
 		case err != nil && test_case.Error != nil:
@@ -177,6 +178,7 @@ func TestHandleResponse(t *testing.T) {
 	var (
 		responseBody interface{}
 		err          error
+		diffs        string
 	)
 	clienter := HttpClienter{}
 
@@ -190,11 +192,11 @@ func TestHandleResponse(t *testing.T) {
 				t.Errorf("\n\nTC %d : HandleResponse() error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"", test_case.Id, err, test_case.Error)
 			} else {
+				diffs = cmp.Diff(test_case.ResponseBody, responseBody)
 				switch {
-				case !reflect.DeepEqual(test_case.ResponseBody, responseBody):
-					t.Errorf("\n\nTC %d : Wrong response read element,"+
-						"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-						test_case.Id, responseBody, test_case.ResponseBody)
+				case diffs != "":
+					t.Errorf("\n\nTC %d : Wrong response read element (-got +want) :\n%s",
+						test_case.Id, diffs)
 				}
 			}
 		case err != nil && test_case.Error != nil:
