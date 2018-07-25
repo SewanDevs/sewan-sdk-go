@@ -26,7 +26,6 @@ func CompareJsonAndMap(jsonFile string,
 		err = json.Unmarshal(jsonData, &dataStruct)
 		if err == nil {
 			diffs = cmp.Diff(fileDataMap, dataStruct)
-
 		}
 	}
 	return err, diffs

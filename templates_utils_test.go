@@ -19,7 +19,7 @@ func TestFetchTemplateFromList(t *testing.T) {
 			1,
 			"",
 			[]interface{}{},
-			map[string]interface{}{},
+			map[string]interface{}(nil),
 			errors.New("Template \"\" does not exists, please validate it's name."),
 		},
 		{
@@ -40,14 +40,14 @@ func TestFetchTemplateFromList(t *testing.T) {
 			4,
 			"template 42",
 			TEMPLATES_LIST,
-			map[string]interface{}{},
+			map[string]interface{}(nil),
 			errors.New("Template \"template 42\" does not exists, please validate it's name."),
 		},
 		{
 			5,
 			"template 42",
 			WRONG_TEMPLATES_LIST,
-			map[string]interface{}{"intin":"toutou"},
+			map[string]interface{}(nil),
 			errors.New("One of the fetch template " +
 				"has a wrong format." +
 				"\ngot : string" +
@@ -55,9 +55,10 @@ func TestFetchTemplateFromList(t *testing.T) {
 		},
 	}
 	var (
-		err      error
-		template map[string]interface{}
-		diffs    string
+		err         error
+		template    map[string]interface{}
+		diffs       string
+		error_error bool
 	)
 	fake_templates_tooler := TemplatesTooler{
 		TemplatesTools: Template_Templater{},
@@ -65,23 +66,41 @@ func TestFetchTemplateFromList(t *testing.T) {
 	for _, test_case := range test_cases {
 		template, err = fake_templates_tooler.TemplatesTools.FetchTemplateFromList(test_case.Template_name,
 			test_case.TemplateList)
-		diffs = cmp.Diff(test_case.Template, template)
+		diffs = cmp.Diff(template, test_case.Template)
 		switch {
 		case err == nil || test_case.Error == nil:
-			if !(err == nil && test_case.Error == nil) {
+			error_error = !(err == nil && test_case.Error == nil)
+			switch {
+			case error_error && (diffs != ""):
+				t.Errorf("\n\nTC %d : FetchTemplateFromList() error was incorrect,"+
+					"\n\rgot: \"%s\"\n\rwant: \"%s\"\n"+
+					"\n\nAND Wrong FetchTemplateFromList() template"+
+					" (-got +want) :\n%s",
+					test_case.Id, err, test_case.Error,
+					diffs)
+			case error_error && (diffs == ""):
 				t.Errorf("\n\nTC %d : FetchTemplateFromList() error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
 					test_case.Id, err, test_case.Error)
-			}
-			if diffs != "" {
+			case !error_error && (diffs != ""):
 				t.Errorf("\n\nTC %d : Wrong FetchTemplateFromList() template"+
 					" (-got +want) :\n%s", test_case.Id, diffs)
 			}
 		case err != nil && test_case.Error != nil:
-			if err.Error() != test_case.Error.Error() {
+			error_error = err.Error() != test_case.Error.Error()
+			switch {
+			case error_error && (diffs != ""):
+				t.Errorf("\n\nTC %d : FetchTemplateFromList() error was incorrect,"+
+					"\n\rgot: \"%s\"\n\rwant: \"%s\""+
+					"AND Wrong FetchTemplateFromList() template (-got +want) :\n%s",
+					test_case.Id, err.Error(), test_case.Error.Error(), diffs)
+			case error_error && (diffs == ""):
 				t.Errorf("\n\nTC %d : FetchTemplateFromList() error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
 					test_case.Id, err.Error(), test_case.Error.Error())
+			case !error_error && (diffs != ""):
+				t.Errorf("\n\nTC %d : Wrong FetchTemplateFromList() template"+
+					" (-got +want) :\n%s", test_case.Id, diffs)
 			}
 		}
 	}
@@ -177,7 +196,6 @@ func TestUpdateSchemaFromTemplateOnResourceCreation(t *testing.T) {
 	for _, test_case := range test_cases {
 		err = fake_templates_tooler.TemplatesTools.UpdateSchemaFromTemplateOnResourceCreation(test_case.Dinit,
 			test_case.Template)
-		diffs = cmp.Diff(test_val, expected_val)
 		switch {
 		case err == nil || test_case.Error == nil:
 			if !(err == nil && test_case.Error == nil) {
@@ -192,6 +210,7 @@ func TestUpdateSchemaFromTemplateOnResourceCreation(t *testing.T) {
 					test_val = test_case.Dinit.Get(fieldName)
 				}
 				expected_val = fieldValue
+				diffs = cmp.Diff(test_val, expected_val)
 				if diffs != "" {
 					t.Errorf("TC %d : Schema update error  (-got +want) :\n%s",
 						test_case.Id, diffs)

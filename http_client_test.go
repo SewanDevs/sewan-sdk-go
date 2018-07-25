@@ -57,7 +57,6 @@ func TestGetTemplatesList(t *testing.T) {
 		fake_client_tooler.Client = test_case.TC_clienter
 		templates_list, err = client_tooler.Client.GetTemplatesList(&fake_client_tooler,
 			test_case.Enterprise_slug, api)
-
 		switch {
 		case err == nil || test_case.Error == nil:
 			if !(err == nil && test_case.Error == nil) {
