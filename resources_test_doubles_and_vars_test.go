@@ -24,10 +24,135 @@ const (
 )
 
 var (
+	RESOURCE_OVERRIDE_JSON_MAP = map[string]interface{}{
+		"resource": map[string]interface{}{
+			"sewan_clouddc_vm": map[string]interface{}{
+				"CreateTemplateOverrideConfig Unit test": map[string]interface{}{
+					"disks": []interface{}{
+						map[string]interface{}{
+							"name":          "unit test disk template1",
+							"size":          float64(20),
+							"storage_class": "storage_enterprise",
+						},
+					},
+					"disk_image": "",
+					"os":         "CentOS",
+					"ram":        float64(1),
+					"cpu":        float64(1),
+					"backup":     "",
+					"nics": []interface{}{
+						map[string]interface{}{
+							"vlan":      "unit test vlan1",
+							"connected": true,
+						},
+						map[string]interface{}{
+							"vlan":      "unit test vlan2",
+							"connected": true,
+						},
+					},
+					"vdc":  "",
+					"boot": "",
+				},
+			},
+		},
+	}
+	NON_EXISTING_ERROR_VM_SCHEMA_MAP = map[string]interface{}{
+		ID_FIELD:         "an id, same behaviour if it's an int or float",
+		NAME_FIELD:       "VM schema update unit test",
+		TEMPLATE_FIELD:   "template1",
+		RAM_FIELD:        2,
+		ENTERPRISE_FIELD: "unit test enterprise",
+		NICS_FIELD: []interface{}{
+			map[string]interface{}{
+				VLAN_NAME_FIELD: "vm additional unit test vlan1",
+				CONNECTED_FIELD: true,
+			},
+		},
+		DYNAMIC_FIELD: "",
+	}
+	VM_SCHEMA_MAP_PRE_UPDATE_FROM_TEMPLATE = map[string]interface{}{
+		NAME_FIELD:       "VM schema update unit test",
+		TEMPLATE_FIELD:   "template1",
+		RAM_FIELD:        2,
+		ENTERPRISE_FIELD: "unit test enterprise",
+		NICS_FIELD: []interface{}{
+			map[string]interface{}{
+				VLAN_NAME_FIELD: "vm additional unit test vlan1",
+				CONNECTED_FIELD: true,
+			},
+		},
+		DYNAMIC_FIELD: "",
+	}
+	VM_SCHEMA_MAP_POST_UPDATE_FROM_TEMPLATE = map[string]interface{}{
+		NAME_FIELD:       "VM schema update unit test",
+		TEMPLATE_FIELD:   "template1",
+		CPU_FIELD:        1,
+		RAM_FIELD:        2,
+		ENTERPRISE_FIELD: "unit test enterprise",
+		NICS_FIELD: []interface{}{
+			map[string]interface{}{
+				VLAN_NAME_FIELD:  "unit test vlan1",
+				MAC_ADRESS_FIELD: "",
+				CONNECTED_FIELD:  true,
+			},
+			map[string]interface{}{
+				VLAN_NAME_FIELD:  "unit test vlan2",
+				MAC_ADRESS_FIELD: "",
+				CONNECTED_FIELD:  true,
+			},
+			map[string]interface{}{
+				VLAN_NAME_FIELD:  "vm additional unit test vlan1",
+				MAC_ADRESS_FIELD: "",
+				CONNECTED_FIELD:  true,
+			},
+		},
+		DYNAMIC_FIELD: "",
+	}
+	VM_CREATION_FROM_TEMPLATE1_SCHEMA = map[string]interface{}{
+		NAME_FIELD:       "CreateTemplateOverrideConfig Unit test",
+		RAM_FIELD:        1,
+		CPU_FIELD:        1,
+		ENTERPRISE_FIELD: "unit test enterprise",
+		TEMPLATE_FIELD:   "template1",
+		OS_FIELD:         "Debian",
+		DISKS_FIELD: []interface{}{
+			map[string]interface{}{
+				NAME_FIELD:          "unit test disk template1",
+				SIZE_FIELD:          20,
+				STORAGE_CLASS_FIELD: "storage_enterprise",
+				SLUG_FIELD:          "unit test disk slug",
+			},
+		},
+		NICS_FIELD: []interface{}{
+			map[string]interface{}{VLAN_NAME_FIELD: "unit test vlan1",
+				CONNECTED_FIELD: true,
+			},
+			map[string]interface{}{VLAN_NAME_FIELD: "unit test vlan2",
+				CONNECTED_FIELD: true,
+			},
+		},
+		DYNAMIC_FIELD: "{\"terraform_provisioned\":true,\"creation_template\":\"template1\",\"Template_disks_on_creation\":null}",
+	}
+	VM_CREATION_FROM_TEMPLATE_SCHEMA_PRE_CREATION_WRONG_NICS_INIT_MAP = map[string]interface{}{
+		RAM_FIELD:        1,
+		CPU_FIELD:        1,
+		ENTERPRISE_FIELD: "unit test enterprise",
+		NAME_FIELD:       "template1",
+		OS_FIELD:         "Debian",
+		DISKS_FIELD: []interface{}{
+			map[string]interface{}{
+				NAME_FIELD:          "unit test disk template1",
+				SIZE_FIELD:          20,
+				STORAGE_CLASS_FIELD: "storage_enterprise",
+				SLUG_FIELD:          "unit test disk slug",
+			},
+		},
+		NICS_FIELD:    "Wrong nics type",
+		DYNAMIC_FIELD: "{\"terraform_provisioned\":true,\"creation_template\":\"template1\",\"Template_disks_on_creation\":null}",
+	}
 	VDC_CREATION_MAP = map[string]interface{}{
 		NAME_FIELD:       "Unit test vdc resource",
 		ENTERPRISE_FIELD: "enterprise",
-		DATACENTER_FIELD: "dc1",
 		VDC_RESOURCE_FIELD: []interface{}{
 			map[string]interface{}{
 				RESOURCE_FIELD: RAM_FIELD,
@@ -54,7 +179,6 @@ var (
 	VDC_READ_RESPONSE_MAP = map[string]interface{}{
 		NAME_FIELD:       "Unit test vdc",
 		ENTERPRISE_FIELD: "unit test enterprise",
-		DATACENTER_FIELD: "dc1",
 		VDC_RESOURCE_FIELD: []interface{}{
 			map[string]interface{}{
 				RESOURCE_FIELD: RAM_FIELD,
@@ -225,60 +349,124 @@ var (
 		BACKUP_FIELD:        "backup_no_backup",
 		DISK_IMAGE_FIELD:    "",
 	}
+	TEMPLATE2_MAP = map[string]interface{}{
+		ID_FIELD:         40,
+		NAME_FIELD:       "template2",
+		SLUG_FIELD:       "unit test disk goulouglougoulouglou",
+		RAM_FIELD:        1,
+		CPU_FIELD:        1,
+		OS_FIELD:         "CentOS",
+		ENTERPRISE_FIELD: "unit test enterprise",
+		DISKS_FIELD: []interface{}{
+			map[string]interface{}{
+				NAME_FIELD:          "unit test disk goulouglouglou",
+				SIZE_FIELD:          20,
+				STORAGE_CLASS_FIELD: "storage_enterprise",
+				SLUG_FIELD:          "unit test disk goulouglou slug",
+			},
+		},
+		NICS_FIELD:    []interface{}{},
+		"login":       "",
+		"password":    "",
+		DYNAMIC_FIELD: "",
+	}
+	LAST_TEMPLATE_IN_LIST = map[string]interface{}{
+		ID_FIELD:         69,
+		NAME_FIELD:       "lastTemplate",
+		SLUG_FIELD:       "lastTemplate-slug",
+		RAM_FIELD:        1,
+		CPU_FIELD:        1,
+		OS_FIELD:         "Debian",
+		ENTERPRISE_FIELD: "unit test enterprise",
+		DISKS_FIELD: []interface{}{
+			map[string]interface{}{
+				NAME_FIELD:          "disk-debian9-rd-1",
+				SIZE_FIELD:          10,
+				STORAGE_CLASS_FIELD: "storage_enterprise",
+				SLUG_FIELD:          "disk-debian9-rd-1",
+			},
+		},
+		NICS_FIELD: []interface{}{
+			map[string]interface{}{
+				VLAN_NAME_FIELD:  "unit test vlan1",
+				MAC_ADRESS_FIELD: "00:50:56:00:01:de",
+				CONNECTED_FIELD:  true,
+			},
+			map[string]interface{}{
+				VLAN_NAME_FIELD:  "unit test vlan2",
+				MAC_ADRESS_FIELD: "00:50:56:00:01:df",
+				CONNECTED_FIELD:  true,
+			},
+		},
+		"login":       nil,
+		"password":    nil,
+		DYNAMIC_FIELD: nil,
+	}
+	TEMPLATE1_MAP = map[string]interface{}{
+		ID_FIELD:         82,
+		NAME_FIELD:       "template1",
+		SLUG_FIELD:       "template1 slug",
+		RAM_FIELD:        1,
+		CPU_FIELD:        1,
+		OS_FIELD:         "CentOS",
+		BOOT_FIELD:       "on disk",
+		ENTERPRISE_FIELD: "unit test enterprise",
+		DISKS_FIELD: []interface{}{
+			map[string]interface{}{
+				NAME_FIELD:          "unit test disk template1",
+				SIZE_FIELD:          20,
+				STORAGE_CLASS_FIELD: "storage_enterprise",
+				SLUG_FIELD:          "unit test disk slug",
+			},
+		},
+		NICS_FIELD: []interface{}{
+			map[string]interface{}{VLAN_NAME_FIELD: "unit test vlan1",
+				MAC_ADRESS_FIELD: "00:50:56:21:7c:ab",
+				CONNECTED_FIELD:  true,
+			},
+			map[string]interface{}{VLAN_NAME_FIELD: "unit test vlan2",
+				MAC_ADRESS_FIELD: "00:50:56:21:7c:ac",
+				CONNECTED_FIELD:  true,
+			},
+		},
+		"login":       "",
+		"password":    "",
+		DYNAMIC_FIELD: "",
+	}
+	TEMPLATE1_MAP_BIS = map[string]interface{}{
+		ID_FIELD:         82,
+		NAME_FIELD:       "template1",
+		SLUG_FIELD:       "template1 slug",
+		RAM_FIELD:        1,
+		CPU_FIELD:        1,
+		OS_FIELD:         "CentOS",
+		BOOT_FIELD:       "on disk",
+		ENTERPRISE_FIELD: "unit test enterprise",
+		//DISKS_FIELD:      []interface{}{},
+		//NICS_FIELD:       []interface{}{},
+		DISKS_FIELD: []interface{}{
+			map[string]interface{}{
+				NAME_FIELD:          "unit test disk template1",
+				SIZE_FIELD:          20,
+				STORAGE_CLASS_FIELD: "storage_enterprise",
+				SLUG_FIELD:          "unit test disk slug",
+			},
+		},
+		NICS_FIELD: []interface{}{
+			map[string]interface{}{VLAN_NAME_FIELD: "unit test vlan1",
+				MAC_ADRESS_FIELD: "00:50:56:21:7c:ab",
+				CONNECTED_FIELD:  true,
+			},
+			map[string]interface{}{VLAN_NAME_FIELD: "unit test vlan2",
+				MAC_ADRESS_FIELD: "00:50:56:21:7c:ac",
+				CONNECTED_FIELD:  true,
+			},
+		},
+		DYNAMIC_FIELD: "",
+	}
 	TEMPLATES_LIST = []interface{}{
-		map[string]interface{}{
-			ID_FIELD:         40,
-			NAME_FIELD:       "template2",
-			SLUG_FIELD:       "unit test disk goulouglougoulouglou",
-			RAM_FIELD:        1,
-			CPU_FIELD:        1,
-			OS_FIELD:         "CentOS",
-			ENTERPRISE_FIELD: "unit test enterprise",
-			DISKS_FIELD: []interface{}{
-				map[string]interface{}{
-					NAME_FIELD:          "unit test disk goulouglouglou",
-					SIZE_FIELD:          20,
-					STORAGE_CLASS_FIELD: "storage_enterprise",
-					SLUG_FIELD:          "unit test disk goulouglou slug",
-				},
-			},
-			DATACENTER_FIELD: "dc2",
-			NICS_FIELD:       []interface{}{},
-			"login":          "",
-			"password":       "",
-			DYNAMIC_FIELD:    "",
-		},
-		map[string]interface{}{
-			ID_FIELD:         82,
-			NAME_FIELD:       "template1",
-			SLUG_FIELD:       "template1 slug",
-			RAM_FIELD:        1,
-			CPU_FIELD:        1,
-			OS_FIELD:         "CentOS",
-			ENTERPRISE_FIELD: "unit test enterprise",
-			DISKS_FIELD: []interface{}{
-				map[string]interface{}{
-					NAME_FIELD:          "unit test disk template1",
-					SIZE_FIELD:          20,
-					STORAGE_CLASS_FIELD: "storage_enterprise",
-					SLUG_FIELD:          "unit test disk slug",
-				},
-			},
-			DATACENTER_FIELD: "dc1",
-			NICS_FIELD: []interface{}{
-				map[string]interface{}{VLAN_NAME_FIELD: "unit test vlan1",
-					MAC_ADRESS_FIELD: "00:50:56:21:7c:ab",
-					CONNECTED_FIELD:  true,
-				},
-				map[string]interface{}{VLAN_NAME_FIELD: "unit test vlan2",
-					MAC_ADRESS_FIELD: "00:50:56:21:7c:ac",
-					CONNECTED_FIELD:  true,
-				},
-			},
-			"login":       "",
-			"password":    "",
-			DYNAMIC_FIELD: "",
-		},
+		TEMPLATE2_MAP,
+		TEMPLATE1_MAP,
 		map[string]interface{}{
 			ID_FIELD:         41,
 			NAME_FIELD:       "template3",
@@ -295,11 +483,10 @@ var (
 					SLUG_FIELD:          "unit test disk slug 2",
 				},
 			},
-			DATACENTER_FIELD: "dc2",
-			NICS_FIELD:       []interface{}{},
-			"login":          "",
-			"password":       "",
-			DYNAMIC_FIELD:    "",
+			NICS_FIELD:    []interface{}{},
+			"login":       "",
+			"password":    "",
+			DYNAMIC_FIELD: "",
 		},
 		map[string]interface{}{
 			ID_FIELD:         43,
@@ -317,7 +504,6 @@ var (
 					SLUG_FIELD:          "unit test disk slug",
 				},
 			},
-			DATACENTER_FIELD: "dc2",
 			NICS_FIELD: []interface{}{
 				map[string]interface{}{
 					VLAN_NAME_FIELD:  "unit test vlan1",
@@ -350,45 +536,17 @@ var (
 					SLUG_FIELD:          "disk-template-windows7",
 				},
 			},
-			DATACENTER_FIELD: "dc2",
-			NICS_FIELD:       []interface{}{},
-			"login":          nil,
-			"password":       nil,
-			DYNAMIC_FIELD:    nil,
-		},
-		map[string]interface{}{
-			ID_FIELD:         69,
-			NAME_FIELD:       "template5",
-			SLUG_FIELD:       "template5-slug",
-			RAM_FIELD:        1,
-			CPU_FIELD:        1,
-			OS_FIELD:         "Debian",
-			ENTERPRISE_FIELD: "unit test enterprise",
-			DISKS_FIELD: []interface{}{
-				map[string]interface{}{
-					NAME_FIELD:          "disk-debian9-rd-1",
-					SIZE_FIELD:          10,
-					STORAGE_CLASS_FIELD: "storage_enterprise",
-					SLUG_FIELD:          "disk-debian9-rd-1",
-				},
-			},
-			DATACENTER_FIELD: "dc2",
-			NICS_FIELD: []interface{}{
-				map[string]interface{}{
-					VLAN_NAME_FIELD:  "unit test vlan1",
-					MAC_ADRESS_FIELD: "00:50:56:00:01:de",
-					CONNECTED_FIELD:  true,
-				},
-				map[string]interface{}{
-					VLAN_NAME_FIELD:  "unit test vlan2",
-					MAC_ADRESS_FIELD: "00:50:56:00:01:df",
-					CONNECTED_FIELD:  true,
-				},
-			},
+			NICS_FIELD:    []interface{}{},
 			"login":       nil,
 			"password":    nil,
 			DYNAMIC_FIELD: nil,
 		},
+		LAST_TEMPLATE_IN_LIST,
+	}
+	WRONG_TEMPLATES_LIST = []interface{}{
+		TEMPLATE2_MAP,
+		"Wrongly formated template",
+		LAST_TEMPLATE_IN_LIST,
 	}
 	TEST_UPDATE_VM_MAP = map[string]interface{}{
 		ID_FIELD:    "unit test vm",
@@ -699,7 +857,6 @@ func Fake_vdcInstance_VDC_CREATION_MAP() VDC {
 	return VDC{
 		Name:       "Unit test vdc resource",
 		Enterprise: "enterprise",
-		Datacenter: "dc1",
 		Vdc_resources: []interface{}{
 			map[string]interface{}{
 				RESOURCE_FIELD: "enterprise-mono-ram",
