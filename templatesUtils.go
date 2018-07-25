@@ -213,7 +213,7 @@ func (templater Template_Templater) CreateTemplateOverrideConfig(d *schema.Resou
 		logger.Println("os.IsNotExist(err) = ", os.IsNotExist(err))
 		if _, err := os.Stat(override_file.String()); os.IsNotExist(err) {
 			for list_key, list_value := range template[DISKS_FIELD].([]interface{}) {
-				list_item, _ = schemaer.Read_element(list_key,
+				list_item, _ = schemaer.ReadElement(list_key,
 					list_value,
 					logger)
 				disk := Disk_modifiable_fields{
@@ -226,7 +226,7 @@ func (templater Template_Templater) CreateTemplateOverrideConfig(d *schema.Resou
 			vm.Disks = read_list_value
 			read_list_value = []interface{}{}
 			for list_key, list_value := range d.Get(NICS_FIELD).([]interface{}) {
-				list_item, _ = schemaer.Read_element(list_key,
+				list_item, _ = schemaer.ReadElement(list_key,
 					list_value,
 					logger)
 				nic := Nic_modifiable_fields{

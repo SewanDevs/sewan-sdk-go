@@ -52,12 +52,12 @@ func TestNew(t *testing.T) {
 		},
 	}
 
-	fake_api_tools := APITooler{
+	fakeApi_tools := APITooler{
 		Api: FakeAirDrumResource_APIer{},
 	}
 
 	for _, test_case := range test_cases {
-		api := fake_api_tools.New(
+		api := fakeApi_tools.New(
 			test_case.Input_token,
 			test_case.Input_url,
 		)
@@ -117,11 +117,11 @@ func TestCheckStatus(t *testing.T) {
 		},
 	}
 
-	fake_api_tools := APITooler{}
+	fakeApi_tools := APITooler{}
 
 	for _, test_case := range test_cases {
-		fake_api_tools.Api = FakeAirDrumResource_APIer{}
-		err := fake_api_tools.CheckStatus(test_case.Input_api)
+		fakeApi_tools.Api = FakeAirDrumResource_APIer{}
+		err := fakeApi_tools.CheckStatus(test_case.Input_api)
 		switch {
 		case err == nil || test_case.Err == nil:
 			if !(err == nil && test_case.Err == nil) {

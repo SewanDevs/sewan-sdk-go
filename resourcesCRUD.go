@@ -10,7 +10,7 @@ import (
 )
 
 //------------------------------------------------------------------------------
-func (apier AirDrumResources_Apier) Create_resource(d *schema.ResourceData,
+func (apier AirDrumResources_Apier) CreateResource(d *schema.ResourceData,
 	clientTooler *ClientTooler,
 	templatesTooler *TemplatesTooler,
 	schemaTools *SchemaTooler,
@@ -29,13 +29,13 @@ func (apier AirDrumResources_Apier) Create_resource(d *schema.ResourceData,
 		resp_body_reader               interface{}
 		bodyBytes                      []byte
 	)
-	api_tools := APITooler{
+	apiTools := APITooler{
 		Api: apier,
 	}
 	req := &http.Request{}
 	resp := &http.Response{}
 	resource_instance_creation_err,
-		resourceInstance = api_tools.Api.ResourceInstanceCreate(d,
+		resourceInstance = apiTools.Api.ResourceInstanceCreate(d,
 		clientTooler,
 		templatesTooler,
 		schemaTools,
@@ -48,7 +48,7 @@ func (apier AirDrumResources_Apier) Create_resource(d *schema.ResourceData,
 		resource_json, create_req_err = json.Marshal(resourceInstance)
 		if create_req_err == nil {
 			req, create_req_err = http.NewRequest("POST",
-				api_tools.Api.Get_resource_creation_url(sewan, resourceType),
+				apiTools.Api.GetResourceCreationUrl(sewan, resourceType),
 				bytes.NewBuffer(resource_json))
 			logger.Println("req.Body = ", req.Body)
 			if create_req_err == nil {
@@ -89,7 +89,7 @@ func (apier AirDrumResources_Apier) Create_resource(d *schema.ResourceData,
 							created_resource = resp_body_reader.(map[string]interface{})
 							for key, value := range created_resource {
 								read_value,
-									updateError := schemaTools.SchemaTools.Read_element(key,
+									updateError := schemaTools.SchemaTools.ReadElement(key,
 									value,
 									logger)
 								if updateError == nil {
@@ -120,7 +120,7 @@ func (apier AirDrumResources_Apier) Create_resource(d *schema.ResourceData,
 }
 
 //------------------------------------------------------------------------------
-func (apier AirDrumResources_Apier) Read_resource(d *schema.ResourceData,
+func (apier AirDrumResources_Apier) ReadResource(d *schema.ResourceData,
 	clientTooler *ClientTooler,
 	templatesTooler *TemplatesTooler,
 	schemaTools *SchemaTooler,
@@ -142,14 +142,14 @@ func (apier AirDrumResources_Apier) Read_resource(d *schema.ResourceData,
 	req := &http.Request{}
 	resp := &http.Response{}
 	logger := loggerCreate("read_resource_" + instanceName + ".log")
-	api_tools := APITooler{
+	apiTools := APITooler{
 		Api: apier,
 	}
-	resource_instance_creation_err = api_tools.Api.ValidateResourceType(resourceType)
+	resource_instance_creation_err = apiTools.Api.ValidateResourceType(resourceType)
 
 	if resource_instance_creation_err == nil {
 		req, read_req_err = http.NewRequest("GET",
-			api_tools.Api.Get_resource_url(sewan, resourceType, d.Id()), nil)
+			apiTools.Api.GetResourceUrl(sewan, resourceType, d.Id()), nil)
 		if read_req_err == nil {
 			req.Header.Add("authorization", "Token "+sewan.Token)
 			resp, read_req_err = clientTooler.Client.Do(sewan, req)
@@ -186,7 +186,7 @@ func (apier AirDrumResources_Apier) Read_resource(d *schema.ResourceData,
 
 							for key, value := range read_resource {
 								read_value,
-									updateError := schemaTools.SchemaTools.Read_element(key,
+									updateError := schemaTools.SchemaTools.ReadElement(key,
 									value,
 									logger)
 								if updateError == nil {
@@ -222,7 +222,7 @@ func (apier AirDrumResources_Apier) Read_resource(d *schema.ResourceData,
 }
 
 //------------------------------------------------------------------------------
-func (apier AirDrumResources_Apier) Update_resource(d *schema.ResourceData,
+func (apier AirDrumResources_Apier) UpdateResource(d *schema.ResourceData,
 	clientTooler *ClientTooler,
 	templatesTooler *TemplatesTooler,
 	schemaTools *SchemaTooler,
@@ -243,12 +243,12 @@ func (apier AirDrumResources_Apier) Update_resource(d *schema.ResourceData,
 	)
 	req := &http.Request{}
 	resp := &http.Response{}
-	api_tools := APITooler{
+	apiTools := APITooler{
 		Api: apier,
 	}
 	logger := loggerCreate("update_resource_" + instanceName + ".log")
 	resource_instance_creation_err,
-		resourceInstance = api_tools.Api.ResourceInstanceCreate(d,
+		resourceInstance = apiTools.Api.ResourceInstanceCreate(d,
 		clientTooler,
 		templatesTooler,
 		schemaTools,
@@ -260,7 +260,7 @@ func (apier AirDrumResources_Apier) Update_resource(d *schema.ResourceData,
 		resource_json, update_req_err = json.Marshal(resourceInstance)
 		if update_req_err == nil {
 			req, update_req_err = http.NewRequest("PUT",
-				api_tools.Api.Get_resource_url(sewan, resourceType, d.Id()),
+				apiTools.Api.GetResourceUrl(sewan, resourceType, d.Id()),
 				bytes.NewBuffer(resource_json))
 			logger.Println("req.Body = ", req.Body)
 			if update_req_err == nil {
@@ -321,7 +321,7 @@ func (apier AirDrumResources_Apier) Update_resource(d *schema.ResourceData,
 }
 
 //------------------------------------------------------------------------------
-func (apier AirDrumResources_Apier) Delete_resource(d *schema.ResourceData,
+func (apier AirDrumResources_Apier) DeleteResource(d *schema.ResourceData,
 	clientTooler *ClientTooler,
 	templatesTooler *TemplatesTooler,
 	schemaTools *SchemaTooler,
@@ -338,10 +338,10 @@ func (apier AirDrumResources_Apier) Delete_resource(d *schema.ResourceData,
 		bodyBytes                      []byte
 		instanceName                   string = d.Get(NAME_FIELD).(string)
 	)
-	api_tools := APITooler{
+	apiTools := APITooler{
 		Api: apier,
 	}
-	resource_instance_creation_err = api_tools.Api.ValidateResourceType(resourceType)
+	resource_instance_creation_err = apiTools.Api.ValidateResourceType(resourceType)
 	req := &http.Request{}
 	resp := &http.Response{}
 	logger := loggerCreate("delete_resource_" + instanceName + ".log")
@@ -351,7 +351,7 @@ func (apier AirDrumResources_Apier) Delete_resource(d *schema.ResourceData,
 	if resource_instance_creation_err == nil {
 
 		req, delete_req_err = http.NewRequest("DELETE",
-			api_tools.Api.Get_resource_url(sewan, resourceType, d.Id()), nil)
+			apiTools.Api.GetResourceUrl(sewan, resourceType, d.Id()), nil)
 		if delete_req_err == nil {
 			req.Header.Add("authorization", "Token "+sewan.Token)
 			resp, delete_req_err = clientTooler.Client.Do(sewan, req)

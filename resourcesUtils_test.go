@@ -21,7 +21,7 @@ func TestResourceInstanceCreate(t *testing.T) {
 	}{
 		{
 			1,
-			vm_schema_init(NO_TEMPLATE_VM_MAP),
+			vmSchemaInit(NO_TEMPLATE_VM_MAP),
 			GetTemplatesList_Success_HttpClienterFake{},
 			TemplaterDummy{},
 			VM_RESOURCE_TYPE,
@@ -30,25 +30,25 @@ func TestResourceInstanceCreate(t *testing.T) {
 		},
 		{
 			2,
-			vm_schema_init(EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP),
+			vmSchemaInit(EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP),
 			GetTemplatesList_Success_HttpClienterFake{},
 			EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP_TemplaterFake{},
 			VM_RESOURCE_TYPE,
 			nil,
-			Fake_vmInstance_EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP(),
+			FakeVmInstance_EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP(),
 		},
 		{
 			3,
-			vm_schema_init(EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISKS_VM_MAP),
+			vmSchemaInit(EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISKS_VM_MAP),
 			GetTemplatesList_Success_HttpClienterFake{},
 			EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISKS_VM_MAP_TemplaterFake{},
 			VM_RESOURCE_TYPE,
 			nil,
-			Fake_vmInstance_EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISKS_VM_MAP(),
+			FakeVmInstance_EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISKS_VM_MAP(),
 		},
 		{
 			4,
-			vm_schema_init(NON_EXISTING_TEMPLATE_VM_MAP),
+			vmSchemaInit(NON_EXISTING_TEMPLATE_VM_MAP),
 			GetTemplatesList_Success_HttpClienterFake{},
 			Unexisting_template_TemplaterFake{},
 			VM_RESOURCE_TYPE,
@@ -57,16 +57,16 @@ func TestResourceInstanceCreate(t *testing.T) {
 		},
 		{
 			5,
-			vdc_schema_init(VDC_CREATION_MAP),
+			vdcSchemaInit(VDC_CREATION_MAP),
 			nil,
 			TemplaterDummy{},
 			VDC_RESOURCE_TYPE,
 			nil,
-			Fake_vdcInstance_VDC_CREATION_MAP(),
+			FakeVdcInstance_VDC_CREATION_MAP(),
 		},
 		{
 			6,
-			vdc_schema_init(VDC_CREATION_MAP),
+			vdcSchemaInit(VDC_CREATION_MAP),
 			GetTemplatesList_Success_HttpClienterFake{},
 			TemplaterDummy{},
 			WRONG_RESOURCE_TYPE,
@@ -78,7 +78,7 @@ func TestResourceInstanceCreate(t *testing.T) {
 		},
 		{
 			7,
-			vm_schema_init(NON_EXISTING_TEMPLATE_VM_MAP),
+			vmSchemaInit(NON_EXISTING_TEMPLATE_VM_MAP),
 			GetTemplatesList_Failure_HttpClienterFake{},
 			Unexisting_template_TemplaterFake{},
 			VM_RESOURCE_TYPE,
@@ -87,7 +87,7 @@ func TestResourceInstanceCreate(t *testing.T) {
 		},
 		{
 			8,
-			vm_schema_init(EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP),
+			vmSchemaInit(EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP),
 			GetTemplatesList_Success_HttpClienterFake{},
 			Template_Format_error_TemplaterFake{},
 			VM_RESOURCE_TYPE,
@@ -108,7 +108,7 @@ func TestResourceInstanceCreate(t *testing.T) {
 		instance interface{}
 		diffs    string
 	)
-	api_tools := APITooler{
+	apiTools := APITooler{
 		Api: AirDrumResources_Apier{},
 	}
 	fake_client_tooler := ClientTooler{}
@@ -121,7 +121,7 @@ func TestResourceInstanceCreate(t *testing.T) {
 	for _, test_case := range test_cases {
 		fake_client_tooler.Client = test_case.TC_Clienter
 		fake_templates_tooler.TemplatesTools = test_case.TC_Templater
-		err, instance = api_tools.Api.ResourceInstanceCreate(test_case.D,
+		err, instance = apiTools.Api.ResourceInstanceCreate(test_case.D,
 			&fake_client_tooler,
 			&fake_templates_tooler,
 			&fake_schema_tooler,
@@ -158,7 +158,7 @@ func TestResourceInstanceCreate(t *testing.T) {
 }
 
 //------------------------------------------------------------------------------
-func TestGet_resource_url(t *testing.T) {
+func TestGetResourceUrl(t *testing.T) {
 	test_cases := []struct {
 		Id     int
 		api    API
@@ -185,12 +185,12 @@ func TestGet_resource_url(t *testing.T) {
 		},
 	}
 
-	api_tools := APITooler{
+	apiTools := APITooler{
 		Api: AirDrumResources_Apier{},
 	}
 
 	for _, test_case := range test_cases {
-		s_vm_url := api_tools.Api.Get_resource_url(&test_case.api,
+		s_vm_url := apiTools.Api.GetResourceUrl(&test_case.api,
 			VM_RESOURCE_TYPE,
 			test_case.vm_id)
 
@@ -203,7 +203,7 @@ func TestGet_resource_url(t *testing.T) {
 }
 
 //------------------------------------------------------------------------------
-func TestGet_resource_creation_url(t *testing.T) {
+func TestGetResourceCreationUrl(t *testing.T) {
 	test_cases := []struct {
 		Id                    int
 		api                   API
@@ -219,12 +219,12 @@ func TestGet_resource_creation_url(t *testing.T) {
 		},
 	}
 
-	api_tools := APITooler{
+	apiTools := APITooler{
 		Api: AirDrumResources_Apier{},
 	}
 
 	for _, test_case := range test_cases {
-		s_resource_creation_url := api_tools.Api.Get_resource_creation_url(&test_case.api,
+		s_resource_creation_url := apiTools.Api.GetResourceCreationUrl(&test_case.api,
 			VM_RESOURCE_TYPE)
 
 		switch {
@@ -237,7 +237,7 @@ func TestGet_resource_creation_url(t *testing.T) {
 }
 
 //------------------------------------------------------------------------------
-func TestValidate_status(t *testing.T) {
+func TestValidateStatus(t *testing.T) {
 	test_cases := []struct {
 		Id           int
 		Api          API
@@ -313,19 +313,19 @@ func TestValidate_status(t *testing.T) {
 	var apiClientErr error
 
 	for _, test_case := range test_cases {
-		apiClientErr = apiTooler.Api.Validate_status(&test_case.Api,
+		apiClientErr = apiTooler.Api.ValidateStatus(&test_case.Api,
 			test_case.ResourceType,
 			clientTooler)
 
 		switch {
 		case apiClientErr == nil || test_case.Err == nil:
 			if !(apiClientErr == nil && test_case.Err == nil) {
-				t.Errorf("\n\nTC %d : Validate_status() error was incorrect,"+
+				t.Errorf("\n\nTC %d : ValidateStatus() error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
 					test_case.Id, apiClientErr, test_case.Err)
 			}
 		case apiClientErr.Error() != test_case.Err.Error():
-			t.Errorf("\n\nTC %d : Validate_status() error was incorrect,"+
+			t.Errorf("\n\nTC %d : ValidateStatus() error was incorrect,"+
 				"\n\rgot: \"%s\"\n\rwant: \"%s\"",
 				test_case.Id, apiClientErr.Error(), test_case.Err.Error())
 		}
@@ -339,18 +339,18 @@ func Create_test_resource_schema(id interface{}) *schema.ResourceData {
 	return d
 }
 
-func TestDelete_terraform_resource(t *testing.T) {
+func TestDeleteTerraformResource(t *testing.T) {
 	d := Create_test_resource_schema("resource to delete")
 	schemaTooler := SchemaTooler{
 		SchemaTools: Schema_Schemaer{},
 	}
-	schemaTooler.SchemaTools.Delete_terraform_resource(d)
+	schemaTooler.SchemaTools.DeleteTerraformResource(d)
 	if d.Id() != "" {
 		t.Errorf("Deletion of unit test resource failed.")
 	}
 }
 
-func TestUpdate_local_resource_state_AND_Read_element(t *testing.T) {
+func TestUpdateLocalResourceState_AND_ReadElement(t *testing.T) {
 	test_cases := []struct {
 		Id           int
 		Vm_map       map[string]interface{}
@@ -381,7 +381,7 @@ func TestUpdate_local_resource_state_AND_Read_element(t *testing.T) {
 	}
 	for _, test_case := range test_cases {
 		d = Create_test_resource_schema(test_case.Vm_Id_string)
-		schemaTooler.SchemaTools.Update_local_resource_state(test_case.Vm_map,
+		schemaTooler.SchemaTools.UpdateLocalResourceState(test_case.Vm_map,
 			d,
 			&schemaTooler)
 		for key, value := range test_case.Vm_map {
