@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -113,12 +114,15 @@ func vmInstanceCreate(d *schema.ResourceData,
 		template                       map[string]interface{} = nil
 		template_name                  string                 = d.Get(TEMPLATE_FIELD).(string)
 		enterprise                     string                 = d.Get(ENTERPRISE_FIELD).(string)
+		vmName                         strings.Builder
+		instanceNumber                 int
 	)
 	logger := LoggerCreate("vminstanceCreate" + d.Id() + ".log")
-
+	vmName.WriteString(d.Get(NAME_FIELD).(string))
 	if template_name != "" && d.Id() == "" {
-		vm = VM{}
 		var templateList []interface{}
+		instanceNumber = d.Get(INSTANCE_NUMBER_FIELD).(int)
+		vmName.WriteString(strconv.Itoa(instanceNumber))
 		templateList,
 			get_templates_list_error = clientTooler.Client.GetTemplatesList(clientTooler,
 			enterprise, api)
@@ -143,7 +147,7 @@ func vmInstanceCreate(d *schema.ResourceData,
 	logger.Println("instance_creation_error = ", instance_creation_error)
 	if instance_creation_error == nil {
 		vm = VM{
-			Name:          d.Get(NAME_FIELD).(string),
+			Name:          vmName.String(),
 			Enterprise:    d.Get(ENTERPRISE_FIELD).(string),
 			State:         d.Get(STATE_FIELD).(string),
 			OS:            d.Get(OS_FIELD).(string),
@@ -162,6 +166,7 @@ func vmInstanceCreate(d *schema.ResourceData,
 			Backup_size:   d.Get(BACKUP_SIZE_FIELD).(int),
 			Dynamic_field: d.Get(DYNAMIC_FIELD).(string),
 		}
+		logger.Println("vm.Name =", vm.Name)
 		if d.Id() == "" {
 			dynamic_field_struct := Dynamic_field_struct{
 				Terraform_provisioned:      true,
@@ -202,7 +207,7 @@ func (apier AirDrumResources_Apier) ResourceInstanceCreate(d *schema.ResourceDat
 		resourceInstance, instanceError = vdcInstanceCreate(d,
 			clientTooler,
 			api)
-	case "vm":
+	case VM_RESOURCE_TYPE:
 		resourceInstance, instanceError = vmInstanceCreate(d,
 			clientTooler,
 			templatesTooler,
@@ -221,7 +226,7 @@ func (apier AirDrumResources_Apier) ValidateResourceType(resourceType string) er
 	switch resourceType {
 	case VDC_FIELD:
 		err = nil
-	case "vm":
+	case VM_RESOURCE_TYPE:
 		err = nil
 	default:
 		err = errors.New("Resource of type \"" + resourceType + "\" not supported," +

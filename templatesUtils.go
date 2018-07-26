@@ -37,6 +37,7 @@ type Nic_modifiable_fields struct {
 }
 
 type Template_created_VM_override struct {
+	Name       string        `json:"name"`
 	OS         string        `json:"os"`
 	RAM        int           `json:"ram"`
 	CPU        int           `json:"cpu"`

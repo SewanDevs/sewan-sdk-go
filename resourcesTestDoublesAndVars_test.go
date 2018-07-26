@@ -17,8 +17,6 @@ const (
 	CHECK_REDIRECT_FAILURE  = "CheckRedirectReqFailure"
 	VDC_DESTROY_FAILURE_MSG = "Destroying the VDC now"
 	VM_DESTROY_FAILURE_MSG  = "Destroying the VM now"
-	VM_RESOURCE_TYPE        = "vm"
-	VDC_RESOURCE_TYPE       = VDC_FIELD
 	WRONG_RESOURCE_TYPE     = "a_non_supported_resource_type"
 	ENTERPRISE_SLUG         = "unit test enterprise"
 )
@@ -261,6 +259,19 @@ var (
 		SLUG_FIELD:          "42",
 		TOKEN_FIELD:         "424242",
 		BACKUP_FIELD:        "backup_no_backup",
+	}
+	INSTANCE_NUMBER_FIELD_UNIT_TEST_VM_INSTANCE = map[string]interface{}{
+		NAME_FIELD:            "INSTANCE_NUMBER_FIELDUnitTest",
+		INSTANCE_NUMBER_FIELD: 42,
+		ENTERPRISE_FIELD:      "unit test enterprise",
+		TEMPLATE_FIELD:        "template1",
+		STATE_FIELD:           "UP",
+		VDC_FIELD:             VDC_FIELD,
+		BOOT_FIELD:            "on disk",
+		STORAGE_CLASS_FIELD:   "storage_enterprise",
+		SLUG_FIELD:            "42",
+		TOKEN_FIELD:           "424242",
+		BACKUP_FIELD:          "backup_no_backup",
 	}
 	EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISKS_VM_MAP = map[string]interface{}{
 		NAME_FIELD:       "EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISKS_VM_MAP",
@@ -771,6 +782,10 @@ func resource_vm() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
+			INSTANCE_NUMBER_FIELD: &schema.Schema{
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
 			ENTERPRISE_FIELD: &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -967,7 +982,34 @@ func vmInstanceNO_TEMPLATE_VM_MAP() VM {
 
 func FakeVmInstance_EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP() VM {
 	return VM{
-		Name:       "Unit test template no disc add on vm resource",
+		Name:       "Unit test template no disc add on vm resource0",
+		Enterprise: "unit test enterprise",
+		Template:   "template1",
+		State:      "UP",
+		RAM:        1,
+		CPU:        1,
+		Disks: []interface{}{
+			map[string]interface{}{
+				NAME_FIELD:          "template1 disk1",
+				SIZE_FIELD:          20,
+				STORAGE_CLASS_FIELD: "storage_enterprise",
+				SLUG_FIELD:          "template1 disk1 slug",
+			},
+		},
+		Nics:          []interface{}{},
+		Vdc:           VDC_FIELD,
+		Boot:          "on disk",
+		Storage_class: "storage_enterprise",
+		Slug:          "42",
+		Token:         "424242",
+		Backup:        "backup_no_backup",
+		Dynamic_field: "{\"terraform_provisioned\":true,\"creation_template\":\"template1\",\"Template_disks_on_creation\":[{\"name\":\"template1 disk1\",\"size\":20,\"slug\":\"template1 disk1 slug\",\"storage_class\":\"storage_enterprise\"}]}",
+	}
+}
+
+func FakeVmInstance_INSTANCE_NUMBER_FIELD_UNIT_TEST_VM_INSTANCE_MAP() VM {
+	return VM{
+		Name:       "INSTANCE_NUMBER_FIELDUnitTest42",
 		Enterprise: "unit test enterprise",
 		Template:   "template1",
 		State:      "UP",
@@ -994,7 +1036,7 @@ func FakeVmInstance_EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP() VM {
 
 func FakeVmInstance_EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISKS_VM_MAP() VM {
 	return VM{
-		Name:       "EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISKS_VM_MAP",
+		Name:       "EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISKS_VM_MAP0",
 		Enterprise: "unit test enterprise",
 		Template:   "template1",
 		State:      "UP",
@@ -1147,7 +1189,7 @@ func resource(resourceType string) *schema.Resource {
 	switch resourceType {
 	case VDC_FIELD:
 		resource = resourceVdc()
-	case "vm":
+	case VM_RESOURCE_TYPE:
 		resource = resource_vm()
 	default:
 		//return a false resource

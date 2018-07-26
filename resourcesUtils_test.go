@@ -100,6 +100,15 @@ func TestResourceInstanceCreate(t *testing.T) {
 				"\"" + DATACENTER_FIELD + "\" "),
 			VM{},
 		},
+		{
+			9,
+			vmSchemaInit(INSTANCE_NUMBER_FIELD_UNIT_TEST_VM_INSTANCE),
+			GetTemplatesList_Success_HttpClienterFake{},
+			INSTANCE_NUMBER_FIELD_UNIT_TEST_VM_INSTANCE_MAP_TemplaterFake{},
+			VM_RESOURCE_TYPE,
+			nil,
+			FakeVmInstance_INSTANCE_NUMBER_FIELD_UNIT_TEST_VM_INSTANCE_MAP(),
+		},
 	}
 
 	var (
