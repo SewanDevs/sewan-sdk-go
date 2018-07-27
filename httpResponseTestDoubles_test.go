@@ -7,25 +7,25 @@ import (
 	"net/http"
 )
 
-func HttpResponseFake_OK_json() *http.Response {
+func HttpResponseFake_OKJson() *http.Response {
 	response := http.Response{}
 	response.Status = "200 OK"
 	response.StatusCode = http.StatusOK
 	response.Header = map[string][]string{}
 	response.Header.Add("Content-Type", "application/json")
-	Resp_Body_json, _ := json.Marshal(Resp_Body{Detail: "a simple json"})
-	response.Body = ioutil.NopCloser(bytes.NewBuffer(Resp_Body_json))
+	Resp_BodyJson, _ := json.Marshal(Resp_Body{Detail: "a simple json"})
+	response.Body = ioutil.NopCloser(bytes.NewBuffer(Resp_BodyJson))
 	return &response
 }
 
-func HttpResponseFake_OK_template_list_json() *http.Response {
+func HttpResponseFake_OKTemplateListJson() *http.Response {
 	response := http.Response{}
 	response.Status = "200 OK"
 	response.StatusCode = http.StatusOK
 	response.Header = map[string][]string{}
 	response.Header.Add("Content-Type", "application/json")
-	Resp_Body_json, _ := json.Marshal(TEMPLATES_LIST)
-	response.Body = ioutil.NopCloser(bytes.NewBuffer(Resp_Body_json))
+	Resp_BodyJson, _ := json.Marshal(TEMPLATES_LIST)
+	response.Body = ioutil.NopCloser(bytes.NewBuffer(Resp_BodyJson))
 	return &response
 }
 
@@ -39,14 +39,14 @@ func HttpResponseFake_500_texthtml() *http.Response {
 	return &response
 }
 
-func HttpResponseFake_500_json() *http.Response {
+func HttpResponseFake_500Json() *http.Response {
 	response := http.Response{}
 	response.Status = "500 Internal Server Error"
 	response.StatusCode = http.StatusInternalServerError
 	response.Header = map[string][]string{}
 	response.Header.Add("Content-Type", "application/json")
-	Resp_Body_json, _ := json.Marshal(Resp_Body{Detail: "a json response Resp_Body"})
-	response.Body = ioutil.NopCloser(bytes.NewBuffer(Resp_Body_json))
+	Resp_BodyJson, _ := json.Marshal(Resp_Body{Detail: "a json response Resp_Body"})
+	response.Body = ioutil.NopCloser(bytes.NewBuffer(Resp_BodyJson))
 	return &response
 }
 

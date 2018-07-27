@@ -34,7 +34,7 @@ func CompareJsonAndMap(jsonFile string,
 //------------------------------------------------------------------------------
 type TemplaterDummy struct{}
 
-func (templaterFake TemplaterDummy) FetchTemplateFromList(template_name string,
+func (templaterFake TemplaterDummy) FetchTemplateFromList(templateName string,
 	templateList []interface{}) (map[string]interface{}, error) {
 
 	return nil, nil
@@ -54,36 +54,36 @@ func (templaterFake TemplaterDummy) CreateTemplateOverrideConfig(d *schema.Resou
 }
 
 //------------------------------------------------------------------------------
-type Unexisting_template_TemplaterFake struct{}
+type UnexistingTemplate_TemplaterFake struct{}
 
-func (templaterFake Unexisting_template_TemplaterFake) FetchTemplateFromList(template_name string,
+func (templaterFake UnexistingTemplate_TemplaterFake) FetchTemplateFromList(templateName string,
 	templateList []interface{}) (map[string]interface{}, error) {
 
 	return nil, errors.New("Unavailable template : windows95")
 }
-func (templaterFake Unexisting_template_TemplaterFake) ValidateTemplate(template map[string]interface{}) error {
+func (templaterFake UnexistingTemplate_TemplaterFake) ValidateTemplate(template map[string]interface{}) error {
 
 	return nil
 }
-func (templaterFake Unexisting_template_TemplaterFake) UpdateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
+func (templaterFake UnexistingTemplate_TemplaterFake) UpdateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
 	template map[string]interface{}) error {
 
 	return nil
 }
-func (templaterFake Unexisting_template_TemplaterFake) CreateTemplateOverrideConfig(d *schema.ResourceData,
+func (templaterFake UnexistingTemplate_TemplaterFake) CreateTemplateOverrideConfig(d *schema.ResourceData,
 	template map[string]interface{}) (error, string) {
 	return nil, ""
 }
 
 //------------------------------------------------------------------------------
-type Template_Format_error_TemplaterFake struct{}
+type Template_FormatError_TemplaterFake struct{}
 
-func (templaterFake Template_Format_error_TemplaterFake) FetchTemplateFromList(template_name string,
+func (templaterFake Template_FormatError_TemplaterFake) FetchTemplateFromList(templateName string,
 	templateList []interface{}) (map[string]interface{}, error) {
 
 	return nil, nil
 }
-func (templaterFake Template_Format_error_TemplaterFake) ValidateTemplate(template map[string]interface{}) error {
+func (templaterFake Template_FormatError_TemplaterFake) ValidateTemplate(template map[string]interface{}) error {
 
 	return errors.New("Template missing fields : " + "\"" + NAME_FIELD + "\" " +
 		"\"" + OS_FIELD + "\" " +
@@ -93,12 +93,12 @@ func (templaterFake Template_Format_error_TemplaterFake) ValidateTemplate(templa
 		"\"" + DISKS_FIELD + "\" " +
 		"\"" + DATACENTER_FIELD + "\" ")
 }
-func (templaterFake Template_Format_error_TemplaterFake) UpdateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
+func (templaterFake Template_FormatError_TemplaterFake) UpdateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
 	template map[string]interface{}) error {
 
 	return nil
 }
-func (templaterFake Template_Format_error_TemplaterFake) CreateTemplateOverrideConfig(d *schema.ResourceData,
+func (templaterFake Template_FormatError_TemplaterFake) CreateTemplateOverrideConfig(d *schema.ResourceData,
 	template map[string]interface{}) (error, string) {
 	return nil, ""
 }
@@ -106,7 +106,7 @@ func (templaterFake Template_Format_error_TemplaterFake) CreateTemplateOverrideC
 //------------------------------------------------------------------------------
 type EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP_TemplaterFake struct{}
 
-func (templaterFake EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP_TemplaterFake) FetchTemplateFromList(template_name string,
+func (templaterFake EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP_TemplaterFake) FetchTemplateFromList(templateName string,
 	templateList []interface{}) (map[string]interface{}, error) {
 
 	return map[string]interface{}{
@@ -171,7 +171,7 @@ func (templaterFake EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP_TemplaterFake) C
 //------------------------------------------------------------------------------
 type INSTANCE_NUMBER_FIELD_UNIT_TEST_VM_INSTANCE_MAP_TemplaterFake struct{}
 
-func (templaterFake INSTANCE_NUMBER_FIELD_UNIT_TEST_VM_INSTANCE_MAP_TemplaterFake) FetchTemplateFromList(template_name string,
+func (templaterFake INSTANCE_NUMBER_FIELD_UNIT_TEST_VM_INSTANCE_MAP_TemplaterFake) FetchTemplateFromList(templateName string,
 	templateList []interface{}) (map[string]interface{}, error) {
 
 	return map[string]interface{}{
@@ -236,7 +236,7 @@ func (templaterFake INSTANCE_NUMBER_FIELD_UNIT_TEST_VM_INSTANCE_MAP_TemplaterFak
 //------------------------------------------------------------------------------
 type EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISKS_VM_MAP_TemplaterFake struct{}
 
-func (templaterFake EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISKS_VM_MAP_TemplaterFake) FetchTemplateFromList(template_name string,
+func (templaterFake EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISKS_VM_MAP_TemplaterFake) FetchTemplateFromList(templateName string,
 	templateList []interface{}) (map[string]interface{}, error) {
 
 	return map[string]interface{}{

@@ -26,14 +26,14 @@
     \umlobject[class=Terraform, x=9]{terraform}
 
 
-    \begin{umlcall}[op=1.\ terraform\ init(), type=synchron, return=init\ status]{admin}{terraform}
-      \begin{umlcall}[op=2.\ getProvidersPlugins(), type=synchron, return=providers\_list]{terraform}{tfplan}
+    \begin{umlcall}[op=1.\ terraform\ init(), type=synchron, return=initializationStatus]{admin}{terraform}
+      \begin{umlcall}[op=2.\ getProvidersPlugins(), type=synchron, return=providersList]{terraform}{tfplan}
       \end{umlcall}	
-      \begin{umlfragment}[type=loop, label=provider\_in\_providers\_list, name=loop, inner xsep=1,fill=blue!15]
-	\begin{umlcall}[op=3.\ Validate\_plugin\_installation(), type=synchron]{terraform}{terraform}
+      \begin{umlfragment}[type=loop, label=provider\_in\_providersList, name=loop, inner xsep=1,fill=blue!15]
+	\begin{umlcall}[op=3.\ ValidatePluginInstallation(), type=synchron]{terraform}{terraform}
 	\end{umlcall}
 	\begin{umlfragment}[type=alt, label=plugin\_not\_installed, name=if, inner xsep=19,fill=white]
-	  \begin{umlcall}[op=4.\ get\_and\_install\_plugin\_from\_official\_terraform\_plugins\_repo(), type=synchron]{terraform}{terraform}
+	  \begin{umlcall}[op=4.\ getAndInstallPluginFromOfficialTerraformPluginsRepo(), type=synchron]{terraform}{terraform}
 	  \end{umlcall}
 	\end{umlfragment}
       \end{umlfragment}

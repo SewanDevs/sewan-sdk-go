@@ -24,7 +24,7 @@ const (
 //------------------------------------------------------------------------------
 func TestNew(t *testing.T) {
 
-	test_cases := []struct {
+	testCases := []struct {
 		Id          int
 		Input_token string
 		Input_url   string
@@ -56,21 +56,21 @@ func TestNew(t *testing.T) {
 		Api: FakeAirDrumResource_APIer{},
 	}
 
-	for _, test_case := range test_cases {
+	for _, testCase := range testCases {
 		api := fakeApi_tools.New(
-			test_case.Input_token,
-			test_case.Input_url,
+			testCase.Input_token,
+			testCase.Input_url,
 		)
 
 		switch {
-		case api.Token != test_case.Output_api.Token:
+		case api.Token != testCase.Output_api.Token:
 			t.Errorf("\n\nTC %d : API token error was incorrect,"+
 				"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-				test_case.Id, api.Token, test_case.Output_api.Token)
-		case api.URL != test_case.Output_api.URL:
+				testCase.Id, api.Token, testCase.Output_api.Token)
+		case api.URL != testCase.Output_api.URL:
 			t.Errorf("\n\nTC %d : API token error was incorrect,"+
 				"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-				test_case.Id, api.URL, test_case.Output_api.URL)
+				testCase.Id, api.URL, testCase.Output_api.URL)
 		}
 	}
 }
@@ -78,7 +78,7 @@ func TestNew(t *testing.T) {
 //------------------------------------------------------------------------------
 func TestCheckStatus(t *testing.T) {
 
-	test_cases := []struct {
+	testCases := []struct {
 		Id        int
 		Input_api *API
 		Err       error
@@ -119,20 +119,20 @@ func TestCheckStatus(t *testing.T) {
 
 	fakeApi_tools := APITooler{}
 
-	for _, test_case := range test_cases {
+	for _, testCase := range testCases {
 		fakeApi_tools.Api = FakeAirDrumResource_APIer{}
-		err := fakeApi_tools.CheckStatus(test_case.Input_api)
+		err := fakeApi_tools.CheckStatus(testCase.Input_api)
 		switch {
-		case err == nil || test_case.Err == nil:
-			if !(err == nil && test_case.Err == nil) {
+		case err == nil || testCase.Err == nil:
+			if !(err == nil && testCase.Err == nil) {
 				t.Errorf("\n\nTC %d : Check API error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-					test_case.Id, err, test_case.Err)
+					testCase.Id, err, testCase.Err)
 			}
-		case err.Error() != test_case.Err.Error():
+		case err.Error() != testCase.Err.Error():
 			t.Errorf("\n\nTC %d : Check API error was incorrect,"+
 				"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-				test_case.Id, err.Error(), test_case.Err.Error())
+				testCase.Id, err.Error(), testCase.Err.Error())
 		}
 	}
 }

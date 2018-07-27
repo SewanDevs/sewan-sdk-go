@@ -17,7 +17,7 @@ const (
 	CHECK_REDIRECT_FAILURE  = "CheckRedirectReqFailure"
 	VDC_DESTROY_FAILURE_MSG = "Destroying the VDC now"
 	VM_DESTROY_FAILURE_MSG  = "Destroying the VM now"
-	WRONG_RESOURCE_TYPE     = "a_non_supported_resource_type"
+	WRONG_RESOURCE_TYPE     = "a_non_supportedResource_type"
 	ENTERPRISE_SLUG         = "unit test enterprise"
 )
 
@@ -26,6 +26,40 @@ var (
 		"resource": map[string]interface{}{
 			"sewan_clouddc_vm": map[string]interface{}{
 				"CreateTemplateOverrideConfig Unit test": map[string]interface{}{
+					"name": "CreateTemplateOverrideConfig Unit test",
+					"disks": []interface{}{
+						map[string]interface{}{
+							"name":          "unit test disk template1",
+							"size":          float64(20),
+							"storage_class": "storage_enterprise",
+						},
+					},
+					"disk_image": "",
+					"os":         "CentOS",
+					"ram":        float64(1),
+					"cpu":        float64(1),
+					"backup":     "",
+					"nics": []interface{}{
+						map[string]interface{}{
+							"vlan":      "unit test vlan1",
+							"connected": true,
+						},
+						map[string]interface{}{
+							"vlan":      "unit test vlan2",
+							"connected": true,
+						},
+					},
+					"vdc":  "",
+					"boot": "",
+				},
+			},
+		},
+	}
+	RESOURCE_N42_OVERRIDE_JSON_MAP = map[string]interface{}{
+		"resource": map[string]interface{}{
+			"sewan_clouddc_vm": map[string]interface{}{
+				"CreateTemplateOverrideConfig Unit test": map[string]interface{}{
+					"name": "CreateTemplateOverrideConfig Unit test-${count.index}",
 					"disks": []interface{}{
 						map[string]interface{}{
 							"name":          "unit test disk template1",
@@ -129,7 +163,33 @@ var (
 				CONNECTED_FIELD: true,
 			},
 		},
-		DYNAMIC_FIELD: "{\"terraform_provisioned\":true,\"creation_template\":\"template1\",\"Template_disks_on_creation\":null}",
+		DYNAMIC_FIELD: "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"Template_disks_on_creation\":null}",
+	}
+	VM_CREATION_N42_FROM_TEMPLATE1_SCHEMA = map[string]interface{}{
+		NAME_FIELD:            "CreateTemplateOverrideConfig Unit test",
+		INSTANCE_NUMBER_FIELD: 42,
+		RAM_FIELD:             1,
+		CPU_FIELD:             1,
+		ENTERPRISE_FIELD:      "unit test enterprise",
+		TEMPLATE_FIELD:        "template1",
+		OS_FIELD:              "Debian",
+		DISKS_FIELD: []interface{}{
+			map[string]interface{}{
+				NAME_FIELD:          "unit test disk template1",
+				SIZE_FIELD:          20,
+				STORAGE_CLASS_FIELD: "storage_enterprise",
+				SLUG_FIELD:          "unit test disk slug",
+			},
+		},
+		NICS_FIELD: []interface{}{
+			map[string]interface{}{VLAN_NAME_FIELD: "unit test vlan1",
+				CONNECTED_FIELD: true,
+			},
+			map[string]interface{}{VLAN_NAME_FIELD: "unit test vlan2",
+				CONNECTED_FIELD: true,
+			},
+		},
+		DYNAMIC_FIELD: "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"Template_disks_on_creation\":null}",
 	}
 	VM_CREATION_FROM_TEMPLATE_SCHEMA_PRE_CREATION_WRONG_NICS_INIT_MAP = map[string]interface{}{
 		RAM_FIELD:        1,
@@ -146,7 +206,7 @@ var (
 			},
 		},
 		NICS_FIELD:    "Wrong nics type",
-		DYNAMIC_FIELD: "{\"terraform_provisioned\":true,\"creation_template\":\"template1\",\"Template_disks_on_creation\":null}",
+		DYNAMIC_FIELD: "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"Template_disks_on_creation\":null}",
 	}
 	VDC_CREATION_MAP = map[string]interface{}{
 		NAME_FIELD:       "Unit test vdc resource",
@@ -343,7 +403,7 @@ var (
 		PLATFORM_NAME_FIELD: "42",
 		BACKUP_SIZE_FIELD:   42,
 		COMMENT_FIELD:       "42",
-		DYNAMIC_FIELD:       "{\"terraform_provisioned\":true,\"creation_template\":\"template1\",\"Template_disks_on_creation\":null}",
+		DYNAMIC_FIELD:       "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"Template_disks_on_creation\":null}",
 	}
 	NON_EXISTING_TEMPLATE_VM_MAP = map[string]interface{}{
 		NAME_FIELD:          "windows95 vm",
@@ -904,8 +964,8 @@ func FakeVdcInstance_VDC_CREATION_MAP() VDC {
 				SLUG_FIELD:     "",
 			},
 		},
-		Slug:          "",
-		Dynamic_field: "",
+		Slug:         "",
+		DynamicField: "",
 	}
 }
 
@@ -934,8 +994,8 @@ func vdcInstanceFake() VDC {
 				SLUG_FIELD:     "Unit Test value3",
 			},
 		},
-		Slug:          "Unit Test value",
-		Dynamic_field: "Unit Test value",
+		Slug:         "Unit Test value",
+		DynamicField: "Unit Test value",
 	}
 }
 
@@ -976,13 +1036,13 @@ func vmInstanceNO_TEMPLATE_VM_MAP() VM {
 		Platform_name: "42",
 		Backup_size:   42,
 		Comment:       "",
-		Dynamic_field: "{\"terraform_provisioned\":true,\"creation_template\":\"\",\"Template_disks_on_creation\":null}",
+		DynamicField:  "{\"terraform_provisioned\":true,\"creationTemplate\":\"\",\"Template_disks_on_creation\":null}",
 	}
 }
 
 func FakeVmInstance_EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP() VM {
 	return VM{
-		Name:       "Unit test template no disc add on vm resource0",
+		Name:       "Unit test template no disc add on vm resource-0",
 		Enterprise: "unit test enterprise",
 		Template:   "template1",
 		State:      "UP",
@@ -1003,13 +1063,13 @@ func FakeVmInstance_EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP() VM {
 		Slug:          "42",
 		Token:         "424242",
 		Backup:        "backup_no_backup",
-		Dynamic_field: "{\"terraform_provisioned\":true,\"creation_template\":\"template1\",\"Template_disks_on_creation\":[{\"name\":\"template1 disk1\",\"size\":20,\"slug\":\"template1 disk1 slug\",\"storage_class\":\"storage_enterprise\"}]}",
+		DynamicField:  "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"Template_disks_on_creation\":[{\"name\":\"template1 disk1\",\"size\":20,\"slug\":\"template1 disk1 slug\",\"storage_class\":\"storage_enterprise\"}]}",
 	}
 }
 
 func FakeVmInstance_INSTANCE_NUMBER_FIELD_UNIT_TEST_VM_INSTANCE_MAP() VM {
 	return VM{
-		Name:       "INSTANCE_NUMBER_FIELDUnitTest42",
+		Name:       "INSTANCE_NUMBER_FIELDUnitTest-42",
 		Enterprise: "unit test enterprise",
 		Template:   "template1",
 		State:      "UP",
@@ -1030,13 +1090,13 @@ func FakeVmInstance_INSTANCE_NUMBER_FIELD_UNIT_TEST_VM_INSTANCE_MAP() VM {
 		Slug:          "42",
 		Token:         "424242",
 		Backup:        "backup_no_backup",
-		Dynamic_field: "{\"terraform_provisioned\":true,\"creation_template\":\"template1\",\"Template_disks_on_creation\":[{\"name\":\"template1 disk1\",\"size\":20,\"slug\":\"template1 disk1 slug\",\"storage_class\":\"storage_enterprise\"}]}",
+		DynamicField:  "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"Template_disks_on_creation\":[{\"name\":\"template1 disk1\",\"size\":20,\"slug\":\"template1 disk1 slug\",\"storage_class\":\"storage_enterprise\"}]}",
 	}
 }
 
 func FakeVmInstance_EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISKS_VM_MAP() VM {
 	return VM{
-		Name:       "EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISKS_VM_MAP0",
+		Name:       "EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISKS_VM_MAP-0",
 		Enterprise: "unit test enterprise",
 		Template:   "template1",
 		State:      "UP",
@@ -1079,7 +1139,7 @@ func FakeVmInstance_EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISK
 		Platform_name: "42",
 		Backup_size:   42,
 		Comment:       "",
-		Dynamic_field: "{\"terraform_provisioned\":true,\"creation_template\":\"template1\",\"Template_disks_on_creation\":[{\"name\":\"template1 disk1\",\"size\":20,\"slug\":\"template1 disk1 slug\",\"storage_class\":\"storage_enterprise\"}]}",
+		DynamicField:  "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"Template_disks_on_creation\":[{\"name\":\"template1 disk1\",\"size\":20,\"slug\":\"template1 disk1 slug\",\"storage_class\":\"storage_enterprise\"}]}",
 	}
 }
 
@@ -1111,7 +1171,7 @@ func FakeVmInstance_EXISTING_TEMPLATE_WITH_DELETED_DISK_VM_MAP() VM {
 		Platform_name: "42",
 		Backup_size:   42,
 		Comment:       "",
-		Dynamic_field: "{\"terraform_provisioned\":true,\"creation_template\":\"template1\",\"Template_disks_on_creation\":null}",
+		DynamicField:  "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"Template_disks_on_creation\":null}",
 	}
 }
 
@@ -1212,8 +1272,8 @@ type Resp_Body struct {
 func JsonStub() map[string]interface{} {
 
 	var jsonStub interface{}
-	simple_json, _ := json.Marshal(Resp_Body{Detail: "a simple json"})
-	jsonBytes := ioutil.NopCloser(bytes.NewBuffer(simple_json))
+	simpleJson, _ := json.Marshal(Resp_Body{Detail: "a simple json"})
+	jsonBytes := ioutil.NopCloser(bytes.NewBuffer(simpleJson))
 	readBytes, _ := ioutil.ReadAll(jsonBytes)
 	_ = json.Unmarshal(readBytes, &jsonStub)
 
@@ -1222,8 +1282,8 @@ func JsonStub() map[string]interface{} {
 
 func JsonTemplateListFake() []interface{} {
 	var jsonFake interface{}
-	fake_json, _ := json.Marshal(TEMPLATES_LIST)
-	jsonBytes := ioutil.NopCloser(bytes.NewBuffer(fake_json))
+	fakeJson, _ := json.Marshal(TEMPLATES_LIST)
+	jsonBytes := ioutil.NopCloser(bytes.NewBuffer(fakeJson))
 	readBytes, _ := ioutil.ReadAll(jsonBytes)
 	_ = json.Unmarshal(readBytes, &jsonFake)
 
