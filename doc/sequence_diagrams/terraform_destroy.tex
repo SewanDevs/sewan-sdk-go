@@ -27,15 +27,15 @@
     \umlobject[class=SewanSDK, x=11]{sdk}
     \umlobject[class=AirdrumAPI, x=15]{api}
 
-    \begin{umlcall}[op=1.\ terraform\ refresh(), type=synchron, return=resources\_diff\_list]{admin}{terraform}
+    \begin{umlcall}[op=1.\ terraform\ refresh(), type=synchron, return=resourcesDiffList]{admin}{terraform}
     
       \begin{umlcall}[op=2.\ plan(), type=asynchron]{terraform}{terraform}
       \end{umlcall}
     
       \begin{umlfragment}[type=loop, label=resource\_in\_plan, name=loop, inner xsep=15,,fill=blue!15]
 
-	\begin{umlfragment}[type=alt, label=resource\_exists, name=if, inner xsep=18,fill=white]
-	  \begin{umlcall}[op=3.\ resource\_delete(), type=synchron, return=resource\_state]{terraform}{sdk}
+	\begin{umlfragment}[type=alt, label=resourceExists, name=if, inner xsep=18,fill=white]
+	  \begin{umlcall}[op=3.\ resourceDelete(), type=synchron, return=resourceState]{terraform}{sdk}
 	    \begin{umlcall}[op=4.\ HTTP\_DELETE(), type=synchron, return=HTTP.resp]{sdk}{api}
 	    \end{umlcall}
 	  \end{umlcall}

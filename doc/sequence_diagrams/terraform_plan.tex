@@ -26,7 +26,7 @@
     \umlobject[class=TFplan, x=5]{tfplan}
     \umlobject[class=Terraform\&Plugin, x=11]{terraform}
 
-    \begin{umlcall}[op=1.\ terraform\ refresh(), type=synchron, return=display(resources\_diff\_list)]{admin}{terraform}
+    \begin{umlcall}[op=1.\ terraform\ refresh(), type=synchron, return=display(resourcesDiffList)]{admin}{terraform}
     
       \begin{umlcall}[op=2.\ refresh(), type=asynchron]{terraform}{terraform}
       \end{umlcall}

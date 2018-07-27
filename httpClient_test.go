@@ -13,7 +13,7 @@ func TestDo(t *testing.T) {
 
 //------------------------------------------------------------------------------
 func TestGetTemplatesList(t *testing.T) {
-	test_cases := []struct {
+	testCases := []struct {
 		Id              int
 		TC_clienter     Clienter
 		Enterprise_slug string
@@ -43,9 +43,9 @@ func TestGetTemplatesList(t *testing.T) {
 		},
 	}
 	var (
-		templates_list []interface{}
-		err            error
-		diffs          string
+		templatesList []interface{}
+		err           error
+		diffs         string
 	)
 	client_tooler := ClientTooler{}
 	client_tooler.Client = HttpClienter{}
@@ -53,34 +53,34 @@ func TestGetTemplatesList(t *testing.T) {
 	apiTooler := APITooler{}
 	api := apiTooler.New(TOKEN_FIELD, "url")
 
-	for _, test_case := range test_cases {
-		fake_client_tooler.Client = test_case.TC_clienter
-		templates_list, err = client_tooler.Client.GetTemplatesList(&fake_client_tooler,
-			test_case.Enterprise_slug, api)
+	for _, testCase := range testCases {
+		fake_client_tooler.Client = testCase.TC_clienter
+		templatesList, err = client_tooler.Client.GetTemplatesList(&fake_client_tooler,
+			testCase.Enterprise_slug, api)
 		switch {
-		case err == nil || test_case.Error == nil:
-			if !(err == nil && test_case.Error == nil) {
+		case err == nil || testCase.Error == nil:
+			if !(err == nil && testCase.Error == nil) {
 				t.Errorf("\n\nTC %d : GetTemplatesList() error was incorrect,"+
-					"\n\rgot: \"%s\"\n\rwant: \"%s\"", test_case.Id, err, test_case.Error)
+					"\n\rgot: \"%s\"\n\rwant: \"%s\"", testCase.Id, err, testCase.Error)
 			} else {
-				diffs = cmp.Diff(test_case.TemplateList, templates_list)
+				diffs = cmp.Diff(testCase.TemplateList, templatesList)
 				switch {
 				case diffs != "":
 					t.Errorf("\n\nTC %d : Wrong template list (-got +want) :\n%s",
-						test_case.Id, diffs)
+						testCase.Id, diffs)
 				}
 			}
-		case err != nil && test_case.Error != nil:
-			if templates_list != nil {
+		case err != nil && testCase.Error != nil:
+			if templatesList != nil {
 				t.Errorf("\n\nTC %d : Wrong response read element,"+
 					" it should be nil as error is not nil,"+
 					"\n\rgot map: \n\r\"%s\"\n\rwant map: \n\r\"%s\"\n\r",
-					test_case.Id, templates_list, test_case.TemplateList)
+					testCase.Id, templatesList, testCase.TemplateList)
 			}
-			if err.Error() != test_case.Error.Error() {
+			if err.Error() != testCase.Error.Error() {
 				t.Errorf("\n\nTC %d : Wrong response handle error,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-					test_case.Id, err.Error(), test_case.Error.Error())
+					testCase.Id, err.Error(), testCase.Error.Error())
 			}
 		}
 	}
@@ -88,7 +88,7 @@ func TestGetTemplatesList(t *testing.T) {
 
 //------------------------------------------------------------------------------
 func TestHandleResponse(t *testing.T) {
-	test_cases := []struct {
+	testCases := []struct {
 		Id                 int
 		Response           *http.Response
 		ExpectedCode       int
@@ -98,7 +98,7 @@ func TestHandleResponse(t *testing.T) {
 	}{
 		{
 			1,
-			HttpResponseFake_OK_json(),
+			HttpResponseFake_OKJson(),
 			http.StatusOK,
 			"application/json",
 			JsonStub(),
@@ -106,7 +106,7 @@ func TestHandleResponse(t *testing.T) {
 		},
 		{
 			2,
-			HttpResponseFake_OK_template_list_json(),
+			HttpResponseFake_OKTemplateListJson(),
 			http.StatusOK,
 			"application/json",
 			JsonTemplateListFake(),
@@ -122,7 +122,7 @@ func TestHandleResponse(t *testing.T) {
 		},
 		{
 			4,
-			HttpResponseFake_500_json(),
+			HttpResponseFake_500Json(),
 			http.StatusInternalServerError,
 			"text/html",
 			nil,
@@ -130,7 +130,7 @@ func TestHandleResponse(t *testing.T) {
 		},
 		{
 			5,
-			HttpResponseFake_OK_json(),
+			HttpResponseFake_OKJson(),
 			http.StatusInternalServerError,
 			"text/html",
 			nil,
@@ -139,7 +139,7 @@ func TestHandleResponse(t *testing.T) {
 		},
 		{
 			6,
-			HttpResponseFake_OK_json(),
+			HttpResponseFake_OKJson(),
 			http.StatusInternalServerError,
 			"text/html",
 			nil,
@@ -181,34 +181,34 @@ func TestHandleResponse(t *testing.T) {
 	)
 	clienter := HttpClienter{}
 
-	for _, test_case := range test_cases {
-		responseBody, err = clienter.HandleResponse(test_case.Response,
-			test_case.ExpectedCode, test_case.ExpectedBodyFormat)
+	for _, testCase := range testCases {
+		responseBody, err = clienter.HandleResponse(testCase.Response,
+			testCase.ExpectedCode, testCase.ExpectedBodyFormat)
 
 		switch {
-		case err == nil || test_case.Error == nil:
-			if !(err == nil && test_case.Error == nil) {
+		case err == nil || testCase.Error == nil:
+			if !(err == nil && testCase.Error == nil) {
 				t.Errorf("\n\nTC %d : HandleResponse() error was incorrect,"+
-					"\n\rgot: \"%s\"\n\rwant: \"%s\"", test_case.Id, err, test_case.Error)
+					"\n\rgot: \"%s\"\n\rwant: \"%s\"", testCase.Id, err, testCase.Error)
 			} else {
-				diffs = cmp.Diff(test_case.ResponseBody, responseBody)
+				diffs = cmp.Diff(testCase.ResponseBody, responseBody)
 				switch {
 				case diffs != "":
 					t.Errorf("\n\nTC %d : Wrong response read element (-got +want) :\n%s",
-						test_case.Id, diffs)
+						testCase.Id, diffs)
 				}
 			}
-		case err != nil && test_case.Error != nil:
+		case err != nil && testCase.Error != nil:
 			if responseBody != nil {
 				t.Errorf("\n\nTC %d : Wrong response read element,"+
 					" it should be nil as error is not nil,"+
 					"\n\rgot map: \n\r\"%s\"\n\rwant map: \n\r\"%s\"\n\r",
-					test_case.Id, responseBody, test_case.ResponseBody)
+					testCase.Id, responseBody, testCase.ResponseBody)
 			}
-			if err.Error() != test_case.Error.Error() {
+			if err.Error() != testCase.Error.Error() {
 				t.Errorf("\n\nTC %d : Wrong response handle error,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-					test_case.Id, err.Error(), test_case.Error.Error())
+					testCase.Id, err.Error(), testCase.Error.Error())
 			}
 		}
 	}

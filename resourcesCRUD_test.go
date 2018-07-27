@@ -9,12 +9,12 @@ import (
 )
 
 func TestCreateResource(t *testing.T) {
-	test_cases := []struct {
-		Id               int
-		TC_clienter      Clienter
-		ResourceType     string
-		Creation_Err     error
-		Created_resource map[string]interface{}
+	testCases := []struct {
+		Id              int
+		TC_clienter     Clienter
+		ResourceType    string
+		Creation_Err    error
+		CreatedResource map[string]interface{}
 	}{
 		{
 			1,
@@ -87,7 +87,7 @@ func TestCreateResource(t *testing.T) {
 			9,
 			VM_CreationSuccess_HttpClienterFake{},
 			WRONG_RESOURCE_TYPE,
-			errors.New("Resource of type \"a_non_supported_resource_type\"" +
+			errors.New("Resource of type \"a_non_supportedResource_type\"" +
 				" not supported,list of accepted resource types :\n\r" +
 				"- \"vdc\"\n\r" +
 				"- \"vm\""),
@@ -106,61 +106,61 @@ func TestCreateResource(t *testing.T) {
 
 	sewan = &API{Token: "42", URL: "42", Client: &http.Client{}}
 	fake_client_tooler := ClientTooler{}
-	fake_templates_tooler := TemplatesTooler{
+	fakeTemplates_tooler := TemplatesTooler{
 		TemplatesTools: Template_Templater{},
 	}
 	fake_schema_tooler := SchemaTooler{
 		SchemaTools: Schema_Schemaer{},
 	}
 
-	for _, test_case := range test_cases {
-		resource_res = resource(test_case.ResourceType)
+	for _, testCase := range testCases {
+		resource_res = resource(testCase.ResourceType)
 		d = resource_res.TestResourceData()
 		d.SetId("UnitTest resource1")
 		d.Set(NAME_FIELD, "Unit test resource")
-		fake_client_tooler.Client = test_case.TC_clienter
+		fake_client_tooler.Client = testCase.TC_clienter
 		err, resp_creation_map = apier.CreateResource(d,
 			&fake_client_tooler,
-			&fake_templates_tooler,
+			&fakeTemplates_tooler,
 			&fake_schema_tooler,
-			test_case.ResourceType,
+			testCase.ResourceType,
 			sewan)
 
-		diffs = cmp.Diff(test_case.Created_resource, resp_creation_map)
+		diffs = cmp.Diff(testCase.CreatedResource, resp_creation_map)
 		switch {
-		case err == nil || test_case.Creation_Err == nil:
-			if !(err == nil && test_case.Creation_Err == nil) {
+		case err == nil || testCase.Creation_Err == nil:
+			if !(err == nil && testCase.Creation_Err == nil) {
 				t.Errorf("\n\nTC %d : resource creation error was incorrect,"+
-					"\n\rgot: \"%s\"\n\rwant: \"%s\"", test_case.Id, err, test_case.Creation_Err)
+					"\n\rgot: \"%s\"\n\rwant: \"%s\"", testCase.Id, err, testCase.Creation_Err)
 			} else {
 				switch {
 				case diffs != "":
 					t.Errorf("\n\nTC %d : Wrong created resource map (-got +want) :\n%s",
-						test_case.Id, diffs)
+						testCase.Id, diffs)
 				}
 			}
-		case err != nil && test_case.Creation_Err != nil:
+		case err != nil && testCase.Creation_Err != nil:
 			if resp_creation_map != nil {
 				t.Errorf("\n\nTC %d : Wrong created resource map,"+
 					" it should be nil as error is not nil,"+
 					"\n\rgot map: \n\r\"%s\"\n\rwant map: \n\r\"%s\"\n\r",
-					test_case.Id, resp_creation_map, test_case.Created_resource)
+					testCase.Id, resp_creation_map, testCase.CreatedResource)
 			}
-			if err.Error() != test_case.Creation_Err.Error() {
+			if err.Error() != testCase.Creation_Err.Error() {
 				t.Errorf("\n\nTC %d : resource creation error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-					test_case.Id, err.Error(), test_case.Creation_Err.Error())
+					testCase.Id, err.Error(), testCase.Creation_Err.Error())
 			}
 		case diffs != "":
 			t.Errorf("\n\nTC %d : Wrong created resource map (-got +want) \n%s",
-				test_case.Id, diffs)
+				testCase.Id, diffs)
 		}
 	}
 }
 
 //------------------------------------------------------------------------------
 func TestReadResource(t *testing.T) {
-	test_cases := []struct {
+	testCases := []struct {
 		Id              int
 		TC_clienter     Clienter
 		ResourceType    string
@@ -247,7 +247,7 @@ func TestReadResource(t *testing.T) {
 			10,
 			VDC_ReadSuccess_HttpClienterFake{},
 			WRONG_RESOURCE_TYPE,
-			errors.New("Resource of type \"a_non_supported_resource_type\"" +
+			errors.New("Resource of type \"a_non_supportedResource_type\"" +
 				" not supported,list of accepted resource types :\n\r" +
 				"- \"vdc\"\n\r" +
 				"- \"vm\""),
@@ -267,68 +267,68 @@ func TestReadResource(t *testing.T) {
 	Apier := AirDrumResources_Apier{}
 	sewan = &API{Token: "42", URL: "42", Client: &http.Client{}}
 	fake_client_tooler := ClientTooler{}
-	fake_templates_tooler := TemplatesTooler{
+	fakeTemplates_tooler := TemplatesTooler{
 		TemplatesTools: Template_Templater{},
 	}
 	fake_schema_tooler := SchemaTooler{
 		SchemaTools: Schema_Schemaer{},
 	}
 
-	for _, test_case := range test_cases {
-		resource_res = resource(test_case.ResourceType)
+	for _, testCase := range testCases {
+		resource_res = resource(testCase.ResourceType)
 		d = resource_res.TestResourceData()
 		d.SetId("UnitTest resource1")
 		d.Set(NAME_FIELD, "Unit test resource")
-		fake_client_tooler.Client = test_case.TC_clienter
+		fake_client_tooler.Client = testCase.TC_clienter
 		err, resp_creation_map, res_exists = Apier.ReadResource(d,
 			&fake_client_tooler,
-			&fake_templates_tooler,
+			&fakeTemplates_tooler,
 			&fake_schema_tooler,
-			test_case.ResourceType,
+			testCase.ResourceType,
 			sewan)
-		diffs = cmp.Diff(test_case.ReadResource, resp_creation_map)
+		diffs = cmp.Diff(testCase.ReadResource, resp_creation_map)
 		switch {
-		case err == nil || test_case.Read_Err == nil:
-			if !((err == nil) && (test_case.Read_Err == nil)) {
+		case err == nil || testCase.Read_Err == nil:
+			if !((err == nil) && (testCase.Read_Err == nil)) {
 				t.Errorf("\n\nTC %d : resource read error was incorrect,"+
-					"\n\rgot: \"%s\"\n\rwant: \"%s\"", test_case.Id, err, test_case.Read_Err)
+					"\n\rgot: \"%s\"\n\rwant: \"%s\"", testCase.Id, err, testCase.Read_Err)
 			} else {
 				switch {
-				case res_exists != test_case.Resource_exists:
+				case res_exists != testCase.Resource_exists:
 					t.Errorf("\n\nTC %d : Wrong read resource exists value"+
 						"\n\rgot: \"%v\"\n\rwant: \"%v\"",
-						test_case.Id, res_exists, test_case.Resource_exists)
+						testCase.Id, res_exists, testCase.Resource_exists)
 				case diffs != "":
 					t.Errorf("\n\nTC %d : Wrong resource read resource map (-got +want) :\n%s",
-						test_case.Id, diffs)
+						testCase.Id, diffs)
 				}
 			}
-		case err != nil && test_case.Read_Err != nil:
+		case err != nil && testCase.Read_Err != nil:
 			if resp_creation_map != nil {
 				t.Errorf("\n\nTC %d : Wrong created resource map,"+
 					" it should be nil as error is not nil,"+
 					"\n\rgot map: \n\r\"%s\"\n\rwant map: \n\r\"%s\"\n\r",
-					test_case.Id, resp_creation_map, test_case.ReadResource)
+					testCase.Id, resp_creation_map, testCase.ReadResource)
 			}
-			if err.Error() != test_case.Read_Err.Error() {
+			if err.Error() != testCase.Read_Err.Error() {
 				t.Errorf("\n\nTC %d : resource read error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-					test_case.Id, err.Error(), test_case.Read_Err.Error())
+					testCase.Id, err.Error(), testCase.Read_Err.Error())
 			}
-		case res_exists != test_case.Resource_exists:
+		case res_exists != testCase.Resource_exists:
 			t.Errorf("\n\nTC %d : Wrong read resource exists value"+
 				"\n\rgot: \"%v\"\n\rwant: \"%v\"",
-				test_case.Id, res_exists, test_case.Resource_exists)
+				testCase.Id, res_exists, testCase.Resource_exists)
 		case diffs != "":
 			t.Errorf("\n\nTC %d : Wrong resource read resource map (-got +want) :\n%s",
-				test_case.Id, diffs)
+				testCase.Id, diffs)
 		}
 	}
 }
 
 //------------------------------------------------------------------------------
 func TestUpdateResource(t *testing.T) {
-	test_cases := []struct {
+	testCases := []struct {
 		Id           int
 		TC_clienter  Clienter
 		ResourceType string
@@ -395,7 +395,7 @@ func TestUpdateResource(t *testing.T) {
 			10,
 			VDC_UpdateSuccess_HttpClienterFake{},
 			WRONG_RESOURCE_TYPE,
-			errors.New("Resource of type \"a_non_supported_resource_type\"" +
+			errors.New("Resource of type \"a_non_supportedResource_type\"" +
 				" not supported,list of accepted resource types :\n\r" +
 				"- \"vdc\"\n\r" +
 				"- \"vm\""),
@@ -410,43 +410,43 @@ func TestUpdateResource(t *testing.T) {
 	)
 	sewan = &API{Token: "42", URL: "42", Client: &http.Client{}}
 	fake_client_tooler := ClientTooler{}
-	fake_templates_tooler := TemplatesTooler{
+	fakeTemplates_tooler := TemplatesTooler{
 		TemplatesTools: Template_Templater{},
 	}
 	fake_schema_tooler := SchemaTooler{
 		SchemaTools: Schema_Schemaer{},
 	}
 
-	for _, test_case := range test_cases {
-		resource_res = resource(test_case.ResourceType)
+	for _, testCase := range testCases {
+		resource_res = resource(testCase.ResourceType)
 		d = resource_res.TestResourceData()
 		d.SetId("UnitTest resource1")
 		d.Set(NAME_FIELD, "Unit test resource")
-		fake_client_tooler.Client = test_case.TC_clienter
+		fake_client_tooler.Client = testCase.TC_clienter
 		err = Apier.UpdateResource(d,
 			&fake_client_tooler,
-			&fake_templates_tooler,
+			&fakeTemplates_tooler,
 			&fake_schema_tooler,
-			test_case.ResourceType,
+			testCase.ResourceType,
 			sewan)
 
 		switch {
-		case err == nil || test_case.Update_Err == nil:
-			if !(err == nil && test_case.Update_Err == nil) {
+		case err == nil || testCase.Update_Err == nil:
+			if !(err == nil && testCase.Update_Err == nil) {
 				t.Errorf("\n\nTC %d : resource read error was incorrect,"+
-					"\n\rgot: \"%s\"\n\rwant: \"%s\"", test_case.Id, err, test_case.Update_Err)
+					"\n\rgot: \"%s\"\n\rwant: \"%s\"", testCase.Id, err, testCase.Update_Err)
 			}
-		case err.Error() != test_case.Update_Err.Error():
+		case err.Error() != testCase.Update_Err.Error():
 			t.Errorf("\n\nTC %d : resource read error was incorrect,"+
 				"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-				test_case.Id, err.Error(), test_case.Update_Err.Error())
+				testCase.Id, err.Error(), testCase.Update_Err.Error())
 		}
 	}
 }
 
 ////------------------------------------------------------------------------------
 func TestDeleteResource(t *testing.T) {
-	test_cases := []struct {
+	testCases := []struct {
 		Id           int
 		TC_clienter  Clienter
 		ResourceType string
@@ -519,7 +519,7 @@ func TestDeleteResource(t *testing.T) {
 			7,
 			VM_DeleteSuccess_HttpClienterFake{},
 			WRONG_RESOURCE_TYPE,
-			errors.New("Resource of type \"a_non_supported_resource_type\"" +
+			errors.New("Resource of type \"a_non_supportedResource_type\"" +
 				" not supported,list of accepted resource types :\n\r" +
 				"- \"vdc\"\n\r" +
 				"- \"vm\""),
@@ -534,36 +534,36 @@ func TestDeleteResource(t *testing.T) {
 	Apier := AirDrumResources_Apier{}
 	sewan = &API{Token: "42", URL: "42", Client: &http.Client{}}
 	fake_client_tooler := ClientTooler{}
-	fake_templates_tooler := TemplatesTooler{
+	fakeTemplates_tooler := TemplatesTooler{
 		TemplatesTools: Template_Templater{},
 	}
 	fake_schema_tooler := SchemaTooler{
 		SchemaTools: Schema_Schemaer{},
 	}
 
-	for _, test_case := range test_cases {
-		resource_res = resource(test_case.ResourceType)
+	for _, testCase := range testCases {
+		resource_res = resource(testCase.ResourceType)
 		d = resource_res.TestResourceData()
 		d.SetId("UnitTest resource1")
 		d.Set(NAME_FIELD, "Unit test resource")
-		fake_client_tooler.Client = test_case.TC_clienter
+		fake_client_tooler.Client = testCase.TC_clienter
 		err = Apier.DeleteResource(d,
 			&fake_client_tooler,
-			&fake_templates_tooler,
+			&fakeTemplates_tooler,
 			&fake_schema_tooler,
-			test_case.ResourceType,
+			testCase.ResourceType,
 			sewan)
 
 		switch {
-		case err == nil || test_case.Delete_Err == nil:
-			if !(err == nil && test_case.Delete_Err == nil) {
+		case err == nil || testCase.Delete_Err == nil:
+			if !(err == nil && testCase.Delete_Err == nil) {
 				t.Errorf("\n\nTC %d : resource read error was incorrect,"+
-					"\n\rgot: \"%s\"\n\rwant: \"%s\"", test_case.Id, err, test_case.Delete_Err)
+					"\n\rgot: \"%s\"\n\rwant: \"%s\"", testCase.Id, err, testCase.Delete_Err)
 			}
-		case err.Error() != test_case.Delete_Err.Error():
+		case err.Error() != testCase.Delete_Err.Error():
 			t.Errorf("\n\nTC %d : resource read error was incorrect,"+
 				"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-				test_case.Id, err.Error(), test_case.Delete_Err.Error())
+				testCase.Id, err.Error(), testCase.Delete_Err.Error())
 		}
 	}
 }
