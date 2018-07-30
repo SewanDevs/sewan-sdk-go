@@ -6,6 +6,7 @@ import (
 	"log"
 	"reflect"
 	"strconv"
+	"strings"
 )
 
 type SchemaTooler struct {
@@ -13,8 +14,9 @@ type SchemaTooler struct {
 }
 type Schemaer interface {
 	DeleteTerraformResource(d *schema.ResourceData)
-	UpdateLocalResourceState(resource_state map[string]interface{},
+	UpdateLocalResourceState(resourceState map[string]interface{},
 		d *schema.ResourceData, schemaTools *SchemaTooler) error
+	UpdateVdcResourcesNames(d *schema.ResourceData) error
 	ReadElement(key interface{}, value interface{},
 		logger *log.Logger) (interface{}, error)
 }
@@ -24,16 +26,16 @@ func (schemaer Schema_Schemaer) DeleteTerraformResource(d *schema.ResourceData) 
 	d.SetId("")
 }
 
-func (schemaer Schema_Schemaer) UpdateLocalResourceState(resource_state map[string]interface{},
+func (schemaer Schema_Schemaer) UpdateLocalResourceState(resourceState map[string]interface{},
 	d *schema.ResourceData, schemaTools *SchemaTooler) error {
 
 	var (
 		updateError error = nil
 		readValue   interface{}
 	)
-	logger := LoggerCreate("update_local_resource_state_" +
+	logger := LoggerCreate("update_local_resourceState_" +
 		d.Get(NAME_FIELD).(string) + ".log")
-	for key, value := range resource_state {
+	for key, value := range resourceState {
 		readValue,
 			updateError = schemaTools.SchemaTools.ReadElement(key,
 			value,
@@ -63,6 +65,27 @@ func (schemaer Schema_Schemaer) UpdateLocalResourceState(resource_state map[stri
 		readValue = nil
 	}
 	return updateError
+}
+
+func (schemaer Schema_Schemaer) UpdateVdcResourcesNames(d *schema.ResourceData) error {
+	var (
+		vdcResourcesList       []interface{} = d.Get(VDC_RESOURCE_FIELD).([]interface{})
+		vdcResourcesListUpdate []interface{} = []interface{}{}
+		enterpriseName         string        = d.Get(ENTERPRISE_FIELD).(string)
+		resourceName           string
+	)
+
+	for _, resource := range vdcResourcesList {
+		resourceName = resource.(map[string]interface{})[RESOURCE_FIELD].(string)
+		resourceName = strings.Replace(resourceName,
+			enterpriseName, "", 1)
+		resourceName = strings.Replace(resourceName,
+			MONO_FIELD, "", 1)
+		resource.(map[string]interface{})[RESOURCE_FIELD] = resourceName
+		vdcResourcesListUpdate = append(vdcResourcesListUpdate, resource)
+	}
+
+	return d.Set(VDC_RESOURCE_FIELD, vdcResourcesListUpdate)
 }
 
 func (schemaer Schema_Schemaer) ReadElement(key interface{}, value interface{},

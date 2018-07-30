@@ -126,7 +126,7 @@ func TestHandleResponse(t *testing.T) {
 			http.StatusInternalServerError,
 			"text/html",
 			nil,
-			errors.New("Wrong content type, \n\r expected :text/html\n\r got :application/json"),
+			errors.New("Wrong response content type, \n\r expected :text/html\n\r got :application/json"),
 		},
 		{
 			5,

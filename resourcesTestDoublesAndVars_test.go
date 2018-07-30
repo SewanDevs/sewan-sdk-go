@@ -234,6 +234,68 @@ var (
 			},
 		},
 	}
+	VDC_RESOURCES_NAMES_PRE_UPDATE_MAP = map[string]interface{}{
+		NAME_FIELD:       "Unit test vdc resource",
+		ENTERPRISE_FIELD: "enterprise",
+		VDC_RESOURCE_FIELD: []interface{}{
+			map[string]interface{}{
+				RESOURCE_FIELD: "enterprise-mono-ram",
+				TOTAL_FIELD:    20,
+			},
+			map[string]interface{}{
+				RESOURCE_FIELD: "enterprise-mono-cpu",
+				TOTAL_FIELD:    1,
+			},
+			map[string]interface{}{
+				RESOURCE_FIELD: "enterprise-mono-storage_enterprise",
+				TOTAL_FIELD:    10,
+			},
+			map[string]interface{}{
+				RESOURCE_FIELD: "enterprise-mono-storage_performance",
+				TOTAL_FIELD:    10,
+			},
+			map[string]interface{}{
+				RESOURCE_FIELD: "enterprise-mono-storage_high_performance",
+				TOTAL_FIELD:    10,
+			},
+		},
+	}
+	VDC_RESOURCES_NAMES_UPDATED_MAP = map[string]interface{}{
+		NAME_FIELD:       "Unit test vdc resource",
+		ENTERPRISE_FIELD: "enterprise",
+		VDC_RESOURCE_FIELD: []interface{}{
+			map[string]interface{}{
+				RESOURCE_FIELD: RAM_FIELD,
+				TOTAL_FIELD:    20,
+				USED_FIELD:     0,
+				SLUG_FIELD:     "",
+			},
+			map[string]interface{}{
+				RESOURCE_FIELD: CPU_FIELD,
+				TOTAL_FIELD:    1,
+				USED_FIELD:     0,
+				SLUG_FIELD:     "",
+			},
+			map[string]interface{}{
+				RESOURCE_FIELD: "storage_enterprise",
+				TOTAL_FIELD:    10,
+				USED_FIELD:     0,
+				SLUG_FIELD:     "",
+			},
+			map[string]interface{}{
+				RESOURCE_FIELD: "storage_performance",
+				TOTAL_FIELD:    10,
+				USED_FIELD:     0,
+				SLUG_FIELD:     "",
+			},
+			map[string]interface{}{
+				RESOURCE_FIELD: "storage_high_performance",
+				TOTAL_FIELD:    10,
+				USED_FIELD:     0,
+				SLUG_FIELD:     "",
+			},
+		},
+	}
 	VDC_READ_RESPONSE_MAP = map[string]interface{}{
 		NAME_FIELD:       "Unit test vdc",
 		ENTERPRISE_FIELD: "unit test enterprise",
@@ -793,7 +855,7 @@ func resourceVdc() *schema.Resource {
 	}
 }
 
-func resource_vm_disk() *schema.Resource {
+func resourceVm_disk() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			NAME_FIELD: &schema.Schema{
@@ -816,7 +878,7 @@ func resource_vm_disk() *schema.Resource {
 	}
 }
 
-func resource_vm_nic() *schema.Resource {
+func resourceVm_nic() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			VLAN_NAME_FIELD: &schema.Schema{
@@ -835,7 +897,7 @@ func resource_vm_nic() *schema.Resource {
 	}
 }
 
-func resource_vm() *schema.Resource {
+func resourceVm() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			NAME_FIELD: &schema.Schema{
@@ -873,12 +935,12 @@ func resource_vm() *schema.Resource {
 			DISKS_FIELD: &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
-				Elem:     resource_vm_disk(),
+				Elem:     resourceVm_disk(),
 			},
 			NICS_FIELD: &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
-				Elem:     resource_vm_nic(),
+				Elem:     resourceVm_nic(),
 			},
 			VDC_FIELD: &schema.Schema{
 				Type:     schema.TypeString,
@@ -1233,7 +1295,7 @@ func vdcSchemaInit(vdc map[string]interface{}) *schema.ResourceData {
 }
 
 func vmSchemaInit(vm map[string]interface{}) *schema.ResourceData {
-	d := resource_vm().TestResourceData()
+	d := resourceVm().TestResourceData()
 
 	schemaTooler := SchemaTooler{
 		SchemaTools: Schema_Schemaer{},
@@ -1250,9 +1312,8 @@ func resource(resourceType string) *schema.Resource {
 	case VDC_FIELD:
 		resource = resourceVdc()
 	case VM_RESOURCE_TYPE:
-		resource = resource_vm()
+		resource = resourceVm()
 	default:
-		//return a false resource
 		resource = &schema.Resource{
 			Schema: map[string]*schema.Schema{
 				NAME_FIELD: &schema.Schema{
