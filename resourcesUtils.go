@@ -91,8 +91,8 @@ func vdcInstanceCreate(d *schema.ResourceData,
 		resourceName.Reset()
 		resourceName.WriteString(vdc.Enterprise)
 		resourceName.WriteString(MONO_FIELD)
-		resourceName.WriteString(resource.(map[string]interface{})["resource"].(string))
-		resource.(map[string]interface{})["resource"] = resourceName.String()
+		resourceName.WriteString(resource.(map[string]interface{})[RESOURCE_FIELD].(string))
+		resource.(map[string]interface{})[RESOURCE_FIELD] = resourceName.String()
 		vdc.Vdc_resources[index] = resource
 	}
 

@@ -119,7 +119,7 @@ func (client HttpClienter) HandleResponse(resp *http.Response,
 					"\nPlease validate the configuration api url.")
 			}
 		} else {
-			respError = errors.New("Wrong content type, \n\r expected :" +
+			respError = errors.New("Wrong response content type, \n\r expected :" +
 				expectedBodyFormat + "\n\r got :" + contentType)
 		}
 	} else {
