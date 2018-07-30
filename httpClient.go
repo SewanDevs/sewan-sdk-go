@@ -15,7 +15,7 @@ type ClientTooler struct {
 type Clienter interface {
 	Do(api *API, req *http.Request) (*http.Response, error)
 	GetTemplatesList(clientTooler *ClientTooler,
-		enterprise_slug string, api *API) ([]interface{}, error)
+		enterpriseSlug string, api *API) ([]interface{}, error)
 	HandleResponse(resp *http.Response,
 		expectedCode int,
 		expectedBodyFormat string) (interface{}, error)
@@ -28,52 +28,52 @@ func (client HttpClienter) Do(api *API, req *http.Request) (*http.Response, erro
 }
 
 func (client HttpClienter) GetTemplatesList(clientTooler *ClientTooler,
-	enterprise_slug string, api *API) ([]interface{}, error) {
+	enterpriseSlug string, api *API) ([]interface{}, error) {
 
 	var (
-		req_err              error
-		resp_err             error
-		handler_resp_err     error
-		return_err           error         = nil
-		template_list        interface{}   = nil
-		return_template_list []interface{} = nil
-		templates_list_url   strings.Builder
+		reqError           error
+		respError          error
+		handlerRespError   error
+		returnError        error         = nil
+		templateList       interface{}   = nil
+		returnTemplateList []interface{} = nil
+		templatesListUrl   strings.Builder
 	)
 	resp := &http.Response{}
 	req := &http.Request{}
-	templates_list_url.WriteString(api.URL)
-	templates_list_url.WriteString("template/?enterprise__slug=")
-	templates_list_url.WriteString(enterprise_slug)
+	templatesListUrl.WriteString(api.URL)
+	templatesListUrl.WriteString("template/?enterprise__slug=")
+	templatesListUrl.WriteString(enterpriseSlug)
 	logger := loggerCreate("getTemplatesList.log")
 
-	logger.Println("templates_list_url.String() = ", templates_list_url.String())
-	req, req_err = http.NewRequest("GET",
-		templates_list_url.String(),
+	logger.Println("templatesListUrl.String() = ", templatesListUrl.String())
+	req, reqError = http.NewRequest("GET",
+		templatesListUrl.String(),
 		nil)
 	req.Header.Add("authorization", "Token "+api.Token)
 	logger.Println("req = ", req)
-	logger.Println("req_err = ", req_err)
-	if req_err == nil {
-		resp, resp_err = clientTooler.Client.Do(api, req)
+	logger.Println("reqError = ", reqError)
+	if reqError == nil {
+		resp, respError = clientTooler.Client.Do(api, req)
 		logger.Println("resp = ", resp)
-		if resp_err == nil {
-			template_list, handler_resp_err = clientTooler.Client.HandleResponse(resp,
+		if respError == nil {
+			templateList, handlerRespError = clientTooler.Client.HandleResponse(resp,
 				http.StatusOK,
 				"application/json")
-			if template_list != nil {
-				return_template_list = template_list.([]interface{})
+			if templateList != nil {
+				returnTemplateList = templateList.([]interface{})
 			}
-			if handler_resp_err != nil {
-				return_err = handler_resp_err
+			if handlerRespError != nil {
+				returnError = handlerRespError
 			}
 		} else {
-			return_err = resp_err
+			returnError = respError
 		}
 	} else {
-		return_err = req_err
+		returnError = reqError
 	}
-	logger.Println("return_template_list = ", return_template_list)
-	return return_template_list, return_err
+	logger.Println("returnTemplateList = ", returnTemplateList)
+	return returnTemplateList, returnError
 }
 
 func (client HttpClienter) HandleResponse(resp *http.Response,
@@ -81,13 +81,13 @@ func (client HttpClienter) HandleResponse(resp *http.Response,
 	expectedBodyFormat string) (interface{}, error) {
 
 	var (
-		resp_err         error       = nil
-		responseBody     interface{} = nil
-		contentType      string
-		bodyBytes        []byte
-		resp_body_reader interface{}
-		read_body_err    error = nil
-		read_json_err    error = nil
+		respError      error       = nil
+		responseBody   interface{} = nil
+		contentType    string
+		bodyBytes      []byte
+		respBodyReader interface{}
+		readBodyError  error = nil
+		readJsonError  error = nil
 	)
 
 	if resp.StatusCode == expectedCode {
@@ -96,36 +96,36 @@ func (client HttpClienter) HandleResponse(resp *http.Response,
 		if contentType == expectedBodyFormat {
 			switch contentType {
 			case "application/json":
-				bodyBytes, read_body_err = ioutil.ReadAll(resp.Body)
-				read_json_err = json.Unmarshal(bodyBytes, &resp_body_reader)
+				bodyBytes, readBodyError = ioutil.ReadAll(resp.Body)
+				readJsonError = json.Unmarshal(bodyBytes, &respBodyReader)
 				switch {
-				case read_body_err != nil:
-					resp_err = errors.New("Read of response body error " +
-						read_body_err.Error())
-				case read_json_err != nil:
-					resp_err = errors.New("Response body is not a properly formated json :" +
-						read_json_err.Error())
+				case readBodyError != nil:
+					respError = errors.New("Read of response body error " +
+						readBodyError.Error())
+				case readJsonError != nil:
+					respError = errors.New("Response body is not a properly formated json :" +
+						readJsonError.Error())
 				default:
-					responseBody = resp_body_reader.(interface{})
+					responseBody = respBodyReader.(interface{})
 				}
 			case "text/html":
-				bodyBytes, read_body_err = ioutil.ReadAll(resp.Body)
+				bodyBytes, readBodyError = ioutil.ReadAll(resp.Body)
 				responseBody = string(bodyBytes)
 			case "":
 				responseBody = nil
 			default:
-				resp_err = errors.New("Unhandled api response type : " +
+				respError = errors.New("Unhandled api response type : " +
 					resp.Header.Get("Content-Type") +
 					"\nPlease validate the configuration api url.")
 			}
 		} else {
-			resp_err = errors.New("Wrong content type, \n\r expected :" +
+			respError = errors.New("Wrong response content type, \n\r expected :" +
 				expectedBodyFormat + "\n\r got :" + contentType)
 		}
 	} else {
-		resp_err = errors.New("Wrong response status code, \n\r expected :" +
+		respError = errors.New("Wrong response status code, \n\r expected :" +
 			strconv.Itoa(expectedCode) + "\n\r got :" + strconv.Itoa(resp.StatusCode) +
 			"\n\rFull response status : " + resp.Status)
 	}
-	return responseBody, resp_err
+	return responseBody, respError
 }

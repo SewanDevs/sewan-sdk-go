@@ -6,12 +6,13 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
-type Dynamic_field_struct struct {
+type DynamicField_struct struct {
 	Terraform_provisioned      bool          `json:"terraform_provisioned"`
-	Creation_template          string        `json:"creation_template"`
+	CreationTemplate           string        `json:"creationTemplate"`
 	Template_disks_on_creation []interface{} `json:"Template_disks_on_creation"`
 }
 
@@ -28,7 +29,7 @@ type VDC struct {
 	Datacenter    string        `json:"datacenter"`
 	Vdc_resources []interface{} `json:"vdc_resources"`
 	Slug          string        `json:"slug"`
-	Dynamic_field string        `json:"dynamic_field"`
+	DynamicField  string        `json:"dynamic_field"`
 }
 
 type VM_DISK struct {
@@ -65,7 +66,7 @@ type VM struct {
 	Platform_name string        `json:"platform_name"`
 	Backup_size   int           `json:"backup_size"`
 	Comment       string        `json:"comment,omitempty"`
-	Dynamic_field string        `json:"dynamic_field"`
+	DynamicField  string        `json:"dynamic_field"`
 	Outsourcing   string        `json:"outsourcing"`
 }
 
@@ -74,8 +75,8 @@ func vdcInstanceCreate(d *schema.ResourceData,
 	api *API) (VDC, error) {
 
 	var (
-		vdc           VDC
-		resource_name strings.Builder
+		vdc          VDC
+		resourceName strings.Builder
 	)
 	vdc = VDC{
 		Name:          d.Get(NAME_FIELD).(string),
@@ -83,15 +84,15 @@ func vdcInstanceCreate(d *schema.ResourceData,
 		Datacenter:    d.Get(DATACENTER_FIELD).(string),
 		Vdc_resources: d.Get(VDC_RESOURCE_FIELD).([]interface{}),
 		Slug:          d.Get(SLUG_FIELD).(string),
-		Dynamic_field: d.Get(DYNAMIC_FIELD).(string),
+		DynamicField:  d.Get(DYNAMIC_FIELD).(string),
 	}
 
 	for index, resource := range vdc.Vdc_resources {
-		resource_name.Reset()
-		resource_name.WriteString(vdc.Enterprise)
-		resource_name.WriteString(MONO_FIELD)
-		resource_name.WriteString(resource.(map[string]interface{})["resource"].(string))
-		resource.(map[string]interface{})["resource"] = resource_name.String()
+		resourceName.Reset()
+		resourceName.WriteString(vdc.Enterprise)
+		resourceName.WriteString(MONO_FIELD)
+		resourceName.WriteString(resource.(map[string]interface{})[RESOURCE_FIELD].(string))
+		resource.(map[string]interface{})[RESOURCE_FIELD] = resourceName.String()
 		vdc.Vdc_resources[index] = resource
 	}
 
@@ -105,45 +106,49 @@ func vmInstanceCreate(d *schema.ResourceData,
 	api *API) (VM, error) {
 
 	var (
-		vm                             VM
-		get_templates_list_error       error                  = nil
-		fetch_template_from_list_error error                  = nil
-		template_format_error          error                  = nil
-		instance_creation_error        error                  = nil
-		template                       map[string]interface{} = nil
-		template_name                  string                 = d.Get(TEMPLATE_FIELD).(string)
-		enterprise                     string                 = d.Get(ENTERPRISE_FIELD).(string)
+		vm                         VM
+		getTemplatesListError      error                  = nil
+		fetchTemplateFromListError error                  = nil
+		templateFormatError        error                  = nil
+		instanceCreationError      error                  = nil
+		template                   map[string]interface{} = nil
+		templateName               string                 = d.Get(TEMPLATE_FIELD).(string)
+		enterprise                 string                 = d.Get(ENTERPRISE_FIELD).(string)
+		vmName                     strings.Builder
+		instanceNumber             int
 	)
 	logger := LoggerCreate("vminstanceCreate" + d.Id() + ".log")
-
-	if template_name != "" && d.Id() == "" {
-		vm = VM{}
+	vmName.WriteString(d.Get(NAME_FIELD).(string))
+	if templateName != "" && d.Id() == "" {
 		var templateList []interface{}
+		instanceNumber = d.Get(INSTANCE_NUMBER_FIELD).(int)
+		vmName.WriteString(RESOURCE_NAME_COUNT_SEPARATOR)
+		vmName.WriteString(strconv.Itoa(instanceNumber))
 		templateList,
-			get_templates_list_error = clientTooler.Client.GetTemplatesList(clientTooler,
+			getTemplatesListError = clientTooler.Client.GetTemplatesList(clientTooler,
 			enterprise, api)
-		if get_templates_list_error == nil {
+		if getTemplatesListError == nil {
 			template,
-				fetch_template_from_list_error = templatesTooler.TemplatesTools.FetchTemplateFromList(template_name,
+				fetchTemplateFromListError = templatesTooler.TemplatesTools.FetchTemplateFromList(templateName,
 				templateList)
-			template_format_error = templatesTooler.TemplatesTools.ValidateTemplate(template)
+			templateFormatError = templatesTooler.TemplatesTools.ValidateTemplate(template)
 			switch {
-			case fetch_template_from_list_error != nil:
-				instance_creation_error = fetch_template_from_list_error
-			case template_format_error != nil:
-				instance_creation_error = template_format_error
+			case fetchTemplateFromListError != nil:
+				instanceCreationError = fetchTemplateFromListError
+			case templateFormatError != nil:
+				instanceCreationError = templateFormatError
 			default:
-				instance_creation_error = templatesTooler.TemplatesTools.UpdateSchemaFromTemplateOnResourceCreation(d,
+				instanceCreationError = templatesTooler.TemplatesTools.UpdateSchemaFromTemplateOnResourceCreation(d,
 					template)
 			}
 		} else {
-			instance_creation_error = get_templates_list_error
+			instanceCreationError = getTemplatesListError
 		}
 	}
-	logger.Println("instance_creation_error = ", instance_creation_error)
-	if instance_creation_error == nil {
+	logger.Println("instanceCreationError = ", instanceCreationError)
+	if instanceCreationError == nil {
 		vm = VM{
-			Name:          d.Get(NAME_FIELD).(string),
+			Name:          vmName.String(),
 			Enterprise:    d.Get(ENTERPRISE_FIELD).(string),
 			State:         d.Get(STATE_FIELD).(string),
 			OS:            d.Get(OS_FIELD).(string),
@@ -160,29 +165,30 @@ func vmInstanceCreate(d *schema.ResourceData,
 			Disk_image:    d.Get(DISK_IMAGE_FIELD).(string),
 			Platform_name: d.Get(PLATFORM_NAME_FIELD).(string),
 			Backup_size:   d.Get(BACKUP_SIZE_FIELD).(int),
-			Dynamic_field: d.Get(DYNAMIC_FIELD).(string),
+			DynamicField:  d.Get(DYNAMIC_FIELD).(string),
 		}
+		logger.Println("vm.Name =", vm.Name)
 		if d.Id() == "" {
-			dynamic_field_struct := Dynamic_field_struct{
+			dynamicFieldStruct := DynamicField_struct{
 				Terraform_provisioned:      true,
-				Creation_template:          d.Get(TEMPLATE_FIELD).(string),
+				CreationTemplate:           d.Get(TEMPLATE_FIELD).(string),
 				Template_disks_on_creation: nil,
 			}
 			if template != nil {
-				dynamic_field_struct.Template_disks_on_creation = template[DISKS_FIELD].([]interface{})
-				override_err, _ := templatesTooler.TemplatesTools.CreateTemplateOverrideConfig(d, template)
-				if override_err != nil {
-					instance_creation_error = override_err
+				dynamicFieldStruct.Template_disks_on_creation = template[DISKS_FIELD].([]interface{})
+				overrideError, _ := templatesTooler.TemplatesTools.CreateTemplateOverrideConfig(d, template)
+				if overrideError != nil {
+					instanceCreationError = overrideError
 				}
 				vm.Template = d.Get(TEMPLATE_FIELD).(string)
 			}
-			dynamic_field_json, _ := json.Marshal(dynamic_field_struct)
-			vm.Dynamic_field = string(dynamic_field_json)
+			dynamicFieldJson, _ := json.Marshal(dynamicFieldStruct)
+			vm.DynamicField = string(dynamicFieldJson)
 		}
 	}
 	logger.Println("vm = ", vm)
-	logger.Println("instance_creation_error = ", instance_creation_error)
-	return vm, instance_creation_error
+	logger.Println("instanceCreationError = ", instanceCreationError)
+	return vm, instanceCreationError
 }
 
 func (apier AirDrumResources_Apier) ResourceInstanceCreate(d *schema.ResourceData,
@@ -202,7 +208,7 @@ func (apier AirDrumResources_Apier) ResourceInstanceCreate(d *schema.ResourceDat
 		resourceInstance, instanceError = vdcInstanceCreate(d,
 			clientTooler,
 			api)
-	case "vm":
+	case VM_RESOURCE_TYPE:
 		resourceInstance, instanceError = vmInstanceCreate(d,
 			clientTooler,
 			templatesTooler,
@@ -221,7 +227,7 @@ func (apier AirDrumResources_Apier) ValidateResourceType(resourceType string) er
 	switch resourceType {
 	case VDC_FIELD:
 		err = nil
-	case "vm":
+	case VM_RESOURCE_TYPE:
 		err = nil
 	default:
 		err = errors.New("Resource of type \"" + resourceType + "\" not supported," +
@@ -236,33 +242,33 @@ func (apier AirDrumResources_Apier) ValidateResourceType(resourceType string) er
 func (apier AirDrumResources_Apier) GetResourceCreationUrl(api *API,
 	resourceType string) string {
 
-	var resource_url strings.Builder
-	resource_url.WriteString(api.URL)
-	resource_url.WriteString(resourceType)
-	resource_url.WriteString("/")
-	return resource_url.String()
+	var resourceUrl strings.Builder
+	resourceUrl.WriteString(api.URL)
+	resourceUrl.WriteString(resourceType)
+	resourceUrl.WriteString("/")
+	return resourceUrl.String()
 }
 
 func (apier AirDrumResources_Apier) GetResourceUrl(api *API,
 	resourceType string,
-	resource_id string) string {
+	resourceId string) string {
 
-	var resource_url strings.Builder
+	var resourceUrl strings.Builder
 	apiTools := APITooler{
 		Api: apier,
 	}
 	s_create_url := apiTools.Api.GetResourceCreationUrl(api, resourceType)
-	resource_url.WriteString(s_create_url)
-	resource_url.WriteString(resource_id)
-	resource_url.WriteString("/")
-	return resource_url.String()
+	resourceUrl.WriteString(s_create_url)
+	resourceUrl.WriteString(resourceId)
+	resourceUrl.WriteString("/")
+	return resourceUrl.String()
 }
 
 func (apier AirDrumResources_Apier) ValidateStatus(api *API,
 	resourceType string,
 	clientTooler ClientTooler) error {
 
-	var apiErr error
+	var apiError error
 	var responseBody string
 	apiTools := APITooler{
 		Api: apier,
@@ -271,27 +277,27 @@ func (apier AirDrumResources_Apier) ValidateStatus(api *API,
 		apiTools.Api.GetResourceCreationUrl(api, resourceType),
 		nil)
 	req.Header.Add("authorization", "Token "+api.Token)
-	resp, apiErr := clientTooler.Client.Do(api, req)
+	resp, apiError := clientTooler.Client.Do(api, req)
 
-	if apiErr == nil {
+	if apiError == nil {
 		if resp.Body != nil {
 			bodyBytes, _ := ioutil.ReadAll(resp.Body)
 			responseBody = string(bodyBytes)
 			switch {
 			case resp.StatusCode == http.StatusUnauthorized:
-				apiErr = errors.New(resp.Status + responseBody)
+				apiError = errors.New(resp.Status + responseBody)
 			case resp.Header.Get("content-type") != "application/json":
-				apiErr = errors.New("Could not get a proper json response from \"" +
+				apiError = errors.New("Could not get a proper json response from \"" +
 					api.URL + "\", the api is down or this url is wrong.")
 			}
 		} else {
-			apiErr = errors.New("Could not get a response body from \"" + api.URL +
+			apiError = errors.New("Could not get a response body from \"" + api.URL +
 				"\", the api is down or this url is wrong.")
 		}
 	} else {
-		apiErr = errors.New("Could not get a response from \"" + api.URL +
+		apiError = errors.New("Could not get a response from \"" + api.URL +
 			"\", the api is down or this url is wrong.")
 	}
 
-	return apiErr
+	return apiError
 }

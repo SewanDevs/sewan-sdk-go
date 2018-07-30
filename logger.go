@@ -24,13 +24,13 @@ func loggerCreate(logFile string) *log.Logger {
 	logFilePath.WriteString(logFolder)
 	logFilePath.WriteString(logFile)
 
-	_, folder_exists_error := os.Stat(logFolder)
-	if folder_exists_error != nil {
+	_, folder_existsError := os.Stat(logFolder)
+	if folder_existsError != nil {
 		os.Mkdir(logFolder, 0777)
 	}
 
-	var _, file_exists_error = os.Stat(logFilePath.String())
-	if file_exists_error == nil {
+	var _, file_existsError = os.Stat(logFilePath.String())
+	if file_existsError == nil {
 		os.Remove(logFilePath.String())
 	}
 	os.Create(logFilePath.String())

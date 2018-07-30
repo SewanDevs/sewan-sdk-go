@@ -28,20 +28,20 @@
     \umlobject[class=AirdrumAPI, x=14]{api}
     \umlobject[class=ResourceSchema,x=18]{schema}
     
-    \begin{umlcall}[op=1.\ terraform\ refresh(), type=synchron, return=refresh\ status]{admin}{terraform}
+    \begin{umlcall}[op=1.\ terraform\ refresh(), type=synchron, return=refreshedStatus]{admin}{terraform}
 
-      \begin{umlcall}[op=2.\ getLocalResourcesList(), type=synchron, return=resources\_list]{terraform}{localstate}
+      \begin{umlcall}[op=2.\ getLocalResourcesList(), type=synchron, return=resourcesList]{terraform}{localstate}
       \end{umlcall}
 
-      \begin{umlfragment}[type=loop, label=resource\_in\_resources\_list, name=loop, inner xsep=10,fill=blue!15]
-	\begin{umlcall}[op=3.\ create\_schema(local\_resource\_state), type=asynchron]{terraform}{schema}
-	  \begin{umlcall}[op=4.\ resource\_read(), type=synchron, return=distant\_resource\_state]{terraform}{sdk}
+      \begin{umlfragment}[type=loop, label=resource\_in\_resourcesList, name=loop, inner xsep=10,fill=blue!15]
+	\begin{umlcall}[op=3.\ createSchema(localResourceState), type=asynchron]{terraform}{schema}
+	  \begin{umlcall}[op=4.\ resourceRead(), type=synchron, return=distantResourceState]{terraform}{sdk}
 	    \begin{umlcall}[op=5.\ HTTP\_GET(), type=synchron, return=HTTP.resp]{sdk}{api}
 	    \end{umlcall}
 	  \end{umlcall}
-	  \begin{umlcall}[op=6.\ update\_schema(distant\_resource\_state), type=asynchron]{terraform}{schema}
+	  \begin{umlcall}[op=6.\ update(distantResourceState), type=asynchron]{terraform}{schema}
 	  \end{umlcall}
-	  \begin{umlcall}[op=7.\ update\_resource(schema), type=synchron, return=OK]{terraform}{localstate}
+	  \begin{umlcall}[op=7.\ updateResource(schema), type=synchron, return=OK]{terraform}{localstate}
 	  \end{umlcall}
 	\end{umlcall}
       \end{umlfragment}

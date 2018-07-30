@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	DEFAULT_RESOURCE_TYPE = "vm"
+	DEFAULT_RESOURCE_TYPE = VM_RESOURCE_TYPE
 )
 
 type API struct {

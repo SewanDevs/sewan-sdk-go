@@ -17,24 +17,24 @@ func (apier AirDrumResources_Apier) CreateResource(d *schema.ResourceData,
 	resourceType string,
 	sewan *API) (error, map[string]interface{}) {
 	var (
-		resource_instance_creation_err error = nil
-		create_req_err                 error = nil
-		createError                    error = nil
-		create_resp_body_err           error = nil
-		created_resource               map[string]interface{}
-		resourceInstance               interface{}
-		responseBody                   string
-		instanceName                   string = d.Get(NAME_FIELD).(string)
-		resource_json                  []byte
-		resp_body_reader               interface{}
-		bodyBytes                      []byte
+		resourceInstanceCreationError error = nil
+		createReqError                error = nil
+		createError                   error = nil
+		createRespBodyError           error = nil
+		createdResource               map[string]interface{}
+		resourceInstance              interface{}
+		responseBody                  string
+		instanceName                  string = d.Get(NAME_FIELD).(string)
+		resourceJson                  []byte
+		respBodyReader                interface{}
+		bodyBytes                     []byte
 	)
 	apiTools := APITooler{
 		Api: apier,
 	}
 	req := &http.Request{}
 	resp := &http.Response{}
-	resource_instance_creation_err,
+	resourceInstanceCreationError,
 		resourceInstance = apiTools.Api.ResourceInstanceCreate(d,
 		clientTooler,
 		templatesTooler,
@@ -43,57 +43,57 @@ func (apier AirDrumResources_Apier) CreateResource(d *schema.ResourceData,
 		sewan)
 	logger := loggerCreate("create_resource_" + instanceName + ".log")
 
-	if resource_instance_creation_err == nil {
+	if resourceInstanceCreationError == nil {
 		logger.Println("resourceInstance = ", resourceInstance)
-		resource_json, create_req_err = json.Marshal(resourceInstance)
-		if create_req_err == nil {
-			req, create_req_err = http.NewRequest("POST",
+		resourceJson, createReqError = json.Marshal(resourceInstance)
+		if createReqError == nil {
+			req, createReqError = http.NewRequest("POST",
 				apiTools.Api.GetResourceCreationUrl(sewan, resourceType),
-				bytes.NewBuffer(resource_json))
+				bytes.NewBuffer(resourceJson))
 			logger.Println("req.Body = ", req.Body)
-			if create_req_err == nil {
+			if createReqError == nil {
 				req.Header.Add("authorization", "Token "+sewan.Token)
 				req.Header.Add("content-type", "application/json")
-				resp, create_req_err = clientTooler.Client.Do(sewan, req)
+				resp, createReqError = clientTooler.Client.Do(sewan, req)
 			}
 		}
 
 		if resp != nil {
-			if create_req_err != nil {
+			if createReqError != nil {
 				createError = errors.New("Creation of \"" + instanceName +
-					"\" failed, response reception error : " + create_req_err.Error())
+					"\" failed, response reception error : " + createReqError.Error())
 			} else {
 				if resp.Body != nil {
 					defer resp.Body.Close()
-					bodyBytes, create_resp_body_err = ioutil.ReadAll(resp.Body)
+					bodyBytes, createRespBodyError = ioutil.ReadAll(resp.Body)
 					responseBody = string(bodyBytes)
 				} else {
 					bodyBytes = []byte{}
-					create_resp_body_err = nil
+					createRespBodyError = nil
 					responseBody = ""
 				}
 				switch resp.Header.Get("Content-Type") {
 				case "application/json":
-					resp_body_json_err := json.Unmarshal(bodyBytes, &resp_body_reader)
+					resp_bodyJsonError := json.Unmarshal(bodyBytes, &respBodyReader)
 					switch {
-					case create_resp_body_err != nil:
+					case createRespBodyError != nil:
 						createError = errors.New("Read of " + instanceName +
-							" response body error " + create_resp_body_err.Error())
-					case resp_body_json_err != nil:
+							" response body error " + createRespBodyError.Error())
+					case resp_bodyJsonError != nil:
 						createError = errors.New("Creation of \"" + instanceName +
 							"\" failed, " +
 							"the response body is not a properly formated json :\n\r\"" +
-							resp_body_json_err.Error() + "\"")
+							resp_bodyJsonError.Error() + "\"")
 					default:
 						if resp.StatusCode == http.StatusCreated {
-							created_resource = resp_body_reader.(map[string]interface{})
-							for key, value := range created_resource {
-								read_value,
+							createdResource = respBodyReader.(map[string]interface{})
+							for key, value := range createdResource {
+								readValue,
 									updateError := schemaTools.SchemaTools.ReadElement(key,
 									value,
 									logger)
 								if updateError == nil {
-									created_resource[key] = read_value
+									createdResource[key] = readValue
 								}
 							}
 						} else {
@@ -109,14 +109,14 @@ func (apier AirDrumResources_Apier) CreateResource(d *schema.ResourceData,
 				}
 			}
 		} else {
-			createError = create_req_err
+			createError = createReqError
 		}
 	} else {
-		createError = resource_instance_creation_err
+		createError = resourceInstanceCreationError
 	}
 	logger.Println("createError = ", createError,
-		"\ncreated_resource = ", created_resource)
-	return createError, created_resource
+		"\ncreatedResource = ", createdResource)
+	return createError, createdResource
 }
 
 //------------------------------------------------------------------------------
@@ -128,16 +128,16 @@ func (apier AirDrumResources_Apier) ReadResource(d *schema.ResourceData,
 	sewan *API) (error, map[string]interface{}, bool) {
 
 	var (
-		readError                      error = nil
-		read_req_err                   error = nil
-		resource_instance_creation_err error = nil
-		read_resp_body_err             error = nil
-		read_resource                  map[string]interface{}
-		responseBody                   string
-		resp_body_reader               interface{}
-		resource_exists                bool   = true
-		instanceName                   string = d.Get(NAME_FIELD).(string)
-		bodyBytes                      []byte
+		readError                     error = nil
+		readReqError                  error = nil
+		resourceInstanceCreationError error = nil
+		readRespBodyError             error = nil
+		read_resource                 map[string]interface{}
+		responseBody                  string
+		respBodyReader                interface{}
+		resource_exists               bool   = true
+		instanceName                  string = d.Get(NAME_FIELD).(string)
+		bodyBytes                     []byte
 	)
 	req := &http.Request{}
 	resp := &http.Response{}
@@ -145,52 +145,52 @@ func (apier AirDrumResources_Apier) ReadResource(d *schema.ResourceData,
 	apiTools := APITooler{
 		Api: apier,
 	}
-	resource_instance_creation_err = apiTools.Api.ValidateResourceType(resourceType)
+	resourceInstanceCreationError = apiTools.Api.ValidateResourceType(resourceType)
 
-	if resource_instance_creation_err == nil {
-		req, read_req_err = http.NewRequest("GET",
+	if resourceInstanceCreationError == nil {
+		req, readReqError = http.NewRequest("GET",
 			apiTools.Api.GetResourceUrl(sewan, resourceType, d.Id()), nil)
-		if read_req_err == nil {
+		if readReqError == nil {
 			req.Header.Add("authorization", "Token "+sewan.Token)
-			resp, read_req_err = clientTooler.Client.Do(sewan, req)
+			resp, readReqError = clientTooler.Client.Do(sewan, req)
 		}
 
 		if resp != nil {
-			if read_req_err != nil {
+			if readReqError != nil {
 				readError = errors.New("Read of \"" + instanceName +
-					"\" state failed, response reception error : " + read_req_err.Error())
+					"\" state failed, response reception error : " + readReqError.Error())
 			} else {
 				if resp.Body != nil {
 					defer resp.Body.Close()
-					bodyBytes, read_resp_body_err = ioutil.ReadAll(resp.Body)
+					bodyBytes, readRespBodyError = ioutil.ReadAll(resp.Body)
 					responseBody = string(bodyBytes)
 				} else {
 					bodyBytes = []byte{}
-					read_resp_body_err = nil
+					readRespBodyError = nil
 					responseBody = ""
 				}
 				switch resp.Header.Get("Content-Type") {
 				case "application/json":
 					switch {
-					case read_resp_body_err != nil:
+					case readRespBodyError != nil:
 						readError = errors.New("Read of " + instanceName +
-							" state response body read error " + read_resp_body_err.Error())
+							" state response body read error " + readRespBodyError.Error())
 					case resp.StatusCode == http.StatusOK:
-						resp_body_json_err := json.Unmarshal(bodyBytes, &resp_body_reader)
-						if resp_body_json_err != nil {
+						resp_bodyJsonError := json.Unmarshal(bodyBytes, &respBodyReader)
+						if resp_bodyJsonError != nil {
 							readError = errors.New("Read of \"" + instanceName +
 								"\" failed, response body json error :\n\r\"" +
-								resp_body_json_err.Error() + "\"")
+								resp_bodyJsonError.Error() + "\"")
 						} else {
-							read_resource = resp_body_reader.(map[string]interface{})
+							read_resource = respBodyReader.(map[string]interface{})
 
 							for key, value := range read_resource {
-								read_value,
+								readValue,
 									updateError := schemaTools.SchemaTools.ReadElement(key,
 									value,
 									logger)
 								if updateError == nil {
-									read_resource[key] = read_value
+									read_resource[key] = readValue
 								}
 							}
 						}
@@ -208,10 +208,10 @@ func (apier AirDrumResources_Apier) ReadResource(d *schema.ResourceData,
 				}
 			}
 		} else {
-			readError = read_req_err
+			readError = readReqError
 		}
 	} else {
-		readError = resource_instance_creation_err
+		readError = resourceInstanceCreationError
 	}
 
 	logger.Println("readError =", readError,
@@ -230,16 +230,16 @@ func (apier AirDrumResources_Apier) UpdateResource(d *schema.ResourceData,
 	sewan *API) error {
 
 	var (
-		resource_instance_creation_err error = nil
-		updateError                    error = nil
-		update_req_err                 error = nil
-		update_resp_body_err           error = nil
-		resourceInstance               interface{}
-		responseBody                   string
-		instanceName                   string = d.Get(NAME_FIELD).(string)
-		resource_json                  []byte
-		resp_body_reader               interface{}
-		bodyBytes                      []byte
+		resourceInstanceCreationError error = nil
+		updateError                   error = nil
+		updateReqError                error = nil
+		updateRespBodyError           error = nil
+		resourceInstance              interface{}
+		responseBody                  string
+		instanceName                  string = d.Get(NAME_FIELD).(string)
+		resourceJson                  []byte
+		respBodyReader                interface{}
+		bodyBytes                     []byte
 	)
 	req := &http.Request{}
 	resp := &http.Response{}
@@ -247,7 +247,7 @@ func (apier AirDrumResources_Apier) UpdateResource(d *schema.ResourceData,
 		Api: apier,
 	}
 	logger := loggerCreate("update_resource_" + instanceName + ".log")
-	resource_instance_creation_err,
+	resourceInstanceCreationError,
 		resourceInstance = apiTools.Api.ResourceInstanceCreate(d,
 		clientTooler,
 		templatesTooler,
@@ -255,47 +255,47 @@ func (apier AirDrumResources_Apier) UpdateResource(d *schema.ResourceData,
 		resourceType,
 		sewan)
 
-	if resource_instance_creation_err == nil {
+	if resourceInstanceCreationError == nil {
 
-		resource_json, update_req_err = json.Marshal(resourceInstance)
-		if update_req_err == nil {
-			req, update_req_err = http.NewRequest("PUT",
+		resourceJson, updateReqError = json.Marshal(resourceInstance)
+		if updateReqError == nil {
+			req, updateReqError = http.NewRequest("PUT",
 				apiTools.Api.GetResourceUrl(sewan, resourceType, d.Id()),
-				bytes.NewBuffer(resource_json))
+				bytes.NewBuffer(resourceJson))
 			logger.Println("req.Body = ", req.Body)
-			if update_req_err == nil {
+			if updateReqError == nil {
 				req.Header.Add("authorization", "Token "+sewan.Token)
 				req.Header.Add("content-type", "application/json")
-				resp, update_req_err = clientTooler.Client.Do(sewan, req)
+				resp, updateReqError = clientTooler.Client.Do(sewan, req)
 			}
 		}
 
 		if resp != nil {
-			if update_req_err != nil {
+			if updateReqError != nil {
 				updateError = errors.New("Update of \"" + instanceName +
-					"\" state failed, response reception error : " + update_req_err.Error())
+					"\" state failed, response reception error : " + updateReqError.Error())
 			} else {
 				if resp.Body != nil {
 					defer resp.Body.Close()
-					bodyBytes, update_resp_body_err = ioutil.ReadAll(resp.Body)
+					bodyBytes, updateRespBodyError = ioutil.ReadAll(resp.Body)
 					responseBody = string(bodyBytes)
 				} else {
 					bodyBytes = []byte{}
-					update_resp_body_err = nil
+					updateRespBodyError = nil
 					responseBody = ""
 				}
 				switch resp.Header.Get("Content-Type") {
 				case "application/json":
 					switch {
-					case update_resp_body_err != nil:
+					case updateRespBodyError != nil:
 						updateError = errors.New("Read of \"" + instanceName +
-							"\" state response body read error " + update_resp_body_err.Error())
+							"\" state response body read error " + updateRespBodyError.Error())
 					case resp.StatusCode == http.StatusOK:
-						resp_body_json_err := json.Unmarshal(bodyBytes, &resp_body_reader)
-						if resp_body_json_err != nil {
+						resp_bodyJsonError := json.Unmarshal(bodyBytes, &respBodyReader)
+						if resp_bodyJsonError != nil {
 							updateError = errors.New("Read of \"" + instanceName +
 								"\" failed, response body json error :\n\r\"" +
-								resp_body_json_err.Error())
+								resp_bodyJsonError.Error())
 						}
 					default:
 						updateError = errors.New(resp.Status + responseBody)
@@ -309,11 +309,11 @@ func (apier AirDrumResources_Apier) UpdateResource(d *schema.ResourceData,
 				}
 			}
 		} else {
-			updateError = update_req_err
+			updateError = updateReqError
 		}
 
 	} else {
-		updateError = resource_instance_creation_err
+		updateError = resourceInstanceCreationError
 	}
 
 	logger.Println("updateError = ", updateError)
@@ -329,62 +329,62 @@ func (apier AirDrumResources_Apier) DeleteResource(d *schema.ResourceData,
 	sewan *API) error {
 
 	var (
-		resource_instance_creation_err error = nil
-		deleteError                    error = nil
-		delete_req_err                 error = nil
-		delete_resp_body_err           error = nil
-		responseBody                   string
-		resp_body_reader               interface{}
-		bodyBytes                      []byte
-		instanceName                   string = d.Get(NAME_FIELD).(string)
+		resourceInstanceCreationError error = nil
+		deleteError                   error = nil
+		deleteReqError                error = nil
+		deleteRespBodyError           error = nil
+		responseBody                  string
+		respBodyReader                interface{}
+		bodyBytes                     []byte
+		instanceName                  string = d.Get(NAME_FIELD).(string)
 	)
 	apiTools := APITooler{
 		Api: apier,
 	}
-	resource_instance_creation_err = apiTools.Api.ValidateResourceType(resourceType)
+	resourceInstanceCreationError = apiTools.Api.ValidateResourceType(resourceType)
 	req := &http.Request{}
 	resp := &http.Response{}
 	logger := loggerCreate("delete_resource_" + instanceName + ".log")
 	logger.Println("--------------- ", instanceName, " ( id= ", d.Id(),
 		") DELETE -----------------")
 
-	if resource_instance_creation_err == nil {
+	if resourceInstanceCreationError == nil {
 
-		req, delete_req_err = http.NewRequest("DELETE",
+		req, deleteReqError = http.NewRequest("DELETE",
 			apiTools.Api.GetResourceUrl(sewan, resourceType, d.Id()), nil)
-		if delete_req_err == nil {
+		if deleteReqError == nil {
 			req.Header.Add("authorization", "Token "+sewan.Token)
-			resp, delete_req_err = clientTooler.Client.Do(sewan, req)
+			resp, deleteReqError = clientTooler.Client.Do(sewan, req)
 		}
 
 		if resp != nil {
-			if delete_req_err != nil {
+			if deleteReqError != nil {
 				deleteError = errors.New("Deletion of \"" + instanceName +
-					"\" state failed, response reception error : " + delete_req_err.Error())
+					"\" state failed, response reception error : " + deleteReqError.Error())
 			} else {
 				if resp.Body != nil {
 					defer resp.Body.Close()
-					bodyBytes, delete_resp_body_err = ioutil.ReadAll(resp.Body)
+					bodyBytes, deleteRespBodyError = ioutil.ReadAll(resp.Body)
 					responseBody = string(bodyBytes)
 				} else {
 					bodyBytes = []byte{}
-					delete_resp_body_err = nil
+					deleteRespBodyError = nil
 					responseBody = ""
 				}
 				if resp.StatusCode != http.StatusNoContent {
 					switch resp.Header.Get("Content-Type") {
 					case "application/json":
 						switch {
-						case delete_resp_body_err != nil:
+						case deleteRespBodyError != nil:
 							deleteError = errors.New("Deletion of " + instanceName +
-								" response reception error : " + delete_resp_body_err.Error())
+								" response reception error : " + deleteRespBodyError.Error())
 						default:
-							resp_body_json_err := json.Unmarshal(bodyBytes, &resp_body_reader)
+							resp_bodyJsonError := json.Unmarshal(bodyBytes, &respBodyReader)
 							switch {
-							case resp_body_json_err != nil:
+							case resp_bodyJsonError != nil:
 								deleteError = errors.New("Read of \"" + instanceName +
 									"\" failed, response body json error :\n\r\"" +
-									resp_body_json_err.Error())
+									resp_bodyJsonError.Error())
 							default:
 								deleteError = errors.New(resp.Status + responseBody)
 							}
@@ -399,10 +399,10 @@ func (apier AirDrumResources_Apier) DeleteResource(d *schema.ResourceData,
 				}
 			}
 		} else {
-			deleteError = delete_req_err
+			deleteError = deleteReqError
 		}
 	} else {
-		deleteError = resource_instance_creation_err
+		deleteError = resourceInstanceCreationError
 	}
 
 	logger.Println("deleteError = ", deleteError)

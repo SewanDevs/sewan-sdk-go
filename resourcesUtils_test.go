@@ -10,7 +10,7 @@ import (
 
 //------------------------------------------------------------------------------
 func TestResourceInstanceCreate(t *testing.T) {
-	test_cases := []struct {
+	testCases := []struct {
 		Id            int
 		D             *schema.ResourceData
 		TC_Clienter   Clienter
@@ -50,7 +50,7 @@ func TestResourceInstanceCreate(t *testing.T) {
 			4,
 			vmSchemaInit(NON_EXISTING_TEMPLATE_VM_MAP),
 			GetTemplatesList_Success_HttpClienterFake{},
-			Unexisting_template_TemplaterFake{},
+			UnexistingTemplate_TemplaterFake{},
 			VM_RESOURCE_TYPE,
 			errors.New("Unavailable template : windows95"),
 			VM{},
@@ -70,7 +70,7 @@ func TestResourceInstanceCreate(t *testing.T) {
 			GetTemplatesList_Success_HttpClienterFake{},
 			TemplaterDummy{},
 			WRONG_RESOURCE_TYPE,
-			errors.New("Resource of type \"a_non_supported_resource_type\" not supported," +
+			errors.New("Resource of type \"a_non_supportedResource_type\" not supported," +
 				"list of accepted resource types :\n\r" +
 				"- \"vdc\"\n\r" +
 				"- \"vm\""),
@@ -80,7 +80,7 @@ func TestResourceInstanceCreate(t *testing.T) {
 			7,
 			vmSchemaInit(NON_EXISTING_TEMPLATE_VM_MAP),
 			GetTemplatesList_Failure_HttpClienterFake{},
-			Unexisting_template_TemplaterFake{},
+			UnexistingTemplate_TemplaterFake{},
 			VM_RESOURCE_TYPE,
 			errors.New("GetTemplatesList() error"),
 			VM{},
@@ -89,7 +89,7 @@ func TestResourceInstanceCreate(t *testing.T) {
 			8,
 			vmSchemaInit(EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP),
 			GetTemplatesList_Success_HttpClienterFake{},
-			Template_Format_error_TemplaterFake{},
+			Template_FormatError_TemplaterFake{},
 			VM_RESOURCE_TYPE,
 			errors.New("Template missing fields : " + "\"" + NAME_FIELD + "\" " +
 				"\"" + OS_FIELD + "\" " +
@@ -99,6 +99,15 @@ func TestResourceInstanceCreate(t *testing.T) {
 				"\"" + DISKS_FIELD + "\" " +
 				"\"" + DATACENTER_FIELD + "\" "),
 			VM{},
+		},
+		{
+			9,
+			vmSchemaInit(INSTANCE_NUMBER_FIELD_UNIT_TEST_VM_INSTANCE),
+			GetTemplatesList_Success_HttpClienterFake{},
+			INSTANCE_NUMBER_FIELD_UNIT_TEST_VM_INSTANCE_MAP_TemplaterFake{},
+			VM_RESOURCE_TYPE,
+			nil,
+			FakeVmInstance_INSTANCE_NUMBER_FIELD_UNIT_TEST_VM_INSTANCE_MAP(),
 		},
 	}
 
@@ -112,46 +121,46 @@ func TestResourceInstanceCreate(t *testing.T) {
 		Api: AirDrumResources_Apier{},
 	}
 	fake_client_tooler := ClientTooler{}
-	fake_templates_tooler := TemplatesTooler{}
+	fakeTemplates_tooler := TemplatesTooler{}
 	fake_schema_tooler := SchemaTooler{
 		SchemaTools: Schema_Schemaer{},
 	}
 	sewan = &API{Token: "42", URL: "42", Client: &http.Client{}}
 
-	for _, test_case := range test_cases {
-		fake_client_tooler.Client = test_case.TC_Clienter
-		fake_templates_tooler.TemplatesTools = test_case.TC_Templater
-		err, instance = apiTools.Api.ResourceInstanceCreate(test_case.D,
+	for _, testCase := range testCases {
+		fake_client_tooler.Client = testCase.TC_Clienter
+		fakeTemplates_tooler.TemplatesTools = testCase.TC_Templater
+		err, instance = apiTools.Api.ResourceInstanceCreate(testCase.D,
 			&fake_client_tooler,
-			&fake_templates_tooler,
+			&fakeTemplates_tooler,
 			&fake_schema_tooler,
-			test_case.Resource_type,
+			testCase.Resource_type,
 			sewan)
-		diffs = cmp.Diff(instance, test_case.VmInstance)
+		diffs = cmp.Diff(instance, testCase.VmInstance)
 		switch {
-		case err == nil || test_case.Error == nil:
-			if !(err == nil && test_case.Error == nil) {
+		case err == nil || testCase.Error == nil:
+			if !(err == nil && testCase.Error == nil) {
 				t.Errorf("\n\nTC %d : ResourceInstanceCreate() error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-					test_case.Id, err, test_case.Error)
+					testCase.Id, err, testCase.Error)
 			} else {
 				switch {
 				case diffs != "":
 					t.Errorf("\n\nTC %d : Wrong ResourceInstanceCreate() "+
 						"created instance (-got +want) :\n%s",
-						test_case.Id, diffs)
+						testCase.Id, diffs)
 				}
 			}
-		case err != nil && test_case.Error != nil:
+		case err != nil && testCase.Error != nil:
 			switch {
 			case diffs != "":
 				t.Errorf("\n\nTC %d : Wrong ResourceInstanceCreate() "+
 					"created instance (-got +want) :\n%s",
-					test_case.Id, diffs)
-			case err.Error() != test_case.Error.Error():
+					testCase.Id, diffs)
+			case err.Error() != testCase.Error.Error():
 				t.Errorf("\n\nTC %d : resource creation error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-					test_case.Id, err.Error(), test_case.Error.Error())
+					testCase.Id, err.Error(), testCase.Error.Error())
 			}
 		}
 	}
@@ -159,7 +168,7 @@ func TestResourceInstanceCreate(t *testing.T) {
 
 //------------------------------------------------------------------------------
 func TestGetResourceUrl(t *testing.T) {
-	test_cases := []struct {
+	testCases := []struct {
 		Id     int
 		api    API
 		vm_id  string
@@ -189,22 +198,22 @@ func TestGetResourceUrl(t *testing.T) {
 		Api: AirDrumResources_Apier{},
 	}
 
-	for _, test_case := range test_cases {
-		s_vm_url := apiTools.Api.GetResourceUrl(&test_case.api,
+	for _, testCase := range testCases {
+		s_vm_url := apiTools.Api.GetResourceUrl(&testCase.api,
 			VM_RESOURCE_TYPE,
-			test_case.vm_id)
+			testCase.vm_id)
 
 		switch {
-		case s_vm_url != test_case.vm_url:
+		case s_vm_url != testCase.vm_url:
 			t.Errorf("VM url was incorrect,\n\rgot: \"%s\"\n\rwant: \"%s\"",
-				s_vm_url, test_case.vm_url)
+				s_vm_url, testCase.vm_url)
 		}
 	}
 }
 
 //------------------------------------------------------------------------------
 func TestGetResourceCreationUrl(t *testing.T) {
-	test_cases := []struct {
+	testCases := []struct {
 		Id                    int
 		api                   API
 		resource_creation_url string
@@ -223,22 +232,22 @@ func TestGetResourceCreationUrl(t *testing.T) {
 		Api: AirDrumResources_Apier{},
 	}
 
-	for _, test_case := range test_cases {
-		s_resource_creation_url := apiTools.Api.GetResourceCreationUrl(&test_case.api,
+	for _, testCase := range testCases {
+		s_resource_creation_url := apiTools.Api.GetResourceCreationUrl(&testCase.api,
 			VM_RESOURCE_TYPE)
 
 		switch {
-		case s_resource_creation_url != test_case.resource_creation_url:
+		case s_resource_creation_url != testCase.resource_creation_url:
 			t.Errorf("resource api creation url was incorrect,"+
 				"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-				s_resource_creation_url, test_case.resource_creation_url)
+				s_resource_creation_url, testCase.resource_creation_url)
 		}
 	}
 }
 
 //------------------------------------------------------------------------------
 func TestValidateStatus(t *testing.T) {
-	test_cases := []struct {
+	testCases := []struct {
 		Id           int
 		Api          API
 		Err          error
@@ -312,92 +321,29 @@ func TestValidateStatus(t *testing.T) {
 	}
 	var apiClientErr error
 
-	for _, test_case := range test_cases {
-		apiClientErr = apiTooler.Api.ValidateStatus(&test_case.Api,
-			test_case.ResourceType,
+	for _, testCase := range testCases {
+		apiClientErr = apiTooler.Api.ValidateStatus(&testCase.Api,
+			testCase.ResourceType,
 			clientTooler)
 
 		switch {
-		case apiClientErr == nil || test_case.Err == nil:
-			if !(apiClientErr == nil && test_case.Err == nil) {
+		case apiClientErr == nil || testCase.Err == nil:
+			if !(apiClientErr == nil && testCase.Err == nil) {
 				t.Errorf("\n\nTC %d : ValidateStatus() error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-					test_case.Id, apiClientErr, test_case.Err)
+					testCase.Id, apiClientErr, testCase.Err)
 			}
-		case apiClientErr.Error() != test_case.Err.Error():
+		case apiClientErr.Error() != testCase.Err.Error():
 			t.Errorf("\n\nTC %d : ValidateStatus() error was incorrect,"+
 				"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-				test_case.Id, apiClientErr.Error(), test_case.Err.Error())
+				testCase.Id, apiClientErr.Error(), testCase.Err.Error())
 		}
 	}
 }
 
-func Create_test_resource_schema(id interface{}) *schema.ResourceData {
-	vm_res := resource_vm()
+func CreateTestResourceSchema(id interface{}) *schema.ResourceData {
+	vm_res := resourceVm()
 	d := vm_res.TestResourceData()
 	d.SetId(id.(string))
 	return d
-}
-
-func TestDeleteTerraformResource(t *testing.T) {
-	d := Create_test_resource_schema("resource to delete")
-	schemaTooler := SchemaTooler{
-		SchemaTools: Schema_Schemaer{},
-	}
-	schemaTooler.SchemaTools.DeleteTerraformResource(d)
-	if d.Id() != "" {
-		t.Errorf("Deletion of unit test resource failed.")
-	}
-}
-
-func TestUpdateLocalResourceState_AND_ReadElement(t *testing.T) {
-	test_cases := []struct {
-		Id           int
-		Vm_map       map[string]interface{}
-		Vm_Id_string string
-	}{
-		{
-			1,
-			TEST_UPDATE_VM_MAP,
-			"unit test vm",
-		},
-		{
-			2,
-			TEST_UPDATE_VM_MAP_FLOATID,
-			"121212.12",
-		},
-		{
-			3,
-			TEST_UPDATE_VM_MAP_INTID,
-			"1212",
-		},
-	}
-	var (
-		d     *schema.ResourceData
-		diffs string
-	)
-	schemaTooler := SchemaTooler{
-		SchemaTools: Schema_Schemaer{},
-	}
-	for _, test_case := range test_cases {
-		d = Create_test_resource_schema(test_case.Vm_Id_string)
-		schemaTooler.SchemaTools.UpdateLocalResourceState(test_case.Vm_map,
-			d,
-			&schemaTooler)
-		for key, value := range test_case.Vm_map {
-			diffs = cmp.Diff(d.Get(key), value)
-			switch {
-			case key != ID_FIELD:
-				if diffs != "" {
-					t.Errorf("\n\nTC %d : Update of %s field failed (-got +want) :\n%s",
-						test_case.Id, key, diffs)
-				}
-			default:
-				if d.Id() != test_case.Vm_Id_string {
-					t.Errorf("\n\nTC %d : Update of Id reserved field failed :\n\rGot :%s\n\rWant :%s",
-						test_case.Id, d.Id(), test_case.Vm_Id_string)
-				}
-			}
-		}
-	}
 }

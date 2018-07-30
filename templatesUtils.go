@@ -14,7 +14,7 @@ type TemplatesTooler struct {
 	TemplatesTools Templater
 }
 type Templater interface {
-	FetchTemplateFromList(template_name string,
+	FetchTemplateFromList(templateName string,
 		templateList []interface{}) (map[string]interface{}, error)
 	ValidateTemplate(template map[string]interface{}) error
 	UpdateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
@@ -25,18 +25,19 @@ type Templater interface {
 
 type Template_Templater struct{}
 
-type Disk_modifiable_fields struct {
+type DiskModifiableFields struct {
 	Name          string `json:"name"`
 	Size          int    `json:"size"`
 	Storage_class string `json:"storage_class"`
 }
 
-type Nic_modifiable_fields struct {
+type NicModifiableFields struct {
 	Vlan      string `json:"vlan"`
 	Connected bool   `json:"connected"`
 }
 
-type Template_created_VM_override struct {
+type TemplateCreatedVmOverride struct {
+	Name       string        `json:"name"`
 	OS         string        `json:"os"`
 	RAM        int           `json:"ram"`
 	CPU        int           `json:"cpu"`
@@ -48,124 +49,124 @@ type Template_created_VM_override struct {
 	Disk_image string        `json:"disk_image"`
 }
 
-func (templater Template_Templater) FetchTemplateFromList(template_name string,
+func (templater Template_Templater) FetchTemplateFromList(templateName string,
 	templateList []interface{}) (map[string]interface{}, error) {
 
 	var (
 		template          map[string]interface{} = nil
-		template_list_err error                  = nil
+		templateListError error                  = nil
 	)
 	for i := 0; i < len(templateList); i++ {
 		switch reflect.TypeOf(templateList[i]).Kind() {
 		case reflect.Map:
-			var list_template_name string = templateList[i].(map[string]interface{})[NAME_FIELD].(string)
-			if list_template_name == template_name {
+			var listTemplateName string = templateList[i].(map[string]interface{})[NAME_FIELD].(string)
+			if listTemplateName == templateName {
 				template = templateList[i].(map[string]interface{})
 				break
 			}
 		default:
-			template_list_err = errors.New("One of the fetch template " +
+			templateListError = errors.New("One of the fetch template " +
 				"has a wrong format." +
 				"\ngot : " + reflect.TypeOf(templateList[i]).Kind().String() +
 				"\nwant : " + reflect.Map.String())
 			break
 		}
 	}
-	if template == nil && template_list_err == nil {
-		template_list_err = errors.New("Template \"" + template_name +
+	if template == nil && templateListError == nil {
+		templateListError = errors.New("Template \"" + templateName +
 			"\" does not exists, please validate it's name.")
 	}
-	return template, template_list_err
+	return template, templateListError
 }
 
 func (templater Template_Templater) ValidateTemplate(template map[string]interface{}) error {
 	var (
-		template_error                error
-		template_required_field_slice []string = []string{NAME_FIELD, OS_FIELD, RAM_FIELD,
+		templateError              error
+		templateRequiredFieldSlice []string = []string{NAME_FIELD, OS_FIELD, RAM_FIELD,
 			CPU_FIELD, ENTERPRISE_FIELD, DISKS_FIELD}
-		missing_fields_list strings.Builder
+		missingFieldsList strings.Builder
 	)
-	for _, elem := range template_required_field_slice {
+	for _, elem := range templateRequiredFieldSlice {
 		if _, ok := template[elem]; !ok {
-			missing_fields_list.WriteString("\"")
-			missing_fields_list.WriteString(elem)
-			missing_fields_list.WriteString("\" ")
+			missingFieldsList.WriteString("\"")
+			missingFieldsList.WriteString(elem)
+			missingFieldsList.WriteString("\" ")
 		}
 	}
-	if missing_fields_list.String() != "" {
-		template_error = errors.New("Template missing fields : " +
-			missing_fields_list.String())
+	if missingFieldsList.String() != "" {
+		templateError = errors.New("Template missing fields : " +
+			missingFieldsList.String())
 	} else {
 		if _, ok := template[NICS_FIELD]; ok {
 			if reflect.TypeOf(template[NICS_FIELD]).Kind() != reflect.Slice {
-				template_error = errors.New("Template " + NICS_FIELD +
+				templateError = errors.New("Template " + NICS_FIELD +
 					" is not a list as required but a " +
 					reflect.TypeOf(template[NICS_FIELD]).Kind().String())
 			}
 		}
 	}
-	return template_error
+	return templateError
 }
 
 func (templater Template_Templater) UpdateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
 	template map[string]interface{}) error {
-	var template_handle_err error = nil
+	var templateHandleError error = nil
 	if d.Id() == "" {
-		for template_param_name, template_param_value := range template {
-			if reflect.ValueOf(template_param_name).IsValid() && reflect.ValueOf(template_param_value).IsValid() {
+		for key, value := range template {
+			if reflect.ValueOf(key).IsValid() && reflect.ValueOf(value).IsValid() {
 				var (
-					s_template_param_name   string      = reflect.ValueOf(template_param_name).String()
-					interface_template_name interface{} = reflect.ValueOf(template_param_value).Interface()
-					s_template_param_value  string      = reflect.ValueOf(template_param_value).String()
+					templateParamName     string      = reflect.ValueOf(key).String()
+					interfaceTemplateName interface{} = reflect.ValueOf(value).Interface()
+					templateParamValue    string      = reflect.ValueOf(value).String()
 				)
-				switch reflect.TypeOf(template_param_value).Kind() {
+				switch reflect.TypeOf(value).Kind() {
 				case reflect.String:
 					switch {
-					case s_template_param_name == ID_FIELD:
-					case s_template_param_name == OS_FIELD:
-					case s_template_param_name == NAME_FIELD:
-					case s_template_param_name == DATACENTER_FIELD:
+					case templateParamName == ID_FIELD:
+					case templateParamName == OS_FIELD:
+					case templateParamName == NAME_FIELD:
+					case templateParamName == DATACENTER_FIELD:
 					default:
-						if d.Get(s_template_param_name) == "" {
-							d.Set(s_template_param_name,
-								s_template_param_value)
+						if d.Get(templateParamName) == "" {
+							d.Set(templateParamName,
+								templateParamValue)
 						}
 					}
 				case reflect.Int:
 					switch {
-					case s_template_param_name == ID_FIELD:
+					case templateParamName == ID_FIELD:
 					default:
-						if d.Get(s_template_param_name).(int) == 0 {
-							d.Set(s_template_param_name,
-								int(interface_template_name.(int)))
+						if d.Get(templateParamName).(int) == 0 {
+							d.Set(templateParamName,
+								int(interfaceTemplateName.(int)))
 						}
 					}
 				case reflect.Slice:
 					switch {
-					case template_param_name == DISKS_FIELD:
-					case template_param_name == NICS_FIELD:
+					case key == DISKS_FIELD:
+					case key == NICS_FIELD:
 						var (
-							nic_map           map[string]interface{}
-							schema_nics_slice []interface{}
+							nicMap          map[string]interface{}
+							schemaNicsSlice []interface{}
 						)
-						for _, nic := range template_param_value.([]interface{}) {
-							nic_map = map[string]interface{}{}
+						for _, nic := range value.([]interface{}) {
+							nicMap = map[string]interface{}{}
 							for nicParamName, nicParamValue := range nic.(map[string]interface{}) {
 								switch nicParamName {
 								case VLAN_NAME_FIELD:
-									nic_map[nicParamName] = nicParamValue
+									nicMap[nicParamName] = nicParamValue
 								case CONNECTED_FIELD:
-									nic_map[nicParamName] = nicParamValue
+									nicMap[nicParamName] = nicParamValue
 								default:
 								}
 							}
-							schema_nics_slice = append(schema_nics_slice, nic_map)
+							schemaNicsSlice = append(schemaNicsSlice, nicMap)
 						}
-						for _, nic := range d.Get(s_template_param_name).([]interface{}) {
-							schema_nics_slice = append(schema_nics_slice,
+						for _, nic := range d.Get(templateParamName).([]interface{}) {
+							schemaNicsSlice = append(schemaNicsSlice,
 								nic.(map[string]interface{}))
 						}
-						d.Set(s_template_param_name, schema_nics_slice)
+						d.Set(templateParamName, schemaNicsSlice)
 					default:
 					}
 				default:
@@ -173,16 +174,16 @@ func (templater Template_Templater) UpdateSchemaFromTemplateOnResourceCreation(d
 			}
 		}
 	} else {
-		template_handle_err = errors.New("Template field should not be set on " +
+		templateHandleError = errors.New("Template field should not be set on " +
 			"an existing resource, please review the configuration field." +
 			"\n : The resource schema has not been updated.")
 	}
-	return template_handle_err
+	return templateHandleError
 }
 
 func (templater Template_Templater) CreateTemplateOverrideConfig(d *schema.ResourceData,
 	template map[string]interface{}) (error, string) {
-	vm := Template_created_VM_override{
+	vm := TemplateCreatedVmOverride{
 		RAM:        d.Get(RAM_FIELD).(int),
 		CPU:        d.Get(CPU_FIELD).(int),
 		Vdc:        d.Get(VDC_FIELD).(string),
@@ -191,58 +192,63 @@ func (templater Template_Templater) CreateTemplateOverrideConfig(d *schema.Resou
 		Disk_image: d.Get(DISK_IMAGE_FIELD).(string),
 	}
 	var (
-		schemaer                Schema_Schemaer
-		write_override_file_err error = nil
-		read_list_value         []interface{}
-		list_item               interface{}
-		override_file           strings.Builder
+		schemaer               Schema_Schemaer
+		writeOverrideFileError error = nil
+		readListValue          []interface{}
+		listItem               interface{}
+		overrideFile           strings.Builder
+		vmName                 strings.Builder
+		isSet                  bool
 	)
 	switch {
 	case d.Get(TEMPLATE_FIELD) == "":
-		write_override_file_err = errors.New("Schema \"Template\" field is empty, " +
+		writeOverrideFileError = errors.New("Schema \"Template\" field is empty, " +
 			"can not create a template override configuration.")
 	default:
-		override_file.WriteString(d.Get(TEMPLATE_FIELD).(string))
-		override_file.WriteString("_template_override.tf.json")
-		vm.OS = template[OS_FIELD].(string)
 		logger := LoggerCreate("CreateTemplateOverrideConfig_" +
 			d.Get(TEMPLATE_FIELD).(string) + "_.log")
-		res1, err := os.Stat(override_file.String())
-		logger.Println("os.Stat(override_file.String()),res1 = ", res1)
-		logger.Println("os.Stat(override_file.String()),err = ", err)
-		logger.Println("os.IsNotExist(err) = ", os.IsNotExist(err))
-		if _, err := os.Stat(override_file.String()); os.IsNotExist(err) {
-			for list_key, list_value := range template[DISKS_FIELD].([]interface{}) {
-				list_item, _ = schemaer.ReadElement(list_key,
-					list_value,
+		overrideFile.WriteString(d.Get(TEMPLATE_FIELD).(string))
+		overrideFile.WriteString("Template_override.tf.json")
+		vmName.WriteString(d.Get(NAME_FIELD).(string))
+		_, isSet = d.GetOk(INSTANCE_NUMBER_FIELD)
+		if isSet == true {
+			vmName.WriteString(RESOURCE_NAME_COUNT_SEPARATOR)
+			vmName.WriteString(RESOURCE_INSTANCE_NUMBER)
+		}
+		vm.OS = template[OS_FIELD].(string)
+		vm.Name = vmName.String()
+		if _, err := os.Stat(overrideFile.String()); os.IsNotExist(err) {
+			for listKey, listValue := range template[DISKS_FIELD].([]interface{}) {
+				listItem, _ = schemaer.ReadElement(listKey,
+					listValue,
 					logger)
-				disk := Disk_modifiable_fields{
-					Name:          list_item.(map[string]interface{})["name"].(string),
-					Size:          list_item.(map[string]interface{})["size"].(int),
-					Storage_class: list_item.(map[string]interface{})["storage_class"].(string),
+				disk := DiskModifiableFields{
+					Name:          listItem.(map[string]interface{})[NAME_FIELD].(string),
+					Size:          listItem.(map[string]interface{})[SIZE_FIELD].(int),
+					Storage_class: listItem.(map[string]interface{})[STORAGE_CLASS_FIELD].(string),
 				}
-				read_list_value = append(read_list_value, disk)
+				readListValue = append(readListValue, disk)
 			}
-			vm.Disks = read_list_value
-			read_list_value = []interface{}{}
-			for list_key, list_value := range d.Get(NICS_FIELD).([]interface{}) {
-				list_item, _ = schemaer.ReadElement(list_key,
-					list_value,
+			vm.Disks = readListValue
+			readListValue = []interface{}{}
+			for listKey, listValue := range d.Get(NICS_FIELD).([]interface{}) {
+				listItem, _ = schemaer.ReadElement(listKey,
+					listValue,
 					logger)
-				nic := Nic_modifiable_fields{
-					Vlan:      list_item.(map[string]interface{})["vlan"].(string),
-					Connected: list_item.(map[string]interface{})["connected"].(bool),
+				nic := NicModifiableFields{
+					Vlan:      listItem.(map[string]interface{})[VLAN_NAME_FIELD].(string),
+					Connected: listItem.(map[string]interface{})[CONNECTED_FIELD].(bool),
 				}
-				read_list_value = append(read_list_value, nic)
+				readListValue = append(readListValue, nic)
 			}
-			vm.Nics = read_list_value
+			vm.Nics = readListValue
 			vm_fields_map := map[string]interface{}{d.Get(NAME_FIELD).(string): vm}
 			vm_map := map[string]interface{}{"sewan_clouddc_vm": vm_fields_map}
 			resources_map := map[string]interface{}{"resource": vm_map}
-			vm_json, _ := json.Marshal(resources_map)
-			write_override_file_err = ioutil.WriteFile(override_file.String(),
-				vm_json, 0644)
+			vmJson, _ := json.Marshal(resources_map)
+			writeOverrideFileError = ioutil.WriteFile(overrideFile.String(),
+				vmJson, 0644)
 		}
 	}
-	return write_override_file_err, override_file.String()
+	return writeOverrideFileError, overrideFile.String()
 }

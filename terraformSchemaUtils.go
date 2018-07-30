@@ -6,6 +6,7 @@ import (
 	"log"
 	"reflect"
 	"strconv"
+	"strings"
 )
 
 type SchemaTooler struct {
@@ -13,8 +14,9 @@ type SchemaTooler struct {
 }
 type Schemaer interface {
 	DeleteTerraformResource(d *schema.ResourceData)
-	UpdateLocalResourceState(resource_state map[string]interface{},
+	UpdateLocalResourceState(resourceState map[string]interface{},
 		d *schema.ResourceData, schemaTools *SchemaTooler) error
+	UpdateVdcResourcesNames(d *schema.ResourceData) error
 	ReadElement(key interface{}, value interface{},
 		logger *log.Logger) (interface{}, error)
 }
@@ -24,21 +26,21 @@ func (schemaer Schema_Schemaer) DeleteTerraformResource(d *schema.ResourceData) 
 	d.SetId("")
 }
 
-func (schemaer Schema_Schemaer) UpdateLocalResourceState(resource_state map[string]interface{},
+func (schemaer Schema_Schemaer) UpdateLocalResourceState(resourceState map[string]interface{},
 	d *schema.ResourceData, schemaTools *SchemaTooler) error {
 
 	var (
 		updateError error = nil
-		read_value  interface{}
+		readValue   interface{}
 	)
-	logger := LoggerCreate("update_local_resource_state_" +
+	logger := LoggerCreate("update_local_resourceState_" +
 		d.Get(NAME_FIELD).(string) + ".log")
-	for key, value := range resource_state {
-		read_value,
+	for key, value := range resourceState {
+		readValue,
 			updateError = schemaTools.SchemaTools.ReadElement(key,
 			value,
 			logger)
-		logger.Println("Set \"", key, "\" to \"", read_value, "\"")
+		logger.Println("Set \"", key, "\" to \"", readValue, "\"")
 		if key == ID_FIELD {
 			var s_id string = ""
 			switch {
@@ -58,59 +60,80 @@ func (schemaer Schema_Schemaer) UpdateLocalResourceState(resource_state map[stri
 			}
 			d.SetId(s_id)
 		} else {
-			updateError = d.Set(key, read_value)
+			updateError = d.Set(key, readValue)
 		}
-		read_value = nil
+		readValue = nil
 	}
 	return updateError
+}
+
+func (schemaer Schema_Schemaer) UpdateVdcResourcesNames(d *schema.ResourceData) error {
+	var (
+		vdcResourcesList       []interface{} = d.Get(VDC_RESOURCE_FIELD).([]interface{})
+		vdcResourcesListUpdate []interface{} = []interface{}{}
+		enterpriseName         string        = d.Get(ENTERPRISE_FIELD).(string)
+		resourceName           string
+	)
+
+	for _, resource := range vdcResourcesList {
+		resourceName = resource.(map[string]interface{})[RESOURCE_FIELD].(string)
+		resourceName = strings.Replace(resourceName,
+			enterpriseName, "", 1)
+		resourceName = strings.Replace(resourceName,
+			MONO_FIELD, "", 1)
+		resource.(map[string]interface{})[RESOURCE_FIELD] = resourceName
+		vdcResourcesListUpdate = append(vdcResourcesListUpdate, resource)
+	}
+
+	return d.Set(VDC_RESOURCE_FIELD, vdcResourcesListUpdate)
 }
 
 func (schemaer Schema_Schemaer) ReadElement(key interface{}, value interface{},
 	logger *log.Logger) (interface{}, error) {
 
 	var (
-		readError  error = nil
-		read_value interface{}
+		readError error = nil
+		readValue interface{}
 	)
-	switch value_type := value.(type) {
+	switch valueType := value.(type) {
 	case string:
-		read_value = value.(string)
+		readValue = value.(string)
 	case bool:
-		read_value = value.(bool)
+		readValue = value.(bool)
 	case float64:
-		read_value = int(value.(float64))
+		readValue = int(value.(float64))
 	case int:
-		read_value = value.(int)
+		readValue = value.(int)
 	case map[string]interface{}:
-		var read_map_value map[string]interface{}
-		read_map_value = make(map[string]interface{})
-		var map_item interface{}
-		for map_key, map_value := range value_type {
-			map_item,
-				readError = schemaer.ReadElement(map_key,
-				map_value,
+		var readMapValue map[string]interface{}
+		readMapValue = make(map[string]interface{})
+		var mapItem interface{}
+		for mapKey, mapValue := range valueType {
+			mapItem,
+				readError = schemaer.ReadElement(mapKey,
+				mapValue,
 				logger)
-			read_map_value[map_key] = map_item
+			readMapValue[mapKey] = mapItem
 		}
-		read_value = read_map_value
+		readValue = readMapValue
 	case []interface{}:
-		var read_list_value []interface{}
-		var list_item interface{}
-		for list_key, list_value := range value_type {
-			list_item,
-				readError = schemaer.ReadElement(list_key,
-				list_value,
+		var readListValue []interface{}
+		var listItem interface{}
+		for listKey, listValue := range valueType {
+			listItem,
+				readError = schemaer.ReadElement(listKey,
+				listValue,
 				logger)
-			read_list_value = append(read_list_value, list_item)
+			readListValue = append(readListValue, listItem)
 		}
-		read_value = read_list_value
+		readValue = readListValue
 	default:
 		if value == nil {
-			read_value = nil
+			readValue = nil
 		} else {
 			readError = errors.New("Format " +
-				reflect.TypeOf(value_type).Kind().String() + " not handled.")
+				reflect.TypeOf(valueType).Kind().String() + " not handled.")
 		}
 	}
-	return read_value, readError
+	return readValue, readError
 }
