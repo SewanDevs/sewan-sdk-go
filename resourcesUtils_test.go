@@ -122,9 +122,6 @@ func TestResourceInstanceCreate(t *testing.T) {
 	}
 	fake_client_tooler := ClientTooler{}
 	fakeTemplates_tooler := TemplatesTooler{}
-	fake_schema_tooler := SchemaTooler{
-		SchemaTools: Schema_Schemaer{},
-	}
 	sewan = &API{Token: "42", URL: "42", Client: &http.Client{}}
 
 	for _, testCase := range testCases {
@@ -133,7 +130,6 @@ func TestResourceInstanceCreate(t *testing.T) {
 		err, instance = apiTools.Api.ResourceInstanceCreate(testCase.D,
 			&fake_client_tooler,
 			&fakeTemplates_tooler,
-			&fake_schema_tooler,
 			testCase.Resource_type,
 			sewan)
 		diffs = cmp.Diff(instance, testCase.VmInstance)
@@ -278,7 +274,7 @@ func TestValidateStatus(t *testing.T) {
 				&http.Client{},
 			},
 			errors.New("Could not get a proper json response from \"" +
-				WRONG_API_URL + "\", the api is down or this url is wrong."),
+				WRONG_API_URL + ERROR_API_DOWN_OR_WRONG_API_URL),
 			VM_RESOURCE_TYPE,
 		},
 		{4,
@@ -288,7 +284,7 @@ func TestValidateStatus(t *testing.T) {
 				&http.Client{},
 			},
 			errors.New("Could not get a proper json response from \"" +
-				WRONG_API_URL + "\", the api is down or this url is wrong."),
+				WRONG_API_URL + ERROR_API_DOWN_OR_WRONG_API_URL),
 			VM_RESOURCE_TYPE,
 		},
 		{5,
@@ -298,7 +294,7 @@ func TestValidateStatus(t *testing.T) {
 				&http.Client{},
 			},
 			errors.New("Could not get a response body from \"" +
-				NO_RESP_BODY_API_URL + "\", the api is down or this url is wrong."),
+				NO_RESP_BODY_API_URL + ERROR_API_DOWN_OR_WRONG_API_URL),
 			VM_RESOURCE_TYPE,
 		},
 		{6,
@@ -308,7 +304,7 @@ func TestValidateStatus(t *testing.T) {
 				&http.Client{},
 			},
 			errors.New("Could not get a response from \"" +
-				NO_RESP_API_URL + "\", the api is down or this url is wrong."),
+				NO_RESP_API_URL + ERROR_API_DOWN_OR_WRONG_API_URL),
 			VM_RESOURCE_TYPE,
 		},
 	}

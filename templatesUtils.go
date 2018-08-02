@@ -211,7 +211,7 @@ func (templater Template_Templater) CreateTemplateOverrideConfig(d *schema.Resou
 		overrideFile.WriteString("Template_override.tf.json")
 		vmName.WriteString(d.Get(NAME_FIELD).(string))
 		_, isSet = d.GetOk(INSTANCE_NUMBER_FIELD)
-		if isSet == true {
+		if isSet {
 			vmName.WriteString(RESOURCE_NAME_COUNT_SEPARATOR)
 			vmName.WriteString(RESOURCE_INSTANCE_NUMBER)
 		}

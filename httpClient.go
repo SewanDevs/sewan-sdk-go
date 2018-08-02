@@ -50,7 +50,7 @@ func (client HttpClienter) GetTemplatesList(clientTooler *ClientTooler,
 	req, reqError = http.NewRequest("GET",
 		templatesListUrl.String(),
 		nil)
-	req.Header.Add("authorization", "Token "+api.Token)
+	req.Header.Add(HTTP_AUTHORIZATION, HTTP_TOKEN_HEADER+api.Token)
 	logger.Println("req = ", req)
 	logger.Println("reqError = ", reqError)
 	if reqError == nil {
@@ -59,7 +59,7 @@ func (client HttpClienter) GetTemplatesList(clientTooler *ClientTooler,
 		if respError == nil {
 			templateList, handlerRespError = clientTooler.Client.HandleResponse(resp,
 				http.StatusOK,
-				"application/json")
+				HTTP_JSON_CONTENT_TYPE)
 			if templateList != nil {
 				returnTemplateList = templateList.([]interface{})
 			}
@@ -91,11 +91,11 @@ func (client HttpClienter) HandleResponse(resp *http.Response,
 	)
 
 	if resp.StatusCode == expectedCode {
-		contentType = resp.Header.Get("Content-Type")
+		contentType = resp.Header.Get(HTTP_RESP_CONTENT_TYPE)
 
 		if contentType == expectedBodyFormat {
 			switch contentType {
-			case "application/json":
+			case HTTP_JSON_CONTENT_TYPE:
 				bodyBytes, readBodyError = ioutil.ReadAll(resp.Body)
 				readJsonError = json.Unmarshal(bodyBytes, &respBodyReader)
 				switch {
@@ -108,15 +108,15 @@ func (client HttpClienter) HandleResponse(resp *http.Response,
 				default:
 					responseBody = respBodyReader.(interface{})
 				}
-			case "text/html":
+			case HTTP_HTML_TEXT_CONTENT_TYPE:
 				bodyBytes, readBodyError = ioutil.ReadAll(resp.Body)
 				responseBody = string(bodyBytes)
 			case "":
 				responseBody = nil
 			default:
-				respError = errors.New("Unhandled api response type : " +
-					resp.Header.Get("Content-Type") +
-					"\nPlease validate the configuration api url.")
+				respError = errors.New(ERROR_API_UNHANDLED_RESP_TYPE +
+					resp.Header.Get(HTTP_RESP_CONTENT_TYPE) +
+					ERROR_VALIDATE_API_URL)
 			}
 		} else {
 			respError = errors.New("Wrong response content type, \n\r expected :" +

@@ -66,7 +66,7 @@ func TestCreateResource(t *testing.T) {
 			BadBodyResponseContentType_HttpClienterFake{},
 			VM_RESOURCE_TYPE,
 			errors.New("Unhandled api response type : image" +
-				"\nPlease validate the configuration api url."),
+				ERROR_VALIDATE_API_URL),
 			nil,
 		},
 		{
@@ -231,7 +231,7 @@ func TestReadResource(t *testing.T) {
 			BadBodyResponseContentType_HttpClienterFake{},
 			VM_RESOURCE_TYPE,
 			errors.New("Unhandled api response type : image" +
-				"\nPlease validate the configuration api url."),
+				ERROR_VALIDATE_API_URL),
 			nil,
 			true,
 		},
@@ -383,7 +383,7 @@ func TestUpdateResource(t *testing.T) {
 			BadBodyResponseContentType_HttpClienterFake{},
 			VM_RESOURCE_TYPE,
 			errors.New("Unhandled api response type : image" +
-				"\nPlease validate the configuration api url."),
+				ERROR_VALIDATE_API_URL),
 		},
 		{
 			9,
@@ -507,7 +507,7 @@ func TestDeleteResource(t *testing.T) {
 			BadBodyResponseContentType_HttpClienterFake{},
 			VM_RESOURCE_TYPE,
 			errors.New("Unhandled api response type : image" +
-				"\nPlease validate the configuration api url."),
+				ERROR_VALIDATE_API_URL),
 		},
 		{
 			10,

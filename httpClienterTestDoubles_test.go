@@ -86,7 +86,7 @@ func (client BadBodyResponseContentType_HttpClienterFake) Do(api *API,
 
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add("Content-Type", "image")
+	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, "image")
 	resp.Body = ioutil.NopCloser(bytes.NewBufferString("Internal Server Error"))
 	resp.StatusCode = http.StatusInternalServerError
 	return &resp, nil
@@ -114,7 +114,7 @@ func (client StatusInternalServerError_HttpClienterFake) Do(api *API,
 
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add("Content-Type", "text/html")
+	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_HTML_TEXT_CONTENT_TYPE)
 	resp.Body = ioutil.NopCloser(bytes.NewBufferString("<h1>Server Error (500)</h1>"))
 	resp.StatusCode = http.StatusInternalServerError
 	return &resp, nil
@@ -142,7 +142,7 @@ func (client BadBodyResponse_StatusCreated_HttpClienterFake) Do(api *API,
 
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add("Content-Type", "application/json")
+	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
 	resp.Body = ioutil.NopCloser(bytes.NewBufferString("{\"detail\"\"Invalid json string}}.\"}"))
 	resp.StatusCode = http.StatusCreated
 	return &resp, nil
@@ -170,7 +170,7 @@ func (client BadBodyResponse_StatusOK_HttpClienterFake) Do(api *API,
 
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add("Content-Type", "application/json")
+	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
 	resp.Body = ioutil.NopCloser(bytes.NewBufferString("{\"detail\"\"Invalid json string}}.\"}"))
 	resp.StatusCode = http.StatusOK
 	return &resp, nil
@@ -198,7 +198,7 @@ func (client Error401_HttpClienterFake) Do(api *API,
 
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add("Content-Type", "application/json")
+	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
 	resp.StatusCode = http.StatusUnauthorized
 	resp.Status = UNAUTHORIZED_STATUS
 	body := Resp_Body{"Token non valide."}
@@ -229,7 +229,7 @@ func (client Error404_HttpClienterFake) Do(api *API,
 
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add("Content-Type", "application/json")
+	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
 	resp.StatusCode = http.StatusNotFound
 	resp.Status = NOT_FOUND_STATUS
 	body := Resp_Body{"Not found."}
@@ -260,7 +260,7 @@ func (client VDC_CreationSuccess_HttpClienterFake) Do(api *API,
 
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add("Content-Type", "application/json")
+	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
 	resp.StatusCode = http.StatusCreated
 	js, _ := json.Marshal(VDC_READ_RESPONSE_MAP)
 	resp.Body = ioutil.NopCloser(bytes.NewBuffer(js))
@@ -289,7 +289,7 @@ func (client VDC_ReadSuccess_HttpClienterFake) Do(api *API,
 
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add("Content-Type", "application/json")
+	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
 	resp.StatusCode = http.StatusOK
 	js, _ := json.Marshal(VDC_READ_RESPONSE_MAP)
 	resp.Body = ioutil.NopCloser(bytes.NewBuffer(js))
@@ -318,7 +318,7 @@ func (client VDC_UpdateSuccess_HttpClienterFake) Do(api *API,
 
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add("Content-Type", "application/json")
+	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
 	resp.StatusCode = http.StatusOK
 	js, _ := json.Marshal(VDC_CREATION_MAP)
 	resp.Body = ioutil.NopCloser(bytes.NewBuffer(js))
@@ -346,7 +346,7 @@ func (client VDC_DeleteSuccess_HttpClienterFake) Do(api *API,
 
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add("Content-Type", "application/json")
+	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
 	resp.StatusCode = http.StatusNoContent
 	return &resp, nil
 }
@@ -373,7 +373,7 @@ func (client VM_CreationSuccess_HttpClienterFake) Do(api *API,
 
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add("Content-Type", "application/json")
+	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
 	resp.StatusCode = http.StatusCreated
 	js, _ := json.Marshal(NO_TEMPLATE_VM_MAP)
 	resp.Body = ioutil.NopCloser(bytes.NewBuffer(js))
@@ -402,7 +402,7 @@ func (client VM_ReadSuccess_HttpClienterFake) Do(api *API,
 
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add("Content-Type", "application/json")
+	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
 	resp.StatusCode = http.StatusOK
 	js, _ := json.Marshal(NO_TEMPLATE_VM_MAP)
 	resp.Body = ioutil.NopCloser(bytes.NewBuffer(js))
@@ -431,7 +431,7 @@ func (client VM_UpdateSuccess_HttpClienterFake) Do(api *API,
 
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add("Content-Type", "application/json")
+	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
 	resp.StatusCode = http.StatusOK
 	js, _ := json.Marshal(NO_TEMPLATE_VM_MAP)
 	resp.Body = ioutil.NopCloser(bytes.NewBuffer(js))
@@ -459,7 +459,7 @@ func (client VM_DeleteSuccess_HttpClienterFake) Do(api *API,
 
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add("Content-Type", "application/json")
+	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
 	resp.StatusCode = http.StatusNoContent
 	return &resp, nil
 }
@@ -485,7 +485,7 @@ func (client DeleteWRONGResponseBody_HttpClienterFake) Do(api *API,
 
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add("Content-Type", "application/json")
+	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
 	resp.StatusCode = http.StatusOK
 	resp.Body = ioutil.NopCloser(bytes.NewBufferString(DESTROY_WRONG_MSG))
 	return &resp, nil
@@ -545,7 +545,7 @@ func (client FakeHttpClienter) Do(api *API, req *http.Request) (*http.Response, 
 		resp.StatusCode = http.StatusOK
 		switch {
 		case api.URL == WRONG_API_URL || api.URL == NOT_JSON_RESP_API_URL:
-			resp.Header = map[string][]string{"Content-Type": {"text/plain; charset=utf-8"}}
+			resp.Header = map[string][]string{HTTP_RESP_CONTENT_TYPE: {"text/plain; charset=utf-8"}}
 			resp.Body = ioutil.NopCloser(bytes.NewBufferString("A plain text."))
 		case api.URL == RIGHT_API_URL:
 			if api.Token != RIGHT_API_TOKEN {
@@ -553,7 +553,7 @@ func (client FakeHttpClienter) Do(api *API, req *http.Request) (*http.Response, 
 				resp.StatusCode = http.StatusUnauthorized
 				resp.Body = ioutil.NopCloser(bytes.NewBufferString("{\"detail\":\"Invalid token.\"}"))
 			} else {
-				resp.Header = map[string][]string{"Content-Type": {"application/json"}}
+				resp.Header = map[string][]string{HTTP_RESP_CONTENT_TYPE: {HTTP_JSON_CONTENT_TYPE}}
 				bodyJson, _ := json.Marshal(body{detail: ""})
 				resp.Body = ioutil.NopCloser(bytes.NewBuffer(bodyJson))
 			}

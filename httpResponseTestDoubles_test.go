@@ -12,7 +12,7 @@ func HttpResponseFake_OKJson() *http.Response {
 	response.Status = "200 OK"
 	response.StatusCode = http.StatusOK
 	response.Header = map[string][]string{}
-	response.Header.Add("Content-Type", "application/json")
+	response.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
 	Resp_BodyJson, _ := json.Marshal(Resp_Body{Detail: "a simple json"})
 	response.Body = ioutil.NopCloser(bytes.NewBuffer(Resp_BodyJson))
 	return &response
@@ -23,7 +23,7 @@ func HttpResponseFake_OKTemplateListJson() *http.Response {
 	response.Status = "200 OK"
 	response.StatusCode = http.StatusOK
 	response.Header = map[string][]string{}
-	response.Header.Add("Content-Type", "application/json")
+	response.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
 	Resp_BodyJson, _ := json.Marshal(TEMPLATES_LIST)
 	response.Body = ioutil.NopCloser(bytes.NewBuffer(Resp_BodyJson))
 	return &response
@@ -34,7 +34,7 @@ func HttpResponseFake_500_texthtml() *http.Response {
 	response.Status = "500 Internal Server Error"
 	response.StatusCode = http.StatusInternalServerError
 	response.Header = map[string][]string{}
-	response.Header.Add("Content-Type", "text/html")
+	response.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_HTML_TEXT_CONTENT_TYPE)
 	response.Body = ioutil.NopCloser(bytes.NewBufferString("<h1>Server Error (500)</h1>"))
 	return &response
 }
@@ -44,7 +44,7 @@ func HttpResponseFake_500Json() *http.Response {
 	response.Status = "500 Internal Server Error"
 	response.StatusCode = http.StatusInternalServerError
 	response.Header = map[string][]string{}
-	response.Header.Add("Content-Type", "application/json")
+	response.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
 	Resp_BodyJson, _ := json.Marshal(Resp_Body{Detail: "a json response Resp_Body"})
 	response.Body = ioutil.NopCloser(bytes.NewBuffer(Resp_BodyJson))
 	return &response
@@ -55,7 +55,7 @@ func HttpResponseFake_OK_txthtml() *http.Response {
 	response.Status = "200 OK"
 	response.StatusCode = http.StatusOK
 	response.Header = map[string][]string{}
-	response.Header.Add("Content-Type", "text/html")
+	response.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_HTML_TEXT_CONTENT_TYPE)
 	response.Body = ioutil.NopCloser(bytes.NewBufferString("<h1>An html text</h1>"))
 	return &response
 }
@@ -72,7 +72,7 @@ func HttpResponseFake_OK_wrongjson() *http.Response {
 	response.Status = "200 OK"
 	response.StatusCode = http.StatusOK
 	response.Header = map[string][]string{}
-	response.Header.Add("Content-Type", "application/json")
+	response.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
 	response.Body = ioutil.NopCloser(bytes.NewBufferString("a bad formated json"))
 	return &response
 }
@@ -82,6 +82,6 @@ func HttpResponseFake_OK_image() *http.Response {
 	response.Status = "200 OK"
 	response.StatusCode = http.StatusOK
 	response.Header = map[string][]string{}
-	response.Header.Add("Content-Type", "image")
+	response.Header.Add(HTTP_RESP_CONTENT_TYPE, "image")
 	return &response
 }

@@ -62,7 +62,7 @@ func TestUpdateLocalResourceState_AND_ReadElement(t *testing.T) {
 			default:
 				if d.Id() != testCase.VmIdString {
 					t.Errorf("\n\nTC %d : Update of Id reserved field failed "+
-						":\n\rGot :%s\n\rWant :%s",
+						ERROR_TEST_RESULT_DIFFS,
 						testCase.Id, d.Id(), testCase.VmIdString)
 				}
 			}

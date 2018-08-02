@@ -30,7 +30,6 @@ func (apier FakeAirDrumResource_APIer) ValidateResourceType(resourceType string)
 func (apier FakeAirDrumResource_APIer) ResourceInstanceCreate(d *schema.ResourceData,
 	clientTooler *ClientTooler,
 	templatesTooler *TemplatesTooler,
-	schemaTools *SchemaTooler,
 	resourceType string,
 	api *API) (error, interface{}) {
 

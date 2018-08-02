@@ -30,7 +30,6 @@ type APIer interface {
 	ResourceInstanceCreate(d *schema.ResourceData,
 		clientTooler *ClientTooler,
 		templatesTooler *TemplatesTooler,
-		schemaTools *SchemaTooler,
 		resourceType string,
 		api *API) (error,
 		interface{})

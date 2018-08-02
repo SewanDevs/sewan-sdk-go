@@ -100,7 +100,7 @@ func TestHandleResponse(t *testing.T) {
 			1,
 			HttpResponseFake_OKJson(),
 			http.StatusOK,
-			"application/json",
+			HTTP_JSON_CONTENT_TYPE,
 			JsonStub(),
 			nil,
 		},
@@ -108,7 +108,7 @@ func TestHandleResponse(t *testing.T) {
 			2,
 			HttpResponseFake_OKTemplateListJson(),
 			http.StatusOK,
-			"application/json",
+			HTTP_JSON_CONTENT_TYPE,
 			JsonTemplateListFake(),
 			nil,
 		},
@@ -116,7 +116,7 @@ func TestHandleResponse(t *testing.T) {
 			3,
 			HttpResponseFake_500_texthtml(),
 			http.StatusInternalServerError,
-			"text/html",
+			HTTP_HTML_TEXT_CONTENT_TYPE,
 			"<h1>Server Error (500)</h1>",
 			nil,
 		},
@@ -124,7 +124,7 @@ func TestHandleResponse(t *testing.T) {
 			4,
 			HttpResponseFake_500Json(),
 			http.StatusInternalServerError,
-			"text/html",
+			HTTP_HTML_TEXT_CONTENT_TYPE,
 			nil,
 			errors.New("Wrong response content type, \n\r expected :text/html\n\r got :application/json"),
 		},
@@ -132,7 +132,7 @@ func TestHandleResponse(t *testing.T) {
 			5,
 			HttpResponseFake_OKJson(),
 			http.StatusInternalServerError,
-			"text/html",
+			HTTP_HTML_TEXT_CONTENT_TYPE,
 			nil,
 			errors.New("Wrong response status code, \n\r expected :500\n\r got :200" +
 				"\n\rFull response status : 200 OK"),
@@ -141,7 +141,7 @@ func TestHandleResponse(t *testing.T) {
 			6,
 			HttpResponseFake_OKJson(),
 			http.StatusInternalServerError,
-			"text/html",
+			HTTP_HTML_TEXT_CONTENT_TYPE,
 			nil,
 			errors.New("Wrong response status code, \n\r expected :500\n\r got :200" +
 				"\n\rFull response status : 200 OK"),
@@ -158,7 +158,7 @@ func TestHandleResponse(t *testing.T) {
 			8,
 			HttpResponseFake_OK_wrongjson(),
 			http.StatusOK,
-			"application/json",
+			HTTP_JSON_CONTENT_TYPE,
 			nil,
 			errors.New("Response body is not a properly formated json :" +
 				"invalid character 'a' looking for beginning of value"),
@@ -170,7 +170,7 @@ func TestHandleResponse(t *testing.T) {
 			"image",
 			nil,
 			errors.New("Unhandled api response type : image" +
-				"\nPlease validate the configuration api url."),
+				ERROR_VALIDATE_API_URL),
 		},
 	}
 

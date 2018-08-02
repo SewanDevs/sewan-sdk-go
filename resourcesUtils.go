@@ -70,9 +70,7 @@ type VM struct {
 	Outsourcing   string        `json:"outsourcing"`
 }
 
-func vdcInstanceCreate(d *schema.ResourceData,
-	clientTooler *ClientTooler,
-	api *API) (VDC, error) {
+func vdcInstanceCreate(d *schema.ResourceData) (VDC, error) {
 
 	var (
 		vdc          VDC
@@ -102,7 +100,6 @@ func vdcInstanceCreate(d *schema.ResourceData,
 func vmInstanceCreate(d *schema.ResourceData,
 	clientTooler *ClientTooler,
 	templatesTooler *TemplatesTooler,
-	schemaTools *SchemaTooler,
 	api *API) (VM, error) {
 
 	var (
@@ -194,7 +191,6 @@ func vmInstanceCreate(d *schema.ResourceData,
 func (apier AirDrumResources_Apier) ResourceInstanceCreate(d *schema.ResourceData,
 	clientTooler *ClientTooler,
 	templatesTooler *TemplatesTooler,
-	schemaTools *SchemaTooler,
 	resourceType string,
 	api *API) (error, interface{}) {
 
@@ -205,14 +201,11 @@ func (apier AirDrumResources_Apier) ResourceInstanceCreate(d *schema.ResourceDat
 
 	switch resourceType {
 	case VDC_FIELD:
-		resourceInstance, instanceError = vdcInstanceCreate(d,
-			clientTooler,
-			api)
+		resourceInstance, instanceError = vdcInstanceCreate(d)
 	case VM_RESOURCE_TYPE:
 		resourceInstance, instanceError = vmInstanceCreate(d,
 			clientTooler,
 			templatesTooler,
-			schemaTools,
 			api)
 	default:
 		instanceError = apier.ValidateResourceType(resourceType)
@@ -276,7 +269,7 @@ func (apier AirDrumResources_Apier) ValidateStatus(api *API,
 	req, _ := http.NewRequest("GET",
 		apiTools.Api.GetResourceCreationUrl(api, resourceType),
 		nil)
-	req.Header.Add("authorization", "Token "+api.Token)
+	req.Header.Add(HTTP_AUTHORIZATION, HTTP_TOKEN_HEADER+api.Token)
 	resp, apiError := clientTooler.Client.Do(api, req)
 
 	if apiError == nil {
@@ -286,17 +279,17 @@ func (apier AirDrumResources_Apier) ValidateStatus(api *API,
 			switch {
 			case resp.StatusCode == http.StatusUnauthorized:
 				apiError = errors.New(resp.Status + responseBody)
-			case resp.Header.Get("content-type") != "application/json":
+			case resp.Header.Get(HTTP_REQ_CONTENT_TYPE) != HTTP_JSON_CONTENT_TYPE:
 				apiError = errors.New("Could not get a proper json response from \"" +
-					api.URL + "\", the api is down or this url is wrong.")
+					api.URL + ERROR_API_DOWN_OR_WRONG_API_URL)
 			}
 		} else {
 			apiError = errors.New("Could not get a response body from \"" + api.URL +
-				"\", the api is down or this url is wrong.")
+				ERROR_API_DOWN_OR_WRONG_API_URL)
 		}
 	} else {
 		apiError = errors.New("Could not get a response from \"" + api.URL +
-			"\", the api is down or this url is wrong.")
+			ERROR_API_DOWN_OR_WRONG_API_URL)
 	}
 
 	return apiError

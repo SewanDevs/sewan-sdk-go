@@ -38,7 +38,6 @@ func (apier AirDrumResources_Apier) CreateResource(d *schema.ResourceData,
 		resourceInstance = apiTools.Api.ResourceInstanceCreate(d,
 		clientTooler,
 		templatesTooler,
-		schemaTools,
 		resourceType,
 		sewan)
 	logger := loggerCreate("create_resource_" + instanceName + ".log")
@@ -52,8 +51,8 @@ func (apier AirDrumResources_Apier) CreateResource(d *schema.ResourceData,
 				bytes.NewBuffer(resourceJson))
 			logger.Println("req.Body = ", req.Body)
 			if createReqError == nil {
-				req.Header.Add("authorization", "Token "+sewan.Token)
-				req.Header.Add("content-type", "application/json")
+				req.Header.Add(HTTP_AUTHORIZATION, HTTP_TOKEN_HEADER+sewan.Token)
+				req.Header.Add(HTTP_REQ_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
 				resp, createReqError = clientTooler.Client.Do(sewan, req)
 			}
 		}
@@ -72,8 +71,8 @@ func (apier AirDrumResources_Apier) CreateResource(d *schema.ResourceData,
 					createRespBodyError = nil
 					responseBody = ""
 				}
-				switch resp.Header.Get("Content-Type") {
-				case "application/json":
+				switch resp.Header.Get(HTTP_RESP_CONTENT_TYPE) {
+				case HTTP_JSON_CONTENT_TYPE:
 					resp_bodyJsonError := json.Unmarshal(bodyBytes, &respBodyReader)
 					switch {
 					case createRespBodyError != nil:
@@ -100,12 +99,12 @@ func (apier AirDrumResources_Apier) CreateResource(d *schema.ResourceData,
 							createError = errors.New(resp.Status + responseBody)
 						}
 					}
-				case "text/html":
+				case HTTP_HTML_TEXT_CONTENT_TYPE:
 					createError = errors.New(resp.Status + responseBody)
 				default:
-					createError = errors.New("Unhandled api response type : " +
-						resp.Header.Get("Content-Type") +
-						"\nPlease validate the configuration api url.")
+					createError = errors.New(ERROR_API_UNHANDLED_RESP_TYPE +
+						resp.Header.Get(HTTP_RESP_CONTENT_TYPE) +
+						ERROR_VALIDATE_API_URL)
 				}
 			}
 		} else {
@@ -151,14 +150,14 @@ func (apier AirDrumResources_Apier) ReadResource(d *schema.ResourceData,
 		req, readReqError = http.NewRequest("GET",
 			apiTools.Api.GetResourceUrl(sewan, resourceType, d.Id()), nil)
 		if readReqError == nil {
-			req.Header.Add("authorization", "Token "+sewan.Token)
+			req.Header.Add(HTTP_AUTHORIZATION, HTTP_TOKEN_HEADER+sewan.Token)
 			resp, readReqError = clientTooler.Client.Do(sewan, req)
 		}
 
 		if resp != nil {
 			if readReqError != nil {
-				readError = errors.New("Read of \"" + instanceName +
-					"\" state failed, response reception error : " + readReqError.Error())
+				readError = errors.New(ERROR_READ_OF + instanceName +
+					ERROR_UPDATE_STATE_FAILED_AND_RESP_ERR + readReqError.Error())
 			} else {
 				if resp.Body != nil {
 					defer resp.Body.Close()
@@ -169,8 +168,8 @@ func (apier AirDrumResources_Apier) ReadResource(d *schema.ResourceData,
 					readRespBodyError = nil
 					responseBody = ""
 				}
-				switch resp.Header.Get("Content-Type") {
-				case "application/json":
+				switch resp.Header.Get(HTTP_RESP_CONTENT_TYPE) {
+				case HTTP_JSON_CONTENT_TYPE:
 					switch {
 					case readRespBodyError != nil:
 						readError = errors.New("Read of " + instanceName +
@@ -178,8 +177,8 @@ func (apier AirDrumResources_Apier) ReadResource(d *schema.ResourceData,
 					case resp.StatusCode == http.StatusOK:
 						resp_bodyJsonError := json.Unmarshal(bodyBytes, &respBodyReader)
 						if resp_bodyJsonError != nil {
-							readError = errors.New("Read of \"" + instanceName +
-								"\" failed, response body json error :\n\r\"" +
+							readError = errors.New(ERROR_READ_OF + instanceName +
+								ERROR_JSON_RESP_FAILED_AND_JSON_ERR +
 								resp_bodyJsonError.Error() + "\"")
 						} else {
 							read_resource = respBodyReader.(map[string]interface{})
@@ -199,12 +198,12 @@ func (apier AirDrumResources_Apier) ReadResource(d *schema.ResourceData,
 					default:
 						readError = errors.New(resp.Status + responseBody)
 					}
-				case "text/html":
+				case HTTP_HTML_TEXT_CONTENT_TYPE:
 					readError = errors.New(resp.Status + responseBody)
 				default:
-					readError = errors.New("Unhandled api response type : " +
-						resp.Header.Get("Content-Type") +
-						"\nPlease validate the configuration api url.")
+					readError = errors.New(ERROR_API_UNHANDLED_RESP_TYPE +
+						resp.Header.Get(HTTP_RESP_CONTENT_TYPE) +
+						ERROR_VALIDATE_API_URL)
 				}
 			}
 		} else {
@@ -251,7 +250,6 @@ func (apier AirDrumResources_Apier) UpdateResource(d *schema.ResourceData,
 		resourceInstance = apiTools.Api.ResourceInstanceCreate(d,
 		clientTooler,
 		templatesTooler,
-		schemaTools,
 		resourceType,
 		sewan)
 
@@ -264,8 +262,8 @@ func (apier AirDrumResources_Apier) UpdateResource(d *schema.ResourceData,
 				bytes.NewBuffer(resourceJson))
 			logger.Println("req.Body = ", req.Body)
 			if updateReqError == nil {
-				req.Header.Add("authorization", "Token "+sewan.Token)
-				req.Header.Add("content-type", "application/json")
+				req.Header.Add(HTTP_AUTHORIZATION, HTTP_TOKEN_HEADER+sewan.Token)
+				req.Header.Add(HTTP_REQ_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
 				resp, updateReqError = clientTooler.Client.Do(sewan, req)
 			}
 		}
@@ -273,7 +271,7 @@ func (apier AirDrumResources_Apier) UpdateResource(d *schema.ResourceData,
 		if resp != nil {
 			if updateReqError != nil {
 				updateError = errors.New("Update of \"" + instanceName +
-					"\" state failed, response reception error : " + updateReqError.Error())
+					ERROR_UPDATE_STATE_FAILED_AND_RESP_ERR + updateReqError.Error())
 			} else {
 				if resp.Body != nil {
 					defer resp.Body.Close()
@@ -284,28 +282,28 @@ func (apier AirDrumResources_Apier) UpdateResource(d *schema.ResourceData,
 					updateRespBodyError = nil
 					responseBody = ""
 				}
-				switch resp.Header.Get("Content-Type") {
-				case "application/json":
+				switch resp.Header.Get(HTTP_RESP_CONTENT_TYPE) {
+				case HTTP_JSON_CONTENT_TYPE:
 					switch {
 					case updateRespBodyError != nil:
-						updateError = errors.New("Read of \"" + instanceName +
+						updateError = errors.New(ERROR_READ_OF + instanceName +
 							"\" state response body read error " + updateRespBodyError.Error())
 					case resp.StatusCode == http.StatusOK:
 						resp_bodyJsonError := json.Unmarshal(bodyBytes, &respBodyReader)
 						if resp_bodyJsonError != nil {
-							updateError = errors.New("Read of \"" + instanceName +
-								"\" failed, response body json error :\n\r\"" +
+							updateError = errors.New(ERROR_READ_OF + instanceName +
+								ERROR_JSON_RESP_FAILED_AND_JSON_ERR +
 								resp_bodyJsonError.Error())
 						}
 					default:
 						updateError = errors.New(resp.Status + responseBody)
 					}
-				case "text/html":
+				case HTTP_HTML_TEXT_CONTENT_TYPE:
 					updateError = errors.New(resp.Status + responseBody)
 				default:
-					updateError = errors.New("Unhandled api response type : " +
-						resp.Header.Get("Content-Type") +
-						"\nPlease validate the configuration api url.")
+					updateError = errors.New(ERROR_API_UNHANDLED_RESP_TYPE +
+						resp.Header.Get(HTTP_RESP_CONTENT_TYPE) +
+						ERROR_VALIDATE_API_URL)
 				}
 			}
 		} else {
@@ -353,14 +351,14 @@ func (apier AirDrumResources_Apier) DeleteResource(d *schema.ResourceData,
 		req, deleteReqError = http.NewRequest("DELETE",
 			apiTools.Api.GetResourceUrl(sewan, resourceType, d.Id()), nil)
 		if deleteReqError == nil {
-			req.Header.Add("authorization", "Token "+sewan.Token)
+			req.Header.Add(HTTP_AUTHORIZATION, HTTP_TOKEN_HEADER+sewan.Token)
 			resp, deleteReqError = clientTooler.Client.Do(sewan, req)
 		}
 
 		if resp != nil {
 			if deleteReqError != nil {
 				deleteError = errors.New("Deletion of \"" + instanceName +
-					"\" state failed, response reception error : " + deleteReqError.Error())
+					ERROR_UPDATE_STATE_FAILED_AND_RESP_ERR + deleteReqError.Error())
 			} else {
 				if resp.Body != nil {
 					defer resp.Body.Close()
@@ -372,8 +370,8 @@ func (apier AirDrumResources_Apier) DeleteResource(d *schema.ResourceData,
 					responseBody = ""
 				}
 				if resp.StatusCode != http.StatusNoContent {
-					switch resp.Header.Get("Content-Type") {
-					case "application/json":
+					switch resp.Header.Get(HTTP_RESP_CONTENT_TYPE) {
+					case HTTP_JSON_CONTENT_TYPE:
 						switch {
 						case deleteRespBodyError != nil:
 							deleteError = errors.New("Deletion of " + instanceName +
@@ -382,19 +380,19 @@ func (apier AirDrumResources_Apier) DeleteResource(d *schema.ResourceData,
 							resp_bodyJsonError := json.Unmarshal(bodyBytes, &respBodyReader)
 							switch {
 							case resp_bodyJsonError != nil:
-								deleteError = errors.New("Read of \"" + instanceName +
-									"\" failed, response body json error :\n\r\"" +
+								deleteError = errors.New(ERROR_READ_OF + instanceName +
+									ERROR_JSON_RESP_FAILED_AND_JSON_ERR +
 									resp_bodyJsonError.Error())
 							default:
 								deleteError = errors.New(resp.Status + responseBody)
 							}
 						}
-					case "text/html":
+					case HTTP_HTML_TEXT_CONTENT_TYPE:
 						deleteError = errors.New(resp.Status + responseBody)
 					default:
-						deleteError = errors.New("Unhandled api response type : " +
-							resp.Header.Get("Content-Type") +
-							"\nPlease validate the configuration api url.")
+						deleteError = errors.New(ERROR_API_UNHANDLED_RESP_TYPE +
+							resp.Header.Get(HTTP_RESP_CONTENT_TYPE) +
+							ERROR_VALIDATE_API_URL)
 					}
 				}
 			}
