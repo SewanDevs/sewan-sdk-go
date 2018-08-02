@@ -38,7 +38,7 @@ const (
 	VM_RESOURCE_TYPE                       = "vm"
 	VDC_RESOURCE_TYPE                      = VDC_FIELD
 	RESOURCE_NAME_COUNT_SEPARATOR          = "-"
-	RESOURCE_INSTANCE_NUMBER               = "${count.index}"
+	RESOURCE_DYNAMIC_INSTANCE_NUMBER       = "${count.index + 1}"
 	HTTP_REQ_CONTENT_TYPE                  = "content-type"
 	HTTP_RESP_CONTENT_TYPE                 = "Content-Type"
 	HTTP_JSON_CONTENT_TYPE                 = "application/json"

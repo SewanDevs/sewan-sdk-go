@@ -97,53 +97,72 @@ func vdcInstanceCreate(d *schema.ResourceData) (VDC, error) {
 	return vdc, nil
 }
 
+func getTemplateAndUpdateSchema(templateName string,
+	d *schema.ResourceData,
+	clientTooler *ClientTooler,
+	templatesTooler *TemplatesTooler,
+	api *API) (map[string]interface{}, error) {
+	var (
+		templateList               []interface{}
+		templateError              error                  = nil
+		getTemplatesListError      error                  = nil
+		fetchTemplateFromListError error                  = nil
+		templateFormatError        error                  = nil
+		template                   map[string]interface{} = nil
+		enterprise                 string                 = d.Get(ENTERPRISE_FIELD).(string)
+	)
+	templateList,
+		getTemplatesListError = clientTooler.Client.GetTemplatesList(clientTooler,
+		enterprise, api)
+	if getTemplatesListError == nil {
+		template,
+			fetchTemplateFromListError = templatesTooler.TemplatesTools.FetchTemplateFromList(templateName,
+			templateList)
+		templateFormatError = templatesTooler.TemplatesTools.ValidateTemplate(template)
+		switch {
+		case fetchTemplateFromListError != nil:
+			templateError = fetchTemplateFromListError
+		case templateFormatError != nil:
+			templateError = templateFormatError
+		default:
+			templateError = templatesTooler.TemplatesTools.UpdateSchemaFromTemplateOnResourceCreation(d,
+				template)
+		}
+	} else {
+		templateError = getTemplatesListError
+	}
+	return template, templateError
+}
+
 func vmInstanceCreate(d *schema.ResourceData,
 	clientTooler *ClientTooler,
 	templatesTooler *TemplatesTooler,
 	api *API) (VM, error) {
 
 	var (
-		vm                         VM
-		getTemplatesListError      error                  = nil
-		fetchTemplateFromListError error                  = nil
-		templateFormatError        error                  = nil
-		instanceCreationError      error                  = nil
-		template                   map[string]interface{} = nil
-		templateName               string                 = d.Get(TEMPLATE_FIELD).(string)
-		enterprise                 string                 = d.Get(ENTERPRISE_FIELD).(string)
-		vmName                     strings.Builder
-		instanceNumber             int
+		vm                    VM
+		templateError         error                  = nil
+		instanceCreationError error                  = nil
+		template              map[string]interface{} = nil
+		templateName          string                 = d.Get(TEMPLATE_FIELD).(string)
+		vmName                strings.Builder
+		instanceNumber        int
 	)
 	logger := LoggerCreate("vminstanceCreate" + d.Id() + ".log")
 	vmName.WriteString(d.Get(NAME_FIELD).(string))
 	if templateName != "" && d.Id() == "" {
-		var templateList []interface{}
 		instanceNumber = d.Get(INSTANCE_NUMBER_FIELD).(int)
 		vmName.WriteString(RESOURCE_NAME_COUNT_SEPARATOR)
 		vmName.WriteString(strconv.Itoa(instanceNumber))
-		templateList,
-			getTemplatesListError = clientTooler.Client.GetTemplatesList(clientTooler,
-			enterprise, api)
-		if getTemplatesListError == nil {
-			template,
-				fetchTemplateFromListError = templatesTooler.TemplatesTools.FetchTemplateFromList(templateName,
-				templateList)
-			templateFormatError = templatesTooler.TemplatesTools.ValidateTemplate(template)
-			switch {
-			case fetchTemplateFromListError != nil:
-				instanceCreationError = fetchTemplateFromListError
-			case templateFormatError != nil:
-				instanceCreationError = templateFormatError
-			default:
-				instanceCreationError = templatesTooler.TemplatesTools.UpdateSchemaFromTemplateOnResourceCreation(d,
-					template)
-			}
-		} else {
-			instanceCreationError = getTemplatesListError
-		}
+		template,
+			templateError = getTemplateAndUpdateSchema(templateName,
+			d,
+			clientTooler,
+			templatesTooler,
+			api)
 	}
 	logger.Println("instanceCreationError = ", instanceCreationError)
-	if instanceCreationError == nil {
+	if templateError == nil {
 		vm = VM{
 			Name:          vmName.String(),
 			Enterprise:    d.Get(ENTERPRISE_FIELD).(string),
@@ -182,6 +201,8 @@ func vmInstanceCreate(d *schema.ResourceData,
 			dynamicFieldJson, _ := json.Marshal(dynamicFieldStruct)
 			vm.DynamicField = string(dynamicFieldJson)
 		}
+	} else {
+		instanceCreationError = templateError
 	}
 	logger.Println("vm = ", vm)
 	logger.Println("instanceCreationError = ", instanceCreationError)

@@ -158,7 +158,7 @@ func (templater Template_Templater) CreateTemplateOverrideConfig(d *schema.Resou
 		_, isSet = d.GetOk(INSTANCE_NUMBER_FIELD)
 		if isSet {
 			vmName.WriteString(RESOURCE_NAME_COUNT_SEPARATOR)
-			vmName.WriteString(RESOURCE_INSTANCE_NUMBER)
+			vmName.WriteString(RESOURCE_DYNAMIC_INSTANCE_NUMBER)
 		}
 		vm.OS = template[OS_FIELD].(string)
 		vm.Name = vmName.String()
