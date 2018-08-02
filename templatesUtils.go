@@ -59,7 +59,9 @@ func (templater Template_Templater) FetchTemplateFromList(templateName string,
 	for i := 0; i < len(templateList); i++ {
 		switch reflect.TypeOf(templateList[i]).Kind() {
 		case reflect.Map:
-			var listTemplateName string = templateList[i].(map[string]interface{})[NAME_FIELD].(string)
+			var (
+				listTemplateName string = templateList[i].(map[string]interface{})[NAME_FIELD].(string)
+			)
 			if listTemplateName == templateName {
 				template = templateList[i].(map[string]interface{})
 				break
@@ -97,12 +99,11 @@ func (templater Template_Templater) ValidateTemplate(template map[string]interfa
 		templateError = errors.New("Template missing fields : " +
 			missingFieldsList.String())
 	} else {
-		if _, ok := template[NICS_FIELD]; ok {
-			if reflect.TypeOf(template[NICS_FIELD]).Kind() != reflect.Slice {
-				templateError = errors.New("Template " + NICS_FIELD +
-					" is not a list as required but a " +
-					reflect.TypeOf(template[NICS_FIELD]).Kind().String())
-			}
+		_, ok := template[NICS_FIELD]
+		if ok && (reflect.TypeOf(template[NICS_FIELD]).Kind() != reflect.Slice) {
+			templateError = errors.New("Template " + NICS_FIELD +
+				" is not a list as required but a " +
+				reflect.TypeOf(template[NICS_FIELD]).Kind().String())
 		}
 	}
 	return templateError
@@ -114,63 +115,7 @@ func (templater Template_Templater) UpdateSchemaFromTemplateOnResourceCreation(d
 	if d.Id() == "" {
 		for key, value := range template {
 			if reflect.ValueOf(key).IsValid() && reflect.ValueOf(value).IsValid() {
-				var (
-					templateParamName     string      = reflect.ValueOf(key).String()
-					interfaceTemplateName interface{} = reflect.ValueOf(value).Interface()
-					templateParamValue    string      = reflect.ValueOf(value).String()
-				)
-				switch reflect.TypeOf(value).Kind() {
-				case reflect.String:
-					switch {
-					case templateParamName == ID_FIELD:
-					case templateParamName == OS_FIELD:
-					case templateParamName == NAME_FIELD:
-					case templateParamName == DATACENTER_FIELD:
-					default:
-						if d.Get(templateParamName) == "" {
-							d.Set(templateParamName,
-								templateParamValue)
-						}
-					}
-				case reflect.Int:
-					switch {
-					case templateParamName == ID_FIELD:
-					default:
-						if d.Get(templateParamName).(int) == 0 {
-							d.Set(templateParamName,
-								int(interfaceTemplateName.(int)))
-						}
-					}
-				case reflect.Slice:
-					switch {
-					case key == DISKS_FIELD:
-					case key == NICS_FIELD:
-						var (
-							nicMap          map[string]interface{}
-							schemaNicsSlice []interface{}
-						)
-						for _, nic := range value.([]interface{}) {
-							nicMap = map[string]interface{}{}
-							for nicParamName, nicParamValue := range nic.(map[string]interface{}) {
-								switch nicParamName {
-								case VLAN_NAME_FIELD:
-									nicMap[nicParamName] = nicParamValue
-								case CONNECTED_FIELD:
-									nicMap[nicParamName] = nicParamValue
-								default:
-								}
-							}
-							schemaNicsSlice = append(schemaNicsSlice, nicMap)
-						}
-						for _, nic := range d.Get(templateParamName).([]interface{}) {
-							schemaNicsSlice = append(schemaNicsSlice,
-								nic.(map[string]interface{}))
-						}
-						d.Set(templateParamName, schemaNicsSlice)
-					default:
-					}
-				default:
-				}
+				updateSchemaFieldOnResourceCreation(d, key, value)
 			}
 		}
 	} else {
@@ -251,4 +196,69 @@ func (templater Template_Templater) CreateTemplateOverrideConfig(d *schema.Resou
 		}
 	}
 	return writeOverrideFileError, overrideFile.String()
+}
+
+func conformizeNicsSliceOnResourceCreation(d *schema.ResourceData,
+	templateParamName string,
+	value []interface{}) []interface{} {
+	var (
+		nicMap          map[string]interface{}
+		schemaNicsSlice []interface{}
+	)
+	for _, nic := range value {
+		nicMap = map[string]interface{}{}
+		for nicParamName, nicParamValue := range nic.(map[string]interface{}) {
+			switch nicParamName {
+			case VLAN_NAME_FIELD:
+				nicMap[nicParamName] = nicParamValue
+			case CONNECTED_FIELD:
+				nicMap[nicParamName] = nicParamValue
+			default:
+			}
+		}
+		schemaNicsSlice = append(schemaNicsSlice, nicMap)
+	}
+	for _, nic := range d.Get(templateParamName).([]interface{}) {
+		schemaNicsSlice = append(schemaNicsSlice,
+			nic.(map[string]interface{}))
+	}
+	return schemaNicsSlice
+}
+
+func updateSchemaFieldOnResourceCreation(d *schema.ResourceData, key string, value interface{}) {
+	var (
+		templateParamName     string      = reflect.ValueOf(key).String()
+		interfaceTemplateName interface{} = reflect.ValueOf(value).Interface()
+		templateParamValue    string      = reflect.ValueOf(value).String()
+	)
+	switch reflect.TypeOf(value).Kind() {
+	case reflect.String:
+		switch {
+		case templateParamName == ID_FIELD:
+		case templateParamName == OS_FIELD:
+		case templateParamName == NAME_FIELD:
+		case templateParamName == DATACENTER_FIELD:
+		case d.Get(templateParamName) == "":
+			d.Set(templateParamName, templateParamValue)
+		default:
+		}
+	case reflect.Int:
+		switch {
+		case templateParamName == ID_FIELD:
+		case d.Get(templateParamName).(int) == 0:
+			d.Set(templateParamName, int(interfaceTemplateName.(int)))
+		default:
+		}
+	case reflect.Slice:
+		switch {
+		case key == DISKS_FIELD:
+		case key == NICS_FIELD:
+			schemaNicsSlice := conformizeNicsSliceOnResourceCreation(d,
+				templateParamName,
+				value.([]interface{}))
+			d.Set(templateParamName, schemaNicsSlice)
+		default:
+		}
+	default:
+	}
 }
