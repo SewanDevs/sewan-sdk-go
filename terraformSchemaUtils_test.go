@@ -25,17 +25,17 @@ func TestUpdateLocalResourceState_AND_ReadElement(t *testing.T) {
 	}{
 		{
 			1,
-			TEST_UPDATE_VM_MAP,
+			testUpdateVmMap,
 			"unit test vm",
 		},
 		{
 			2,
-			TEST_UPDATE_VM_MAP_FLOATID,
+			testUpdateVmMapFloatId,
 			"121212.12",
 		},
 		{
 			3,
-			TEST_UPDATE_VM_MAP_INTID,
+			testUpdateVmMapIntId,
 			"1212",
 		},
 	}
@@ -54,7 +54,7 @@ func TestUpdateLocalResourceState_AND_ReadElement(t *testing.T) {
 		for key, value := range testCase.VmMap {
 			diffs = cmp.Diff(d.Get(key), value)
 			switch {
-			case key != ID_FIELD:
+			case key != IdField:
 				if diffs != "" {
 					t.Errorf("\n\nTC %d : Update of %s field failed (-got +want) :\n%s",
 						testCase.Id, key, diffs)
@@ -62,7 +62,7 @@ func TestUpdateLocalResourceState_AND_ReadElement(t *testing.T) {
 			default:
 				if d.Id() != testCase.VmIdString {
 					t.Errorf("\n\nTC %d : Update of Id reserved field failed "+
-						ERROR_TEST_RESULT_DIFFS,
+						errTestResultDiffs,
 						testCase.Id, d.Id(), testCase.VmIdString)
 				}
 			}
@@ -79,8 +79,8 @@ func TestUpdateVdcResourcesNames(t *testing.T) {
 	}{
 		{
 			1,
-			vdcSchemaInit(VDC_RESOURCES_NAMES_PRE_UPDATE_MAP),
-			VDC_RESOURCES_NAMES_UPDATED_MAP,
+			vdcSchemaInit(vdcResourcesNamesPreUpdateMap),
+			vdcResourcesNamesUpdatedMap,
 			nil,
 		},
 	}

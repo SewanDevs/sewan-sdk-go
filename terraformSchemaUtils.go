@@ -34,14 +34,14 @@ func (schemaer Schema_Schemaer) UpdateLocalResourceState(resourceState map[strin
 		readValue   interface{}
 	)
 	logger := LoggerCreate("update_local_resourceState_" +
-		d.Get(NAME_FIELD).(string) + ".log")
+		d.Get(NameField).(string) + ".log")
 	for key, value := range resourceState {
 		readValue,
 			updateError = schemaTools.SchemaTools.ReadElement(key,
 			value,
 			logger)
 		logger.Println("Set \"", key, "\" to \"", readValue, "\"")
-		if key == ID_FIELD {
+		if key == IdField {
 			var s_id string = ""
 			switch {
 			case reflect.TypeOf(value).Kind() == reflect.Float64:
@@ -69,23 +69,23 @@ func (schemaer Schema_Schemaer) UpdateLocalResourceState(resourceState map[strin
 
 func (schemaer Schema_Schemaer) UpdateVdcResourcesNames(d *schema.ResourceData) error {
 	var (
-		vdcResourcesList       []interface{} = d.Get(VDC_RESOURCE_FIELD).([]interface{})
+		vdcResourcesList       []interface{} = d.Get(VdcResourceField).([]interface{})
 		vdcResourcesListUpdate []interface{} = []interface{}{}
-		enterpriseName         string        = d.Get(ENTERPRISE_FIELD).(string)
+		enterpriseName         string        = d.Get(EnterpriseField).(string)
 		resourceName           string
 	)
 
 	for _, resource := range vdcResourcesList {
-		resourceName = resource.(map[string]interface{})[RESOURCE_FIELD].(string)
+		resourceName = resource.(map[string]interface{})[ResourceField].(string)
 		resourceName = strings.Replace(resourceName,
 			enterpriseName, "", 1)
 		resourceName = strings.Replace(resourceName,
-			MONO_FIELD, "", 1)
-		resource.(map[string]interface{})[RESOURCE_FIELD] = resourceName
+			monoField, "", 1)
+		resource.(map[string]interface{})[ResourceField] = resourceName
 		vdcResourcesListUpdate = append(vdcResourcesListUpdate, resource)
 	}
 
-	return d.Set(VDC_RESOURCE_FIELD, vdcResourcesListUpdate)
+	return d.Set(VdcResourceField, vdcResourcesListUpdate)
 }
 
 func (schemaer Schema_Schemaer) ReadElement(key interface{}, value interface{},

@@ -7,22 +7,8 @@ import (
 	"io/ioutil"
 )
 
-const (
-	REQ_ERR                 = "Creation request response error."
-	NOT_FOUND_STATUS        = "404 Not Found"
-	NOT_FOUND_MSG           = "404 Not Found{\"detail\":\"Not found.\"}"
-	UNAUTHORIZED_STATUS     = "401 Unauthorized"
-	UNAUTHORIZED_MSG        = "401 Unauthorized{\"detail\":\"Token non valide.\"}"
-	DESTROY_WRONG_MSG       = "{\"detail\":\"Destroying resource wrong body message\"}"
-	CHECK_REDIRECT_FAILURE  = "CheckRedirectReqFailure"
-	VDC_DESTROY_FAILURE_MSG = "Destroying the VDC now"
-	VM_DESTROY_FAILURE_MSG  = "Destroying the VM now"
-	WRONG_RESOURCE_TYPE     = "a_non_supportedResource_type"
-	ENTERPRISE_SLUG         = "unit test enterprise"
-)
-
 var (
-	RESOURCE_OVERRIDE_JSON_MAP = map[string]interface{}{
+	resourceOverrideJsonMap = map[string]interface{}{
 		"resource": map[string]interface{}{
 			"sewan_clouddc_vm": map[string]interface{}{
 				"CreateTemplateOverrideConfig Unit test": map[string]interface{}{
@@ -55,11 +41,11 @@ var (
 			},
 		},
 	}
-	RESOURCE_N42_OVERRIDE_JSON_MAP = map[string]interface{}{
+	resourceN42OverrideJsonMap = map[string]interface{}{
 		"resource": map[string]interface{}{
 			"sewan_clouddc_vm": map[string]interface{}{
 				"CreateTemplateOverrideConfig Unit test": map[string]interface{}{
-					"name": "CreateTemplateOverrideConfig Unit test-${count.index}",
+					"name": "CreateTemplateOverrideConfig Unit test-${count.index + 1}",
 					"disks": []interface{}{
 						map[string]interface{}{
 							"name":          "unit test disk template1",
@@ -88,734 +74,738 @@ var (
 			},
 		},
 	}
-	NON_EXISTING_ERROR_VM_SCHEMA_MAP = map[string]interface{}{
-		ID_FIELD:         "an id, same behaviour if it's an int or float",
-		NAME_FIELD:       "VM schema update unit test",
-		TEMPLATE_FIELD:   "template1",
-		RAM_FIELD:        2,
-		ENTERPRISE_FIELD: "unit test enterprise",
-		NICS_FIELD: []interface{}{
+	nonExistingErrorVmSchemaMap = map[string]interface{}{
+		IdField:         "an id, same behaviour if it's an int or float",
+		NameField:       "VM schema update unit test",
+		TemplateField:   "template1",
+		RamField:        2,
+		EnterpriseField: "unit test enterprise",
+		NicsField: []interface{}{
 			map[string]interface{}{
-				VLAN_NAME_FIELD: "vm additional unit test vlan1",
-				CONNECTED_FIELD: true,
+				VlanNameField:  "vm additional unit test vlan1",
+				ConnectedField: true,
 			},
 		},
-		DYNAMIC_FIELD: "",
+		DynamicField: "",
 	}
-	VM_SCHEMA_MAP_PRE_UPDATE_FROM_TEMPLATE = map[string]interface{}{
-		NAME_FIELD:       "VM schema update unit test",
-		TEMPLATE_FIELD:   "template1",
-		RAM_FIELD:        2,
-		ENTERPRISE_FIELD: "unit test enterprise",
-		NICS_FIELD: []interface{}{
+	vmSchemaMapPreUpdateFromTemplate = map[string]interface{}{
+		NameField:       "VM schema update unit test",
+		TemplateField:   "template1",
+		RamField:        2,
+		EnterpriseField: "unit test enterprise",
+		NicsField: []interface{}{
 			map[string]interface{}{
-				VLAN_NAME_FIELD: "vm additional unit test vlan1",
-				CONNECTED_FIELD: true,
+				VlanNameField:  "vm additional unit test vlan1",
+				ConnectedField: true,
 			},
 		},
-		DYNAMIC_FIELD: "",
+		DynamicField: "",
 	}
-	VM_SCHEMA_MAP_POST_UPDATE_FROM_TEMPLATE = map[string]interface{}{
-		NAME_FIELD:       "VM schema update unit test",
-		TEMPLATE_FIELD:   "template1",
-		CPU_FIELD:        1,
-		RAM_FIELD:        2,
-		ENTERPRISE_FIELD: "unit test enterprise",
-		NICS_FIELD: []interface{}{
+	vmSchemaMapPostUpdateFromTemplate = map[string]interface{}{
+		NameField:       "VM schema update unit test",
+		TemplateField:   "template1",
+		CpuField:        1,
+		RamField:        2,
+		EnterpriseField: "unit test enterprise",
+		NicsField: []interface{}{
 			map[string]interface{}{
-				VLAN_NAME_FIELD:  "unit test vlan1",
-				MAC_ADRESS_FIELD: "",
-				CONNECTED_FIELD:  true,
+				VlanNameField:  "unit test vlan1",
+				MacAdressField: "",
+				ConnectedField: true,
 			},
 			map[string]interface{}{
-				VLAN_NAME_FIELD:  "unit test vlan2",
-				MAC_ADRESS_FIELD: "",
-				CONNECTED_FIELD:  true,
+				VlanNameField:  "unit test vlan2",
+				MacAdressField: "",
+				ConnectedField: true,
 			},
 			map[string]interface{}{
-				VLAN_NAME_FIELD:  "vm additional unit test vlan1",
-				MAC_ADRESS_FIELD: "",
-				CONNECTED_FIELD:  true,
+				VlanNameField:  "vm additional unit test vlan1",
+				MacAdressField: "",
+				ConnectedField: true,
 			},
 		},
-		DYNAMIC_FIELD: "",
+		DynamicField: "",
 	}
-	VM_CREATION_FROM_TEMPLATE1_SCHEMA = map[string]interface{}{
-		NAME_FIELD:       "CreateTemplateOverrideConfig Unit test",
-		RAM_FIELD:        1,
-		CPU_FIELD:        1,
-		ENTERPRISE_FIELD: "unit test enterprise",
-		TEMPLATE_FIELD:   "template1",
-		OS_FIELD:         "Debian",
-		DISKS_FIELD: []interface{}{
+	vmCreationFromTemplate1Schema = map[string]interface{}{
+		NameField:       "CreateTemplateOverrideConfig Unit test",
+		RamField:        1,
+		CpuField:        1,
+		EnterpriseField: "unit test enterprise",
+		TemplateField:   "template1",
+		OsField:         "Debian",
+		DisksField: []interface{}{
 			map[string]interface{}{
-				NAME_FIELD:          "unit test disk template1",
-				SIZE_FIELD:          20,
-				STORAGE_CLASS_FIELD: "storage_enterprise",
-				SLUG_FIELD:          "unit test disk slug",
+				NameField:         "unit test disk template1",
+				SizeField:         20,
+				StorageClassField: "storage_enterprise",
+				SlugField:         "unit test disk slug",
 			},
 		},
-		NICS_FIELD: []interface{}{
-			map[string]interface{}{VLAN_NAME_FIELD: "unit test vlan1",
-				CONNECTED_FIELD: true,
+		NicsField: []interface{}{
+			map[string]interface{}{VlanNameField: "unit test vlan1",
+				ConnectedField: true,
 			},
-			map[string]interface{}{VLAN_NAME_FIELD: "unit test vlan2",
-				CONNECTED_FIELD: true,
+			map[string]interface{}{VlanNameField: "unit test vlan2",
+				ConnectedField: true,
 			},
 		},
-		DYNAMIC_FIELD: "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"Template_disks_on_creation\":null}",
+		DynamicField: "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"TemplateDisksOnCreation\":null}",
 	}
-	VM_CREATION_N42_FROM_TEMPLATE1_SCHEMA = map[string]interface{}{
-		NAME_FIELD:            "CreateTemplateOverrideConfig Unit test",
-		INSTANCE_NUMBER_FIELD: 42,
-		RAM_FIELD:             1,
-		CPU_FIELD:             1,
-		ENTERPRISE_FIELD:      "unit test enterprise",
-		TEMPLATE_FIELD:        "template1",
-		OS_FIELD:              "Debian",
-		DISKS_FIELD: []interface{}{
+	vmCreationN42FromTemplate1Schema = map[string]interface{}{
+		NameField:           "CreateTemplateOverrideConfig Unit test",
+		instanceNumberField: 42,
+		RamField:            1,
+		CpuField:            1,
+		EnterpriseField:     "unit test enterprise",
+		TemplateField:       "template1",
+		OsField:             "Debian",
+		DisksField: []interface{}{
 			map[string]interface{}{
-				NAME_FIELD:          "unit test disk template1",
-				SIZE_FIELD:          20,
-				STORAGE_CLASS_FIELD: "storage_enterprise",
-				SLUG_FIELD:          "unit test disk slug",
+				NameField:         "unit test disk template1",
+				SizeField:         20,
+				StorageClassField: "storage_enterprise",
+				SlugField:         "unit test disk slug",
 			},
 		},
-		NICS_FIELD: []interface{}{
-			map[string]interface{}{VLAN_NAME_FIELD: "unit test vlan1",
-				CONNECTED_FIELD: true,
+		NicsField: []interface{}{
+			map[string]interface{}{VlanNameField: "unit test vlan1",
+				ConnectedField: true,
 			},
-			map[string]interface{}{VLAN_NAME_FIELD: "unit test vlan2",
-				CONNECTED_FIELD: true,
+			map[string]interface{}{VlanNameField: "unit test vlan2",
+				ConnectedField: true,
 			},
 		},
-		DYNAMIC_FIELD: "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"Template_disks_on_creation\":null}",
+		DynamicField: "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"TemplateDisksOnCreation\":null}",
 	}
-	VM_CREATION_FROM_TEMPLATE_SCHEMA_PRE_CREATION_WRONG_NICS_INIT_MAP = map[string]interface{}{
-		RAM_FIELD:        1,
-		CPU_FIELD:        1,
-		ENTERPRISE_FIELD: "unit test enterprise",
-		NAME_FIELD:       "template1",
-		OS_FIELD:         "Debian",
-		DISKS_FIELD: []interface{}{
+	vmCreationFromTemplate1SchemaPreCreationWrongNicsInitMap = map[string]interface{}{
+		RamField:        1,
+		CpuField:        1,
+		EnterpriseField: "unit test enterprise",
+		NameField:       "template1",
+		OsField:         "Debian",
+		DisksField: []interface{}{
 			map[string]interface{}{
-				NAME_FIELD:          "unit test disk template1",
-				SIZE_FIELD:          20,
-				STORAGE_CLASS_FIELD: "storage_enterprise",
-				SLUG_FIELD:          "unit test disk slug",
+				NameField:         "unit test disk template1",
+				SizeField:         20,
+				StorageClassField: "storage_enterprise",
+				SlugField:         "unit test disk slug",
 			},
 		},
-		NICS_FIELD:    "Wrong nics type",
-		DYNAMIC_FIELD: "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"Template_disks_on_creation\":null}",
+		NicsField:    "Wrong nics type",
+		DynamicField: "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"TemplateDisksOnCreation\":null}",
 	}
-	VDC_CREATION_MAP = map[string]interface{}{
-		NAME_FIELD:       "Unit test vdc resource",
-		ENTERPRISE_FIELD: "enterprise",
-		VDC_RESOURCE_FIELD: []interface{}{
+	vdcCreationMap = map[string]interface{}{
+		NameField:       "Unit test vdc resource",
+		EnterpriseField: "enterprise",
+		VdcResourceField: []interface{}{
 			map[string]interface{}{
-				RESOURCE_FIELD: RAM_FIELD,
-				TOTAL_FIELD:    20,
+				ResourceField: RamField,
+				TotalField:    20,
 			},
 			map[string]interface{}{
-				RESOURCE_FIELD: CPU_FIELD,
-				TOTAL_FIELD:    1,
+				ResourceField: CpuField,
+				TotalField:    1,
 			},
 			map[string]interface{}{
-				RESOURCE_FIELD: "storage_enterprise",
-				TOTAL_FIELD:    10,
+				ResourceField: "storage_enterprise",
+				TotalField:    10,
 			},
 			map[string]interface{}{
-				RESOURCE_FIELD: "storage_performance",
-				TOTAL_FIELD:    10,
+				ResourceField: "storage_performance",
+				TotalField:    10,
 			},
 			map[string]interface{}{
-				RESOURCE_FIELD: "storage_high_performance",
-				TOTAL_FIELD:    10,
-			},
-		},
-	}
-	VDC_RESOURCES_NAMES_PRE_UPDATE_MAP = map[string]interface{}{
-		NAME_FIELD:       "Unit test vdc resource",
-		ENTERPRISE_FIELD: "enterprise",
-		VDC_RESOURCE_FIELD: []interface{}{
-			map[string]interface{}{
-				RESOURCE_FIELD: "enterprise-mono-ram",
-				TOTAL_FIELD:    20,
-			},
-			map[string]interface{}{
-				RESOURCE_FIELD: "enterprise-mono-cpu",
-				TOTAL_FIELD:    1,
-			},
-			map[string]interface{}{
-				RESOURCE_FIELD: "enterprise-mono-storage_enterprise",
-				TOTAL_FIELD:    10,
-			},
-			map[string]interface{}{
-				RESOURCE_FIELD: "enterprise-mono-storage_performance",
-				TOTAL_FIELD:    10,
-			},
-			map[string]interface{}{
-				RESOURCE_FIELD: "enterprise-mono-storage_high_performance",
-				TOTAL_FIELD:    10,
+				ResourceField: "storage_high_performance",
+				TotalField:    10,
 			},
 		},
 	}
-	VDC_RESOURCES_NAMES_UPDATED_MAP = map[string]interface{}{
-		NAME_FIELD:       "Unit test vdc resource",
-		ENTERPRISE_FIELD: "enterprise",
-		VDC_RESOURCE_FIELD: []interface{}{
+	vdcResourcesNamesPreUpdateMap = map[string]interface{}{
+		NameField:       "Unit test vdc resource",
+		EnterpriseField: "enterprise",
+		VdcResourceField: []interface{}{
 			map[string]interface{}{
-				RESOURCE_FIELD: RAM_FIELD,
-				TOTAL_FIELD:    20,
-				USED_FIELD:     0,
-				SLUG_FIELD:     "",
+				ResourceField: "enterprise-mono-ram",
+				TotalField:    20,
 			},
 			map[string]interface{}{
-				RESOURCE_FIELD: CPU_FIELD,
-				TOTAL_FIELD:    1,
-				USED_FIELD:     0,
-				SLUG_FIELD:     "",
+				ResourceField: "enterprise-mono-cpu",
+				TotalField:    1,
 			},
 			map[string]interface{}{
-				RESOURCE_FIELD: "storage_enterprise",
-				TOTAL_FIELD:    10,
-				USED_FIELD:     0,
-				SLUG_FIELD:     "",
+				ResourceField: "enterprise-mono-storage_enterprise",
+				TotalField:    10,
 			},
 			map[string]interface{}{
-				RESOURCE_FIELD: "storage_performance",
-				TOTAL_FIELD:    10,
-				USED_FIELD:     0,
-				SLUG_FIELD:     "",
+				ResourceField: "enterprise-mono-storage_performance",
+				TotalField:    10,
 			},
 			map[string]interface{}{
-				RESOURCE_FIELD: "storage_high_performance",
-				TOTAL_FIELD:    10,
-				USED_FIELD:     0,
-				SLUG_FIELD:     "",
+				ResourceField: "enterprise-mono-storage_high_performance",
+				TotalField:    10,
 			},
 		},
 	}
-	VDC_READ_RESPONSE_MAP = map[string]interface{}{
-		NAME_FIELD:       "Unit test vdc",
-		ENTERPRISE_FIELD: "unit test enterprise",
-		VDC_RESOURCE_FIELD: []interface{}{
+	vdcResourcesNamesUpdatedMap = map[string]interface{}{
+		NameField:       "Unit test vdc resource",
+		EnterpriseField: "enterprise",
+		VdcResourceField: []interface{}{
 			map[string]interface{}{
-				RESOURCE_FIELD: RAM_FIELD,
-				USED_FIELD:     "0",
-				TOTAL_FIELD:    "20",
-				SLUG_FIELD:     "unit test enterprise-dc1-vdc_te-ram",
+				ResourceField: RamField,
+				TotalField:    20,
+				UsedField:     0,
+				SlugField:     "",
 			},
 			map[string]interface{}{
-				RESOURCE_FIELD: CPU_FIELD,
-				USED_FIELD:     "0",
-				TOTAL_FIELD:    "1",
-				SLUG_FIELD:     "unit test enterprise-dc1-vdc_te-cpu",
+				ResourceField: CpuField,
+				TotalField:    1,
+				UsedField:     0,
+				SlugField:     "",
 			},
 			map[string]interface{}{
-				RESOURCE_FIELD: "storage_enterprise",
-				USED_FIELD:     "0",
-				TOTAL_FIELD:    "10",
-				SLUG_FIELD:     "unit test enterprise-dc1-vdc_te-storage_enterprise",
+				ResourceField: "storage_enterprise",
+				TotalField:    10,
+				UsedField:     0,
+				SlugField:     "",
 			},
 			map[string]interface{}{
-				RESOURCE_FIELD: "storage_performance",
-				USED_FIELD:     "0",
-				TOTAL_FIELD:    "10",
-				SLUG_FIELD:     "unit test enterprise-dc1-vdc_te-storage_performance",
+				ResourceField: "storage_performance",
+				TotalField:    10,
+				UsedField:     0,
+				SlugField:     "",
 			},
 			map[string]interface{}{
-				RESOURCE_FIELD: "storage_high_performance",
-				USED_FIELD:     "0",
-				TOTAL_FIELD:    "10",
-				SLUG_FIELD:     "unit test enterprise-dc1-vdc_te-storage_high_performance",
+				ResourceField: "storage_high_performance",
+				TotalField:    10,
+				UsedField:     0,
+				SlugField:     "",
 			},
 		},
-		SLUG_FIELD:    "unit test enterprise-dc1-vdc_te",
-		DYNAMIC_FIELD: "",
 	}
-	NO_TEMPLATE_VM_MAP = map[string]interface{}{
-		NAME_FIELD:  "Unit test no template vm resource",
-		STATE_FIELD: "UP",
-		OS_FIELD:    "Debian",
-		RAM_FIELD:   8,
-		CPU_FIELD:   4,
-		DISKS_FIELD: []interface{}{
+	vdcReadResponseMap = map[string]interface{}{
+		NameField:       "Unit test vdc",
+		EnterpriseField: "unit test enterprise",
+		VdcResourceField: []interface{}{
 			map[string]interface{}{
-				NAME_FIELD:          "disk 1",
-				SIZE_FIELD:          24,
-				STORAGE_CLASS_FIELD: "storage_enterprise",
+				ResourceField: RamField,
+				UsedField:     "0",
+				TotalField:    "20",
+				SlugField:     "unit test enterprise-dc1-vdc_te-ram",
+			},
+			map[string]interface{}{
+				ResourceField: CpuField,
+				UsedField:     "0",
+				TotalField:    "1",
+				SlugField:     "unit test enterprise-dc1-vdc_te-cpu",
+			},
+			map[string]interface{}{
+				ResourceField: "storage_enterprise",
+				UsedField:     "0",
+				TotalField:    "10",
+				SlugField:     "unit test enterprise-dc1-vdc_te-storage_enterprise",
+			},
+			map[string]interface{}{
+				ResourceField: "storage_performance",
+				UsedField:     "0",
+				TotalField:    "10",
+				SlugField:     "unit test enterprise-dc1-vdc_te-storage_performance",
+			},
+			map[string]interface{}{
+				ResourceField: "storage_high_performance",
+				UsedField:     "0",
+				TotalField:    "10",
+				SlugField:     "unit test enterprise-dc1-vdc_te-storage_high_performance",
 			},
 		},
-		NICS_FIELD: []interface{}{
-			map[string]interface{}{
-				VLAN_NAME_FIELD:  "vlan 1 update",
-				MAC_ADRESS_FIELD: "00:21:21:21:21:21",
-				CONNECTED_FIELD:  true,
-			},
-			map[string]interface{}{
-				VLAN_NAME_FIELD:  "vlan 2",
-				MAC_ADRESS_FIELD: "00:21:21:21:21:21",
-				CONNECTED_FIELD:  true,
-			},
-		},
-		VDC_FIELD:           VDC_FIELD,
-		BOOT_FIELD:          "on disk",
-		STORAGE_CLASS_FIELD: "storage_enterprise",
-		SLUG_FIELD:          "42",
-		TOKEN_FIELD:         "424242",
-		BACKUP_FIELD:        "backup_no_backup",
-		DISK_IMAGE_FIELD:    "",
-		PLATFORM_NAME_FIELD: "42",
-		BACKUP_SIZE_FIELD:   42,
-		COMMENT_FIELD:       "42",
+		SlugField:    "unit test enterprise-dc1-vdc_te",
+		DynamicField: "",
 	}
-	EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP = map[string]interface{}{
-		NAME_FIELD:          "Unit test template no disc add on vm resource",
-		ENTERPRISE_FIELD:    "unit test enterprise",
-		TEMPLATE_FIELD:      "template1",
-		STATE_FIELD:         "UP",
-		VDC_FIELD:           VDC_FIELD,
-		BOOT_FIELD:          "on disk",
-		STORAGE_CLASS_FIELD: "storage_enterprise",
-		SLUG_FIELD:          "42",
-		TOKEN_FIELD:         "424242",
-		BACKUP_FIELD:        "backup_no_backup",
+	noTemplateVmMap = map[string]interface{}{
+		NameField:  "Unit test no template vm resource",
+		StateField: "UP",
+		OsField:    "Debian",
+		RamField:   8,
+		CpuField:   4,
+		DisksField: []interface{}{
+			map[string]interface{}{
+				NameField:         "disk 1",
+				SizeField:         24,
+				StorageClassField: "storage_enterprise",
+			},
+		},
+		NicsField: []interface{}{
+			map[string]interface{}{
+				VlanNameField:  "vlan 1 update",
+				MacAdressField: "00:21:21:21:21:21",
+				ConnectedField: true,
+			},
+			map[string]interface{}{
+				VlanNameField:  "vlan 2",
+				MacAdressField: "00:21:21:21:21:21",
+				ConnectedField: true,
+			},
+		},
+		BootField:         BootField,
+		BootField:         "on disk",
+		StorageClassField: "storage_enterprise",
+		SlugField:         "42",
+		TokenField:        "424242",
+		BackupField:       "backup_no_backup",
+		DiskImageField:    "",
+		PlatformNameField: "42",
+		BackupSizeField:   42,
+		CommentField:      "42",
 	}
-	INSTANCE_NUMBER_FIELD_UNIT_TEST_VM_INSTANCE = map[string]interface{}{
-		NAME_FIELD:            "INSTANCE_NUMBER_FIELDUnitTest",
-		INSTANCE_NUMBER_FIELD: 42,
-		ENTERPRISE_FIELD:      "unit test enterprise",
-		TEMPLATE_FIELD:        "template1",
-		STATE_FIELD:           "UP",
-		VDC_FIELD:             VDC_FIELD,
-		BOOT_FIELD:            "on disk",
-		STORAGE_CLASS_FIELD:   "storage_enterprise",
-		SLUG_FIELD:            "42",
-		TOKEN_FIELD:           "424242",
-		BACKUP_FIELD:          "backup_no_backup",
+	existingTemplateNoAdditionalDiskVmMap = map[string]interface{}{
+		NameField:         "Unit test template no disc add on vm resource",
+		EnterpriseField:   "unit test enterprise",
+		TemplateField:     "template1",
+		StateField:        "UP",
+		BootField:         BootField,
+		BootField:         "on disk",
+		StorageClassField: "storage_enterprise",
+		SlugField:         "42",
+		TokenField:        "424242",
+		BackupField:       "backup_no_backup",
 	}
-	EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISKS_VM_MAP = map[string]interface{}{
-		NAME_FIELD:       "EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISKS_VM_MAP",
-		ENTERPRISE_FIELD: "unit test enterprise",
-		TEMPLATE_FIELD:   "template1",
-		STATE_FIELD:      "UP",
-		OS_FIELD:         "Debian",
-		RAM_FIELD:        8,
-		CPU_FIELD:        4,
-		DISKS_FIELD: []interface{}{
-			map[string]interface{}{
-				NAME_FIELD:          "disk 1",
-				SIZE_FIELD:          24,
-				STORAGE_CLASS_FIELD: "storage_enterprise",
-			},
-		},
-		NICS_FIELD: []interface{}{
-			map[string]interface{}{
-				VLAN_NAME_FIELD:  "non template vlan 1",
-				MAC_ADRESS_FIELD: "00:21:21:21:21:21",
-				CONNECTED_FIELD:  true,
-			},
-			map[string]interface{}{
-				VLAN_NAME_FIELD:  "non template vlan 2",
-				MAC_ADRESS_FIELD: "00:21:21:21:21:22",
-				CONNECTED_FIELD:  true,
-			},
-		},
-		VDC_FIELD:           VDC_FIELD,
-		BOOT_FIELD:          "on disk",
-		STORAGE_CLASS_FIELD: "storage_enterprise",
-		SLUG_FIELD:          "42",
-		TOKEN_FIELD:         "424242",
-		BACKUP_FIELD:        "backup_no_backup",
-		DISK_IMAGE_FIELD:    "",
-		PLATFORM_NAME_FIELD: "42",
-		BACKUP_SIZE_FIELD:   42,
-		COMMENT_FIELD:       "42",
+	instanceNumberFieldUnitTestVmInstance = map[string]interface{}{
+		NameField:           "instanceNumberFieldUnitTest",
+		instanceNumberField: 42,
+		EnterpriseField:     "unit test enterprise",
+		TemplateField:       "template1",
+		StateField:          "UP",
+		BootField:           BootField,
+		BootField:           "on disk",
+		StorageClassField:   "storage_enterprise",
+		SlugField:           "42",
+		TokenField:          "424242",
+		BackupField:         "backup_no_backup",
 	}
-	EXISTING_TEMPLATE_WITH_DELETED_DISK_VM_MAP = map[string]interface{}{
-		ID_FIELD:         "EXISTING_TEMPLATE_AND_VM_INSTANCE_WITH_DELETED_DISK_VM_MAP",
-		NAME_FIELD:       "EXISTING_TEMPLATE_WITH_DELETED_DISK_VM_MAP",
-		ENTERPRISE_FIELD: "unit test enterprise",
-		TEMPLATE_FIELD:   "template1",
-		STATE_FIELD:      "UP",
-		OS_FIELD:         "Debian",
-		RAM_FIELD:        8,
-		CPU_FIELD:        4,
-		DISKS_FIELD: []interface{}{
+	existingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap = map[string]interface{}{
+		NameField:       "existingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap",
+		EnterpriseField: "unit test enterprise",
+		TemplateField:   "template1",
+		StateField:      "UP",
+		OsField:         "Debian",
+		RamField:        8,
+		CpuField:        4,
+		DisksField: []interface{}{
 			map[string]interface{}{
-				NAME_FIELD:          "template1 disk1",
-				SIZE_FIELD:          24,
-				STORAGE_CLASS_FIELD: "storage_enterprise",
-			},
-			map[string]interface{}{
-				NAME_FIELD:          "disk 1",
-				SIZE_FIELD:          24,
-				STORAGE_CLASS_FIELD: "storage_enterprise",
+				NameField:         "disk 1",
+				SizeField:         24,
+				StorageClassField: "storage_enterprise",
 			},
 		},
-		NICS_FIELD:          []interface{}{},
-		VDC_FIELD:           VDC_FIELD,
-		BOOT_FIELD:          "on disk",
-		STORAGE_CLASS_FIELD: "storage_enterprise",
-		SLUG_FIELD:          "42",
-		TOKEN_FIELD:         "424242",
-		BACKUP_FIELD:        "backup_no_backup",
-		DISK_IMAGE_FIELD:    "",
-		PLATFORM_NAME_FIELD: "42",
-		BACKUP_SIZE_FIELD:   42,
-		COMMENT_FIELD:       "42",
-		DYNAMIC_FIELD:       "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"Template_disks_on_creation\":null}",
+		NicsField: []interface{}{
+			map[string]interface{}{
+				VlanNameField:  "non template vlan 1",
+				MacAdressField: "00:21:21:21:21:21",
+				ConnectedField: true,
+			},
+			map[string]interface{}{
+				VlanNameField:  "non template vlan 2",
+				MacAdressField: "00:21:21:21:21:22",
+				ConnectedField: true,
+			},
+		},
+		BootField:         BootField,
+		BootField:         "on disk",
+		StorageClassField: "storage_enterprise",
+		SlugField:         "42",
+		TokenField:        "424242",
+		BackupField:       "backup_no_backup",
+		DiskImageField:    "",
+		PlatformNameField: "42",
+		BackupSizeField:   42,
+		CommentField:      "42",
 	}
-	NON_EXISTING_TEMPLATE_VM_MAP = map[string]interface{}{
-		NAME_FIELD:          "windows95 vm",
-		ENTERPRISE_FIELD:    "unit test enterprise",
-		TEMPLATE_FIELD:      "windows95",
-		STATE_FIELD:         "UP",
-		RAM_FIELD:           8,
-		CPU_FIELD:           4,
-		VDC_FIELD:           VDC_FIELD,
-		BOOT_FIELD:          "on disk",
-		STORAGE_CLASS_FIELD: "storage_enterprise",
-		SLUG_FIELD:          "42",
-		TOKEN_FIELD:         "424242",
-		BACKUP_FIELD:        "backup_no_backup",
-		DISK_IMAGE_FIELD:    "",
+	existingTemplateWithDeletedDiskVmMap = map[string]interface{}{
+		IdField:         "EXISTING_TEMPLATE_AND_VM_INSTANCE_WITH_DELETED_DISK_VM_MAP",
+		NameField:       "existingTemplateWithDeletedDiskVmMap",
+		EnterpriseField: "unit test enterprise",
+		TemplateField:   "template1",
+		StateField:      "UP",
+		OsField:         "Debian",
+		RamField:        8,
+		CpuField:        4,
+		DisksField: []interface{}{
+			map[string]interface{}{
+				NameField:         "template1 disk1",
+				SizeField:         24,
+				StorageClassField: "storage_enterprise",
+			},
+			map[string]interface{}{
+				NameField:         "disk 1",
+				SizeField:         24,
+				StorageClassField: "storage_enterprise",
+			},
+		},
+		NicsField:         []interface{}{},
+		BootField:         BootField,
+		BootField:         "on disk",
+		StorageClassField: "storage_enterprise",
+		SlugField:         "42",
+		TokenField:        "424242",
+		BackupField:       "backup_no_backup",
+		DiskImageField:    "",
+		PlatformNameField: "42",
+		BackupSizeField:   42,
+		CommentField:      "42",
+		DynamicField:      "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"TemplateDisksOnCreation\":null}",
 	}
-	TEMPLATE2_MAP = map[string]interface{}{
-		ID_FIELD:         40,
-		NAME_FIELD:       "template2",
-		SLUG_FIELD:       "unit test disk goulouglougoulouglou",
-		RAM_FIELD:        1,
-		CPU_FIELD:        1,
-		OS_FIELD:         "CentOS",
-		ENTERPRISE_FIELD: "unit test enterprise",
-		DISKS_FIELD: []interface{}{
-			map[string]interface{}{
-				NAME_FIELD:          "unit test disk goulouglouglou",
-				SIZE_FIELD:          20,
-				STORAGE_CLASS_FIELD: "storage_enterprise",
-				SLUG_FIELD:          "unit test disk goulouglou slug",
-			},
-		},
-		NICS_FIELD:    []interface{}{},
-		"login":       "",
-		"password":    "",
-		DYNAMIC_FIELD: "",
+	nonExistingTemplateVmMap = map[string]interface{}{
+		NameField:         "windows95 vm",
+		EnterpriseField:   "unit test enterprise",
+		TemplateField:     "windows95",
+		StateField:        "UP",
+		RamField:          8,
+		CpuField:          4,
+		BootField:         BootField,
+		BootField:         "on disk",
+		StorageClassField: "storage_enterprise",
+		SlugField:         "42",
+		TokenField:        "424242",
+		BackupField:       "backup_no_backup",
+		DiskImageField:    "",
 	}
-	LAST_TEMPLATE_IN_LIST = map[string]interface{}{
-		ID_FIELD:         69,
-		NAME_FIELD:       "lastTemplate",
-		SLUG_FIELD:       "lastTemplate-slug",
-		RAM_FIELD:        1,
-		CPU_FIELD:        1,
-		OS_FIELD:         "Debian",
-		ENTERPRISE_FIELD: "unit test enterprise",
-		DISKS_FIELD: []interface{}{
+	template2Map = map[string]interface{}{
+		IdField:         40,
+		NameField:       "template2",
+		SlugField:       "unit test disk goulouglougoulouglou",
+		RamField:        1,
+		CpuField:        1,
+		OsField:         "CentOS",
+		EnterpriseField: "unit test enterprise",
+		DisksField: []interface{}{
 			map[string]interface{}{
-				NAME_FIELD:          "disk-debian9-rd-1",
-				SIZE_FIELD:          10,
-				STORAGE_CLASS_FIELD: "storage_enterprise",
-				SLUG_FIELD:          "disk-debian9-rd-1",
+				NameField:         "unit test disk goulouglouglou",
+				SizeField:         20,
+				StorageClassField: "storage_enterprise",
+				SlugField:         "unit test disk goulouglou slug",
 			},
 		},
-		NICS_FIELD: []interface{}{
-			map[string]interface{}{
-				VLAN_NAME_FIELD:  "unit test vlan1",
-				MAC_ADRESS_FIELD: "00:50:56:00:01:de",
-				CONNECTED_FIELD:  true,
-			},
-			map[string]interface{}{
-				VLAN_NAME_FIELD:  "unit test vlan2",
-				MAC_ADRESS_FIELD: "00:50:56:00:01:df",
-				CONNECTED_FIELD:  true,
-			},
-		},
-		"login":       nil,
-		"password":    nil,
-		DYNAMIC_FIELD: nil,
+		NicsField:    []interface{}{},
+		"login":      "",
+		"password":   "",
+		DynamicField: "",
 	}
-	TEMPLATE1_MAP = map[string]interface{}{
-		ID_FIELD:         82,
-		NAME_FIELD:       "template1",
-		SLUG_FIELD:       "template1 slug",
-		RAM_FIELD:        1,
-		CPU_FIELD:        1,
-		OS_FIELD:         "CentOS",
-		BOOT_FIELD:       "on disk",
-		ENTERPRISE_FIELD: "unit test enterprise",
-		DISKS_FIELD: []interface{}{
+	lastTemplateInTemplatesList = map[string]interface{}{
+		IdField:         69,
+		NameField:       "lastTemplate",
+		SlugField:       "lastTemplate-slug",
+		RamField:        1,
+		CpuField:        1,
+		OsField:         "Debian",
+		EnterpriseField: "unit test enterprise",
+		DisksField: []interface{}{
 			map[string]interface{}{
-				NAME_FIELD:          "unit test disk template1",
-				SIZE_FIELD:          20,
-				STORAGE_CLASS_FIELD: "storage_enterprise",
-				SLUG_FIELD:          "unit test disk slug",
+				NameField:         "disk-debian9-rd-1",
+				SizeField:         10,
+				StorageClassField: "storage_enterprise",
+				SlugField:         "disk-debian9-rd-1",
 			},
 		},
-		NICS_FIELD: []interface{}{
-			map[string]interface{}{VLAN_NAME_FIELD: "unit test vlan1",
-				MAC_ADRESS_FIELD: "00:50:56:21:7c:ab",
-				CONNECTED_FIELD:  true,
-			},
-			map[string]interface{}{VLAN_NAME_FIELD: "unit test vlan2",
-				MAC_ADRESS_FIELD: "00:50:56:21:7c:ac",
-				CONNECTED_FIELD:  true,
-			},
-		},
-		"login":       "",
-		"password":    "",
-		DYNAMIC_FIELD: "",
-	}
-	TEMPLATE1_MAP_BIS = map[string]interface{}{
-		ID_FIELD:         82,
-		NAME_FIELD:       "template1",
-		SLUG_FIELD:       "template1 slug",
-		RAM_FIELD:        1,
-		CPU_FIELD:        1,
-		OS_FIELD:         "CentOS",
-		BOOT_FIELD:       "on disk",
-		ENTERPRISE_FIELD: "unit test enterprise",
-		//DISKS_FIELD:      []interface{}{},
-		//NICS_FIELD:       []interface{}{},
-		DISKS_FIELD: []interface{}{
+		NicsField: []interface{}{
 			map[string]interface{}{
-				NAME_FIELD:          "unit test disk template1",
-				SIZE_FIELD:          20,
-				STORAGE_CLASS_FIELD: "storage_enterprise",
-				SLUG_FIELD:          "unit test disk slug",
+				VlanNameField:  "unit test vlan1",
+				MacAdressField: "00:50:56:00:01:de",
+				ConnectedField: true,
+			},
+			map[string]interface{}{
+				VlanNameField:  "unit test vlan2",
+				MacAdressField: "00:50:56:00:01:df",
+				ConnectedField: true,
 			},
 		},
-		NICS_FIELD: []interface{}{
-			map[string]interface{}{VLAN_NAME_FIELD: "unit test vlan1",
-				MAC_ADRESS_FIELD: "00:50:56:21:7c:ab",
-				CONNECTED_FIELD:  true,
-			},
-			map[string]interface{}{VLAN_NAME_FIELD: "unit test vlan2",
-				MAC_ADRESS_FIELD: "00:50:56:21:7c:ac",
-				CONNECTED_FIELD:  true,
-			},
-		},
-		DYNAMIC_FIELD: "",
+		"login":      nil,
+		"password":   nil,
+		DynamicField: nil,
 	}
-	TEMPLATES_LIST = []interface{}{
-		TEMPLATE2_MAP,
-		TEMPLATE1_MAP,
+	template1Map = map[string]interface{}{
+		IdField:         82,
+		NameField:       "template1",
+		SlugField:       "template1 slug",
+		RamField:        1,
+		CpuField:        1,
+		OsField:         "CentOS",
+		BootField:       "on disk",
+		EnterpriseField: "unit test enterprise",
+		DisksField: []interface{}{
+			map[string]interface{}{
+				NameField:         "unit test disk template1",
+				SizeField:         20,
+				StorageClassField: "storage_enterprise",
+				SlugField:         "unit test disk slug",
+			},
+		},
+		NicsField: []interface{}{
+			map[string]interface{}{VlanNameField: "unit test vlan1",
+				MacAdressField: "00:50:56:21:7c:ab",
+				ConnectedField: true,
+			},
+			map[string]interface{}{VlanNameField: "unit test vlan2",
+				MacAdressField: "00:50:56:21:7c:ac",
+				ConnectedField: true,
+			},
+		},
+		"login":      "",
+		"password":   "",
+		DynamicField: "",
+	}
+	template1MapBis = map[string]interface{}{
+		IdField:         82,
+		NameField:       "template1",
+		SlugField:       "template1 slug",
+		RamField:        1,
+		CpuField:        1,
+		OsField:         "CentOS",
+		BootField:       "on disk",
+		EnterpriseField: "unit test enterprise",
+		DisksField: []interface{}{
+			map[string]interface{}{
+				NameField:         "unit test disk template1",
+				SizeField:         20,
+				StorageClassField: "storage_enterprise",
+				SlugField:         "unit test disk slug",
+			},
+		},
+		NicsField: []interface{}{
+			map[string]interface{}{VlanNameField: "unit test vlan1",
+				MacAdressField: "00:50:56:21:7c:ab",
+				ConnectedField: true,
+			},
+			map[string]interface{}{VlanNameField: "unit test vlan2",
+				MacAdressField: "00:50:56:21:7c:ac",
+				ConnectedField: true,
+			},
+		},
+		DynamicField: "",
+	}
+	templatesList = []interface{}{
+		template2Map,
+		template1Map,
 		map[string]interface{}{
-			ID_FIELD:         41,
-			NAME_FIELD:       "template3",
-			SLUG_FIELD:       "unit test template3 slug",
-			RAM_FIELD:        1,
-			CPU_FIELD:        1,
-			OS_FIELD:         "Debian",
-			ENTERPRISE_FIELD: "unit test enterprise",
-			DISKS_FIELD: []interface{}{
+			IdField:         41,
+			NameField:       "template3",
+			SlugField:       "unit test template3 slug",
+			RamField:        1,
+			CpuField:        1,
+			OsField:         "Debian",
+			EnterpriseField: "unit test enterprise",
+			DisksField: []interface{}{
 				map[string]interface{}{
-					NAME_FIELD:          "unit test disk2",
-					SIZE_FIELD:          20,
-					STORAGE_CLASS_FIELD: "storage_enterprise",
-					SLUG_FIELD:          "unit test disk slug 2",
+					NameField:         "unit test disk2",
+					SizeField:         20,
+					StorageClassField: "storage_enterprise",
+					SlugField:         "unit test disk slug 2",
 				},
 			},
-			NICS_FIELD:    []interface{}{},
-			"login":       "",
-			"password":    "",
-			DYNAMIC_FIELD: "",
+			NicsField:    []interface{}{},
+			"login":      "",
+			"password":   "",
+			DynamicField: "",
 		},
 		map[string]interface{}{
-			ID_FIELD:         43,
-			NAME_FIELD:       "template4",
-			SLUG_FIELD:       "tpl-centos7-rd",
-			RAM_FIELD:        1,
-			CPU_FIELD:        1,
-			OS_FIELD:         "CentOS",
-			ENTERPRISE_FIELD: "unit test enterprise",
-			DISKS_FIELD: []interface{}{
+			IdField:         43,
+			NameField:       "template4",
+			SlugField:       "tpl-centos7-rd",
+			RamField:        1,
+			CpuField:        1,
+			OsField:         "CentOS",
+			EnterpriseField: "unit test enterprise",
+			DisksField: []interface{}{
 				map[string]interface{}{
-					NAME_FIELD:          "unit test disk 1",
-					SIZE_FIELD:          20,
-					STORAGE_CLASS_FIELD: "storage_enterprise",
-					SLUG_FIELD:          "unit test disk slug",
+					NameField:         "unit test disk 1",
+					SizeField:         20,
+					StorageClassField: "storage_enterprise",
+					SlugField:         "unit test disk slug",
 				},
 			},
-			NICS_FIELD: []interface{}{
+			NicsField: []interface{}{
 				map[string]interface{}{
-					VLAN_NAME_FIELD:  "unit test vlan1",
-					MAC_ADRESS_FIELD: "00:50:56:00:00:23",
-					CONNECTED_FIELD:  true,
+					VlanNameField:  "unit test vlan1",
+					MacAdressField: "00:50:56:00:00:23",
+					ConnectedField: true,
 				},
 				map[string]interface{}{
-					VLAN_NAME_FIELD:  "unit test vlan2",
-					MAC_ADRESS_FIELD: "00:50:56:00:00:24",
-					CONNECTED_FIELD:  true,
+					VlanNameField:  "unit test vlan2",
+					MacAdressField: "00:50:56:00:00:24",
+					ConnectedField: true,
 				},
 			},
-			"login":       nil,
-			"password":    nil,
-			DYNAMIC_FIELD: nil,
+			"login":      nil,
+			"password":   nil,
+			DynamicField: nil,
 		},
 		map[string]interface{}{
-			ID_FIELD:         58,
-			NAME_FIELD:       "template windaube7",
-			SLUG_FIELD:       "slug windows7",
-			RAM_FIELD:        1,
-			CPU_FIELD:        1,
-			OS_FIELD:         "Windows Serveur 64bits",
-			ENTERPRISE_FIELD: "unit test enterprise",
-			DISKS_FIELD: []interface{}{
+			IdField:         58,
+			NameField:       "template windaube7",
+			SlugField:       "slug windows7",
+			RamField:        1,
+			CpuField:        1,
+			OsField:         "Windows Serveur 64bits",
+			EnterpriseField: "unit test enterprise",
+			DisksField: []interface{}{
 				map[string]interface{}{
-					NAME_FIELD:          "disk-Template-Windows",
-					SIZE_FIELD:          60,
-					STORAGE_CLASS_FIELD: "storage_enterprise",
-					SLUG_FIELD:          "disk-template-windows7",
+					NameField:         "disk-Template-Windows",
+					SizeField:         60,
+					StorageClassField: "storage_enterprise",
+					SlugField:         "disk-template-windows7",
 				},
 			},
-			NICS_FIELD:    []interface{}{},
-			"login":       nil,
-			"password":    nil,
-			DYNAMIC_FIELD: nil,
+			NicsField:    []interface{}{},
+			"login":      nil,
+			"password":   nil,
+			DynamicField: nil,
 		},
-		LAST_TEMPLATE_IN_LIST,
+		lastTemplateInTemplatesList,
 	}
-	WRONG_TEMPLATES_LIST = []interface{}{
-		TEMPLATE2_MAP,
+	wrongTemplatesList = []interface{}{
+		template2Map,
 		"Wrongly formated template",
-		LAST_TEMPLATE_IN_LIST,
+		lastTemplateInTemplatesList,
 	}
-	TEST_UPDATE_VM_MAP = map[string]interface{}{
-		ID_FIELD:    "unit test vm",
-		NAME_FIELD:  "Unit test vm",
-		STATE_FIELD: "DOWN",
-		OS_FIELD:    "CentOS",
-		RAM_FIELD:   16,
-		CPU_FIELD:   8,
-		DISKS_FIELD: []interface{}{
+	testUpdateVmMap = map[string]interface{}{
+		IdField:    "unit test vm",
+		NameField:  "Unit test vm",
+		StateField: "DOWN",
+		OsField:    "CentOS",
+		RamField:   16,
+		CpuField:   8,
+		DisksField: []interface{}{
 			map[string]interface{}{
-				NAME_FIELD:          "disk 1 update",
-				SIZE_FIELD:          42,
-				STORAGE_CLASS_FIELD: "STORAGE_CLASS_FIELD update",
-				SLUG_FIELD:          "slug update",
+				NameField:         "disk 1 update",
+				SizeField:         42,
+				StorageClassField: "StorageClassField update",
+				SlugField:         "slug update",
+				VDiskField:        "",
 			},
 			map[string]interface{}{
-				NAME_FIELD:          "disk 2 update",
-				SIZE_FIELD:          42,
-				STORAGE_CLASS_FIELD: "STORAGE_CLASS_FIELD update",
-				SLUG_FIELD:          "slug update",
-			},
-		},
-		NICS_FIELD: []interface{}{
-			map[string]interface{}{
-				VLAN_NAME_FIELD:  "vlan 1 update",
-				MAC_ADRESS_FIELD: "42",
-				CONNECTED_FIELD:  false,
+				NameField:         "disk 2 update",
+				SizeField:         42,
+				StorageClassField: "StorageClassField update",
+				SlugField:         "slug update",
+				VDiskField:        "",
 			},
 		},
-		VDC_FIELD:           "vdc update",
-		BOOT_FIELD:          "on disk update",
-		STORAGE_CLASS_FIELD: "storage_enterprise update",
-		SLUG_FIELD:          "42 update",
-		TOKEN_FIELD:         "424242 update",
-		BACKUP_FIELD:        "backup_no_backup update",
-		DISK_IMAGE_FIELD:    " update",
-		PLATFORM_NAME_FIELD: "",
-		BACKUP_SIZE_FIELD:   42,
-		COMMENT_FIELD:       "",
+		NicsField: []interface{}{
+			map[string]interface{}{
+				VlanNameField:  "vlan 1 update",
+				MacAdressField: "42",
+				ConnectedField: false,
+			},
+		},
+		BootField:         "vdc update",
+		BootField:         "on disk update",
+		StorageClassField: "storage_enterprise update",
+		SlugField:         "42 update",
+		TokenField:        "424242 update",
+		BackupField:       "backup_no_backup update",
+		DiskImageField:    " update",
+		PlatformNameField: "",
+		BackupSizeField:   42,
+		CommentField:      "",
 	}
-	TEST_UPDATE_VM_MAP_INTID = map[string]interface{}{
-		ID_FIELD:    1212,
-		NAME_FIELD:  "Unit test vm",
-		STATE_FIELD: "DOWN",
-		OS_FIELD:    "CentOS",
-		RAM_FIELD:   16,
-		CPU_FIELD:   8,
-		DISKS_FIELD: []interface{}{
+	testUpdateVmMapIntId = map[string]interface{}{
+		IdField:    1212,
+		NameField:  "Unit test vm",
+		StateField: "DOWN",
+		OsField:    "CentOS",
+		RamField:   16,
+		CpuField:   8,
+		DisksField: []interface{}{
 			map[string]interface{}{
-				NAME_FIELD:          "disk 1 update",
-				SIZE_FIELD:          42,
-				STORAGE_CLASS_FIELD: "STORAGE_CLASS_FIELD update",
-				SLUG_FIELD:          "slug update",
+				NameField:         "disk 1 update",
+				SizeField:         42,
+				StorageClassField: "StorageClassField update",
+				SlugField:         "slug update",
+				VDiskField:        "",
 			},
 			map[string]interface{}{
-				NAME_FIELD:          "disk 2 update",
-				SIZE_FIELD:          42,
-				STORAGE_CLASS_FIELD: "STORAGE_CLASS_FIELD update",
-				SLUG_FIELD:          "slug update",
-			},
-		},
-		NICS_FIELD: []interface{}{
-			map[string]interface{}{
-				VLAN_NAME_FIELD:  "vlan 1 update",
-				MAC_ADRESS_FIELD: "42",
-				CONNECTED_FIELD:  false,
+				NameField:         "disk 2 update",
+				SizeField:         42,
+				StorageClassField: "StorageClassField update",
+				SlugField:         "slug update",
+				VDiskField:        "",
 			},
 		},
-		VDC_FIELD:           "vdc update",
-		BOOT_FIELD:          "on disk update",
-		STORAGE_CLASS_FIELD: "storage_enterprise update",
-		SLUG_FIELD:          "42 update",
-		TOKEN_FIELD:         "424242 update",
-		BACKUP_FIELD:        "backup_no_backup update",
-		DISK_IMAGE_FIELD:    " update",
-		PLATFORM_NAME_FIELD: "",
-		BACKUP_SIZE_FIELD:   43,
-		COMMENT_FIELD:       "",
+		NicsField: []interface{}{
+			map[string]interface{}{
+				VlanNameField:  "vlan 1 update",
+				MacAdressField: "42",
+				ConnectedField: false,
+			},
+		},
+		BootField:         "vdc update",
+		BootField:         "on disk update",
+		StorageClassField: "storage_enterprise update",
+		SlugField:         "42 update",
+		TokenField:        "424242 update",
+		BackupField:       "backup_no_backup update",
+		DiskImageField:    " update",
+		PlatformNameField: "",
+		BackupSizeField:   43,
+		CommentField:      "",
 	}
-	TEST_UPDATE_VM_MAP_FLOATID = map[string]interface{}{
-		ID_FIELD:    121212.12,
-		NAME_FIELD:  "Unit test vm",
-		STATE_FIELD: "DOWN",
-		OS_FIELD:    "CentOS",
-		RAM_FIELD:   16,
-		CPU_FIELD:   8,
-		DISKS_FIELD: []interface{}{
+	testUpdateVmMapFloatId = map[string]interface{}{
+		IdField:    121212.12,
+		NameField:  "Unit test vm",
+		StateField: "DOWN",
+		OsField:    "CentOS",
+		RamField:   16,
+		CpuField:   8,
+		DisksField: []interface{}{
 			map[string]interface{}{
-				NAME_FIELD:          "disk 1 update",
-				SIZE_FIELD:          42,
-				STORAGE_CLASS_FIELD: "STORAGE_CLASS_FIELD update",
-				SLUG_FIELD:          "slug update",
+				NameField:         "disk 1 update",
+				SizeField:         42,
+				StorageClassField: "StorageClassField update",
+				SlugField:         "slug update",
+				VDiskField:        "",
 			},
 			map[string]interface{}{
-				NAME_FIELD:          "disk 2 update",
-				SIZE_FIELD:          42,
-				STORAGE_CLASS_FIELD: "STORAGE_CLASS_FIELD update",
-				SLUG_FIELD:          "slug update",
-			},
-		},
-		NICS_FIELD: []interface{}{
-			map[string]interface{}{
-				VLAN_NAME_FIELD:  "vlan 1 update",
-				MAC_ADRESS_FIELD: "42",
-				CONNECTED_FIELD:  false,
+				NameField:         "disk 2 update",
+				SizeField:         42,
+				StorageClassField: "StorageClassField update",
+				SlugField:         "slug update",
+				VDiskField:        "",
 			},
 		},
-		VDC_FIELD:           "vdc update",
-		BOOT_FIELD:          "on disk update",
-		STORAGE_CLASS_FIELD: "storage_enterprise update",
-		SLUG_FIELD:          "42 update",
-		TOKEN_FIELD:         "424242 update",
-		BACKUP_FIELD:        "backup_no_backup update",
-		DISK_IMAGE_FIELD:    " update",
-		PLATFORM_NAME_FIELD: "",
-		BACKUP_SIZE_FIELD:   42,
-		COMMENT_FIELD:       "",
+		NicsField: []interface{}{
+			map[string]interface{}{
+				VlanNameField:  "vlan 1 update",
+				MacAdressField: "42",
+				ConnectedField: false,
+			},
+		},
+		BootField:         "vdc update",
+		BootField:         "on disk update",
+		StorageClassField: "storage_enterprise update",
+		SlugField:         "42 update",
+		TokenField:        "424242 update",
+		BackupField:       "backup_no_backup update",
+		DiskImageField:    " update",
+		PlatformNameField: "",
+		BackupSizeField:   42,
+		CommentField:      "",
 	}
 )
 
 func resourceVdcResource() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
-			RESOURCE_FIELD: &schema.Schema{
+			ResourceField: &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			USED_FIELD: &schema.Schema{
+			UsedField: &schema.Schema{
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			TOTAL_FIELD: &schema.Schema{
+			TotalField: &schema.Schema{
 				Type:     schema.TypeInt,
 				Required: true,
 			},
-			SLUG_FIELD: &schema.Schema{
+			SlugField: &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -826,28 +816,28 @@ func resourceVdcResource() *schema.Resource {
 func resourceVdc() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
-			NAME_FIELD: &schema.Schema{
+			NameField: &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			ENTERPRISE_FIELD: &schema.Schema{
+			EnterpriseField: &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			DATACENTER_FIELD: &schema.Schema{
+			DatacenterField: &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			VDC_RESOURCE_FIELD: &schema.Schema{
+			VdcResourceField: &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     resourceVdcResource(),
 			},
-			SLUG_FIELD: &schema.Schema{
+			SlugField: &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			DYNAMIC_FIELD: &schema.Schema{
+			DynamicField: &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
@@ -855,22 +845,26 @@ func resourceVdc() *schema.Resource {
 	}
 }
 
-func resourceVm_disk() *schema.Resource {
+func resourceVmDisk() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
-			NAME_FIELD: &schema.Schema{
+			NameField: &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			SIZE_FIELD: &schema.Schema{
+			SizeField: &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
-			STORAGE_CLASS_FIELD: &schema.Schema{
+			StorageClassField: &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			SLUG_FIELD: &schema.Schema{
+			SlugField: &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			VDiskField: &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -878,18 +872,18 @@ func resourceVm_disk() *schema.Resource {
 	}
 }
 
-func resourceVm_nic() *schema.Resource {
+func resourceVmNic() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
-			VLAN_NAME_FIELD: &schema.Schema{
+			VlanNameField: &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			MAC_ADRESS_FIELD: &schema.Schema{
+			MacAdressField: &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			CONNECTED_FIELD: &schema.Schema{
+			ConnectedField: &schema.Schema{
 				Type:     schema.TypeBool,
 				Required: true,
 			},
@@ -900,89 +894,93 @@ func resourceVm_nic() *schema.Resource {
 func resourceVm() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
-			NAME_FIELD: &schema.Schema{
+			NameField: &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			INSTANCE_NUMBER_FIELD: &schema.Schema{
+			instanceNumberField: &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
-			ENTERPRISE_FIELD: &schema.Schema{
+			EnterpriseField: &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			TEMPLATE_FIELD: &schema.Schema{
+			TemplateField: &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			STATE_FIELD: &schema.Schema{
+			StateField: &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			OS_FIELD: &schema.Schema{
+			OsField: &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			RAM_FIELD: &schema.Schema{
+			RamField: &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
-			CPU_FIELD: &schema.Schema{
+			CpuField: &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
-			DISKS_FIELD: &schema.Schema{
+			DisksField: &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
-				Elem:     resourceVm_disk(),
+				Elem:     resourceVmDisk(),
 			},
-			NICS_FIELD: &schema.Schema{
+			NicsField: &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
-				Elem:     resourceVm_nic(),
+				Elem:     resourceVmNic(),
 			},
-			VDC_FIELD: &schema.Schema{
+			BootField: &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			BOOT_FIELD: &schema.Schema{
+			BootField: &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			STORAGE_CLASS_FIELD: &schema.Schema{
+			StorageClassField: &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			SLUG_FIELD: &schema.Schema{
+			SlugField: &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			TOKEN_FIELD: &schema.Schema{
+			TokenField: &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			BACKUP_FIELD: &schema.Schema{
+			BackupField: &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			DISK_IMAGE_FIELD: &schema.Schema{
+			DiskImageField: &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			PLATFORM_NAME_FIELD: &schema.Schema{
+			PlatformNameField: &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			BACKUP_SIZE_FIELD: &schema.Schema{
+			BackupSizeField: &schema.Schema{
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			COMMENT_FIELD: &schema.Schema{
+			CommentField: &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			DYNAMIC_FIELD: &schema.Schema{
+			DynamicField: &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			outsourcingField: &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -990,40 +988,40 @@ func resourceVm() *schema.Resource {
 	}
 }
 
-func FakeVdcInstance_VDC_CREATION_MAP() VDC {
+func FakeVdcInstanceVdcCreationMap() VDC {
 	return VDC{
 		Name:       "Unit test vdc resource",
 		Enterprise: "enterprise",
 		Vdc_resources: []interface{}{
 			map[string]interface{}{
-				RESOURCE_FIELD: "enterprise-mono-ram",
-				USED_FIELD:     0,
-				TOTAL_FIELD:    20,
-				SLUG_FIELD:     "",
+				ResourceField: "enterprise-mono-ram",
+				UsedField:     0,
+				TotalField:    20,
+				SlugField:     "",
 			},
 			map[string]interface{}{
-				RESOURCE_FIELD: "enterprise-mono-cpu",
-				USED_FIELD:     0,
-				TOTAL_FIELD:    1,
-				SLUG_FIELD:     "",
+				ResourceField: "enterprise-mono-cpu",
+				UsedField:     0,
+				TotalField:    1,
+				SlugField:     "",
 			},
 			map[string]interface{}{
-				RESOURCE_FIELD: "enterprise-mono-storage_enterprise",
-				USED_FIELD:     0,
-				TOTAL_FIELD:    10,
-				SLUG_FIELD:     "",
+				ResourceField: "enterprise-mono-storage_enterprise",
+				UsedField:     0,
+				TotalField:    10,
+				SlugField:     "",
 			},
 			map[string]interface{}{
-				RESOURCE_FIELD: "enterprise-mono-storage_performance",
-				USED_FIELD:     0,
-				TOTAL_FIELD:    10,
-				SLUG_FIELD:     "",
+				ResourceField: "enterprise-mono-storage_performance",
+				UsedField:     0,
+				TotalField:    10,
+				SlugField:     "",
 			},
 			map[string]interface{}{
-				RESOURCE_FIELD: "enterprise-mono-storage_high_performance",
-				USED_FIELD:     0,
-				TOTAL_FIELD:    10,
-				SLUG_FIELD:     "",
+				ResourceField: "enterprise-mono-storage_high_performance",
+				UsedField:     0,
+				TotalField:    10,
+				SlugField:     "",
 			},
 		},
 		Slug:         "",
@@ -1038,22 +1036,22 @@ func vdcInstanceFake() VDC {
 		Datacenter: "Unit Test value",
 		Vdc_resources: []interface{}{
 			map[string]interface{}{
-				RESOURCE_FIELD: "Resource1",
-				USED_FIELD:     1,
-				TOTAL_FIELD:    2,
-				SLUG_FIELD:     "Unit Test value1",
+				ResourceField: "Resource1",
+				UsedField:     1,
+				TotalField:    2,
+				SlugField:     "Unit Test value1",
 			},
 			map[string]interface{}{
-				RESOURCE_FIELD: "Resource2",
-				USED_FIELD:     1,
-				TOTAL_FIELD:    2,
-				SLUG_FIELD:     "Unit Test value2",
+				ResourceField: "Resource2",
+				UsedField:     1,
+				TotalField:    2,
+				SlugField:     "Unit Test value2",
 			},
 			map[string]interface{}{
-				RESOURCE_FIELD: "Resource3",
-				USED_FIELD:     1,
-				TOTAL_FIELD:    2,
-				SLUG_FIELD:     "Unit Test value3",
+				ResourceField: "Resource3",
+				UsedField:     1,
+				TotalField:    2,
+				SlugField:     "Unit Test value3",
 			},
 		},
 		Slug:         "Unit Test value",
@@ -1061,7 +1059,7 @@ func vdcInstanceFake() VDC {
 	}
 }
 
-func vmInstanceNO_TEMPLATE_VM_MAP() VM {
+func vmInstanceNoTemplateVmMap() VM {
 	return VM{
 		Name:  "Unit test no template vm resource",
 		State: "UP",
@@ -1070,25 +1068,26 @@ func vmInstanceNO_TEMPLATE_VM_MAP() VM {
 		CPU:   4,
 		Disks: []interface{}{
 			map[string]interface{}{
-				NAME_FIELD:          "disk 1",
-				SIZE_FIELD:          24,
-				STORAGE_CLASS_FIELD: "storage_enterprise",
-				SLUG_FIELD:          "",
+				NameField:         "disk 1",
+				SizeField:         24,
+				StorageClassField: "storage_enterprise",
+				SlugField:         "",
+				VDiskField:        "",
 			},
 		},
 		Nics: []interface{}{
 			map[string]interface{}{
-				VLAN_NAME_FIELD:  "vlan 1 update",
-				MAC_ADRESS_FIELD: "00:21:21:21:21:21",
-				CONNECTED_FIELD:  true,
+				VlanNameField:  "vlan 1 update",
+				MacAdressField: "00:21:21:21:21:21",
+				ConnectedField: true,
 			},
 			map[string]interface{}{
-				VLAN_NAME_FIELD:  "vlan 2",
-				MAC_ADRESS_FIELD: "00:21:21:21:21:21",
-				CONNECTED_FIELD:  true,
+				VlanNameField:  "vlan 2",
+				MacAdressField: "00:21:21:21:21:21",
+				ConnectedField: true,
 			},
 		},
-		Vdc:           VDC_FIELD,
+		Vdc:           BootField,
 		Boot:          "on disk",
 		Storage_class: "storage_enterprise",
 		Slug:          "42",
@@ -1098,11 +1097,11 @@ func vmInstanceNO_TEMPLATE_VM_MAP() VM {
 		Platform_name: "42",
 		Backup_size:   42,
 		Comment:       "",
-		DynamicField:  "{\"terraform_provisioned\":true,\"creationTemplate\":\"\",\"Template_disks_on_creation\":null}",
+		DynamicField:  "{\"terraform_provisioned\":true,\"creationTemplate\":\"\",\"TemplateDisksOnCreation\":null}",
 	}
 }
 
-func FakeVmInstance_EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP() VM {
+func FakeVmInstanceExistingTemplateNoAdditionalDiskVmMap() VM {
 	return VM{
 		Name:       "Unit test template no disc add on vm resource-0",
 		Enterprise: "unit test enterprise",
@@ -1112,26 +1111,27 @@ func FakeVmInstance_EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP() VM {
 		CPU:        1,
 		Disks: []interface{}{
 			map[string]interface{}{
-				NAME_FIELD:          "template1 disk1",
-				SIZE_FIELD:          20,
-				STORAGE_CLASS_FIELD: "storage_enterprise",
-				SLUG_FIELD:          "template1 disk1 slug",
+				NameField:         "template1 disk1",
+				SizeField:         20,
+				StorageClassField: "storage_enterprise",
+				SlugField:         "template1 disk1 slug",
+				VDiskField:        "",
 			},
 		},
 		Nics:          []interface{}{},
-		Vdc:           VDC_FIELD,
+		Vdc:           BootField,
 		Boot:          "on disk",
 		Storage_class: "storage_enterprise",
 		Slug:          "42",
 		Token:         "424242",
 		Backup:        "backup_no_backup",
-		DynamicField:  "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"Template_disks_on_creation\":[{\"name\":\"template1 disk1\",\"size\":20,\"slug\":\"template1 disk1 slug\",\"storage_class\":\"storage_enterprise\"}]}",
+		DynamicField:  "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"TemplateDisksOnCreation\":[{\"name\":\"template1 disk1\",\"size\":20,\"slug\":\"template1 disk1 slug\",\"storage_class\":\"storage_enterprise\"}]}",
 	}
 }
 
-func FakeVmInstance_INSTANCE_NUMBER_FIELD_UNIT_TEST_VM_INSTANCE_MAP() VM {
+func FakeVmInstanceInstanceNumberFieldUnitTestVmInstance_MAP() VM {
 	return VM{
-		Name:       "INSTANCE_NUMBER_FIELDUnitTest-42",
+		Name:       "instanceNumberFieldUnitTest-42",
 		Enterprise: "unit test enterprise",
 		Template:   "template1",
 		State:      "UP",
@@ -1139,26 +1139,27 @@ func FakeVmInstance_INSTANCE_NUMBER_FIELD_UNIT_TEST_VM_INSTANCE_MAP() VM {
 		CPU:        1,
 		Disks: []interface{}{
 			map[string]interface{}{
-				NAME_FIELD:          "template1 disk1",
-				SIZE_FIELD:          20,
-				STORAGE_CLASS_FIELD: "storage_enterprise",
-				SLUG_FIELD:          "template1 disk1 slug",
+				NameField:         "template1 disk1",
+				SizeField:         20,
+				StorageClassField: "storage_enterprise",
+				SlugField:         "template1 disk1 slug",
+				VDiskField:        "",
 			},
 		},
 		Nics:          []interface{}{},
-		Vdc:           VDC_FIELD,
+		Vdc:           BootField,
 		Boot:          "on disk",
 		Storage_class: "storage_enterprise",
 		Slug:          "42",
 		Token:         "424242",
 		Backup:        "backup_no_backup",
-		DynamicField:  "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"Template_disks_on_creation\":[{\"name\":\"template1 disk1\",\"size\":20,\"slug\":\"template1 disk1 slug\",\"storage_class\":\"storage_enterprise\"}]}",
+		DynamicField:  "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"TemplateDisksOnCreation\":[{\"name\":\"template1 disk1\",\"size\":20,\"slug\":\"template1 disk1 slug\",\"storage_class\":\"storage_enterprise\"}]}",
 	}
 }
 
-func FakeVmInstance_EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISKS_VM_MAP() VM {
+func FakeVmInstanceExistingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap() VM {
 	return VM{
-		Name:       "EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISKS_VM_MAP-0",
+		Name:       "existingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap-0",
 		Enterprise: "unit test enterprise",
 		Template:   "template1",
 		State:      "UP",
@@ -1167,31 +1168,33 @@ func FakeVmInstance_EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISK
 		CPU:        4,
 		Disks: []interface{}{
 			map[string]interface{}{
-				NAME_FIELD:          "disk 1",
-				SIZE_FIELD:          24,
-				STORAGE_CLASS_FIELD: "storage_enterprise",
-				SLUG_FIELD:          "",
+				NameField:         "disk 1",
+				SizeField:         24,
+				StorageClassField: "storage_enterprise",
+				SlugField:         "",
+				VDiskField:        "",
 			},
 			map[string]interface{}{
-				NAME_FIELD:          "template1 disk1",
-				SIZE_FIELD:          25,
-				STORAGE_CLASS_FIELD: "storage_enterprise",
-				SLUG_FIELD:          "template1 disk1 slug",
+				NameField:         "template1 disk1",
+				SizeField:         25,
+				StorageClassField: "storage_enterprise",
+				SlugField:         "template1 disk1 slug",
+				VDiskField:        "",
 			},
 		},
 		Nics: []interface{}{
 			map[string]interface{}{
-				VLAN_NAME_FIELD:  "non template vlan 1",
-				MAC_ADRESS_FIELD: "00:21:21:21:21:21",
-				CONNECTED_FIELD:  true,
+				VlanNameField:  "non template vlan 1",
+				MacAdressField: "00:21:21:21:21:21",
+				ConnectedField: true,
 			},
 			map[string]interface{}{
-				VLAN_NAME_FIELD:  "non template vlan 2",
-				MAC_ADRESS_FIELD: "00:21:21:21:21:22",
-				CONNECTED_FIELD:  true,
+				VlanNameField:  "non template vlan 2",
+				MacAdressField: "00:21:21:21:21:22",
+				ConnectedField: true,
 			},
 		},
-		Vdc:           VDC_FIELD,
+		Vdc:           BootField,
 		Boot:          "on disk",
 		Storage_class: "storage_enterprise",
 		Slug:          "42",
@@ -1201,13 +1204,13 @@ func FakeVmInstance_EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISK
 		Platform_name: "42",
 		Backup_size:   42,
 		Comment:       "",
-		DynamicField:  "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"Template_disks_on_creation\":[{\"name\":\"template1 disk1\",\"size\":20,\"slug\":\"template1 disk1 slug\",\"storage_class\":\"storage_enterprise\"}]}",
+		DynamicField:  "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"TemplateDisksOnCreation\":[{\"name\":\"template1 disk1\",\"size\":20,\"slug\":\"template1 disk1 slug\",\"storage_class\":\"storage_enterprise\"}]}",
 	}
 }
 
-func FakeVmInstance_EXISTING_TEMPLATE_WITH_DELETED_DISK_VM_MAP() VM {
+func FakeVmInstanceExistingTemplateWithDeletedDiskVmMap() VM {
 	return VM{
-		Name:       "EXISTING_TEMPLATE_WITH_DELETED_DISK_VM_MAP",
+		Name:       "existingTemplateWithDeletedDiskVmMap",
 		Enterprise: "unit test enterprise",
 		Template:   "",
 		State:      "UP",
@@ -1216,14 +1219,15 @@ func FakeVmInstance_EXISTING_TEMPLATE_WITH_DELETED_DISK_VM_MAP() VM {
 		CPU:        4,
 		Disks: []interface{}{
 			map[string]interface{}{
-				NAME_FIELD:          "disk 1",
-				SIZE_FIELD:          24,
-				STORAGE_CLASS_FIELD: "storage_enterprise",
-				SLUG_FIELD:          "",
+				NameField:         "disk 1",
+				SizeField:         24,
+				StorageClassField: "storage_enterprise",
+				SlugField:         "",
+				VDiskField:        "",
 			},
 		},
 		Nics:          []interface{}{},
-		Vdc:           VDC_FIELD,
+		Vdc:           BootField,
 		Boot:          "on disk",
 		Storage_class: "storage_enterprise",
 		Slug:          "42",
@@ -1233,7 +1237,7 @@ func FakeVmInstance_EXISTING_TEMPLATE_WITH_DELETED_DISK_VM_MAP() VM {
 		Platform_name: "42",
 		Backup_size:   42,
 		Comment:       "",
-		DynamicField:  "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"Template_disks_on_creation\":null}",
+		DynamicField:  "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"TemplateDisksOnCreation\":null}",
 	}
 }
 
@@ -1248,26 +1252,28 @@ func vmInstanceNoTemplateFake() VM {
 		CPU:        1,
 		Disks: []interface{}{
 			map[string]interface{}{
-				NAME_FIELD:          "name1",
-				SIZE_FIELD:          10,
-				STORAGE_CLASS_FIELD: "Unit Test value",
+				NameField:         "name1",
+				SizeField:         10,
+				StorageClassField: "Unit Test value",
+				VDiskField:        "",
 			},
 			map[string]interface{}{
-				NAME_FIELD:          "name2",
-				SIZE_FIELD:          10,
-				STORAGE_CLASS_FIELD: "Unit Test value",
+				NameField:         "name2",
+				SizeField:         10,
+				StorageClassField: "Unit Test value",
+				VDiskField:        "",
 			},
 		},
 		Nics: []interface{}{
 			map[string]interface{}{
-				VLAN_NAME_FIELD:  "vlan1",
-				MAC_ADRESS_FIELD: "00:21:21:21:21:21",
-				CONNECTED_FIELD:  true,
+				VlanNameField:  "vlan1",
+				MacAdressField: "00:21:21:21:21:21",
+				ConnectedField: true,
 			},
 			map[string]interface{}{
-				VLAN_NAME_FIELD:  "vlan1",
-				MAC_ADRESS_FIELD: "00:21:21:21:21:21",
-				CONNECTED_FIELD:  false,
+				VlanNameField:  "vlan1",
+				MacAdressField: "00:21:21:21:21:21",
+				ConnectedField: false,
 			},
 		},
 		Vdc:           "Unit Test value",
@@ -1309,14 +1315,14 @@ func resource(resourceType string) *schema.Resource {
 
 	resource := &schema.Resource{}
 	switch resourceType {
-	case VDC_FIELD:
+	case VdcResourceType:
 		resource = resourceVdc()
-	case VM_RESOURCE_TYPE:
+	case VmResourceType:
 		resource = resourceVm()
 	default:
 		resource = &schema.Resource{
 			Schema: map[string]*schema.Schema{
-				NAME_FIELD: &schema.Schema{
+				NameField: &schema.Schema{
 					Type:     schema.TypeString,
 					Required: true,
 				},
@@ -1343,7 +1349,7 @@ func JsonStub() map[string]interface{} {
 
 func JsonTemplateListFake() []interface{} {
 	var jsonFake interface{}
-	fakeJson, _ := json.Marshal(TEMPLATES_LIST)
+	fakeJson, _ := json.Marshal(templatesList)
 	jsonBytes := ioutil.NopCloser(bytes.NewBuffer(fakeJson))
 	readBytes, _ := ioutil.ReadAll(jsonBytes)
 	_ = json.Unmarshal(readBytes, &jsonFake)

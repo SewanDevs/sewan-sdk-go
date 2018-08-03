@@ -14,21 +14,21 @@ type GetTemplatesList_Success_HttpClienterFake struct{}
 func (client GetTemplatesList_Success_HttpClienterFake) Do(api *API,
 	req *http.Request) (*http.Response, error) {
 
-	//return a resp with TEMPLATES_LIST
+	//return a resp with templatesList
 	return nil, nil
 }
 
 func (client GetTemplatesList_Success_HttpClienterFake) GetTemplatesList(clientTooler *ClientTooler,
 	enterpriseSlug string, api *API) ([]interface{}, error) {
 
-	return TEMPLATES_LIST, nil
+	return templatesList, nil
 }
 
 func (client GetTemplatesList_Success_HttpClienterFake) HandleResponse(resp *http.Response,
 	expectedCode int,
 	expectedBodyFormat string) (interface{}, error) {
 
-	return TEMPLATES_LIST, nil
+	return templatesList, nil
 }
 
 //------------------------------------------------------------------------------
@@ -61,7 +61,7 @@ type ErrorResponse_HttpClienterFake struct{}
 func (client ErrorResponse_HttpClienterFake) Do(api *API,
 	req *http.Request) (*http.Response, error) {
 
-	return nil, errors.New(REQ_ERR)
+	return nil, errors.New(reqErr)
 }
 
 func (client ErrorResponse_HttpClienterFake) GetTemplatesList(clientTooler *ClientTooler,
@@ -86,7 +86,7 @@ func (client BadBodyResponseContentType_HttpClienterFake) Do(api *API,
 
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, "image")
+	resp.Header.Add(httpRespContentType, "image")
 	resp.Body = ioutil.NopCloser(bytes.NewBufferString("Internal Server Error"))
 	resp.StatusCode = http.StatusInternalServerError
 	return &resp, nil
@@ -114,7 +114,7 @@ func (client StatusInternalServerError_HttpClienterFake) Do(api *API,
 
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_HTML_TEXT_CONTENT_TYPE)
+	resp.Header.Add(httpRespContentType, httpHtmlTextContentType)
 	resp.Body = ioutil.NopCloser(bytes.NewBufferString("<h1>Server Error (500)</h1>"))
 	resp.StatusCode = http.StatusInternalServerError
 	return &resp, nil
@@ -139,10 +139,9 @@ type BadBodyResponse_StatusCreated_HttpClienterFake struct{}
 
 func (client BadBodyResponse_StatusCreated_HttpClienterFake) Do(api *API,
 	req *http.Request) (*http.Response, error) {
-
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
+	resp.Header.Add(httpRespContentType, httpJsonContentType)
 	resp.Body = ioutil.NopCloser(bytes.NewBufferString("{\"detail\"\"Invalid json string}}.\"}"))
 	resp.StatusCode = http.StatusCreated
 	return &resp, nil
@@ -170,7 +169,7 @@ func (client BadBodyResponse_StatusOK_HttpClienterFake) Do(api *API,
 
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
+	resp.Header.Add(httpRespContentType, httpJsonContentType)
 	resp.Body = ioutil.NopCloser(bytes.NewBufferString("{\"detail\"\"Invalid json string}}.\"}"))
 	resp.StatusCode = http.StatusOK
 	return &resp, nil
@@ -198,9 +197,9 @@ func (client Error401_HttpClienterFake) Do(api *API,
 
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
+	resp.Header.Add(httpRespContentType, httpJsonContentType)
 	resp.StatusCode = http.StatusUnauthorized
-	resp.Status = UNAUTHORIZED_STATUS
+	resp.Status = unauthorizedStatus
 	body := Resp_Body{"Token non valide."}
 	js, _ := json.Marshal(body)
 	resp.Body = ioutil.NopCloser(bytes.NewBuffer(js))
@@ -229,9 +228,9 @@ func (client Error404_HttpClienterFake) Do(api *API,
 
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
+	resp.Header.Add(httpRespContentType, httpJsonContentType)
 	resp.StatusCode = http.StatusNotFound
-	resp.Status = NOT_FOUND_STATUS
+	resp.Status = notFoundRespStatus
 	body := Resp_Body{"Not found."}
 	js, _ := json.Marshal(body)
 	resp.Body = ioutil.NopCloser(bytes.NewBuffer(js))
@@ -260,9 +259,9 @@ func (client VDC_CreationSuccess_HttpClienterFake) Do(api *API,
 
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
+	resp.Header.Add(httpRespContentType, httpJsonContentType)
 	resp.StatusCode = http.StatusCreated
-	js, _ := json.Marshal(VDC_READ_RESPONSE_MAP)
+	js, _ := json.Marshal(vdcReadResponseMap)
 	resp.Body = ioutil.NopCloser(bytes.NewBuffer(js))
 	return &resp, nil
 }
@@ -289,9 +288,9 @@ func (client VDC_ReadSuccess_HttpClienterFake) Do(api *API,
 
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
+	resp.Header.Add(httpRespContentType, httpJsonContentType)
 	resp.StatusCode = http.StatusOK
-	js, _ := json.Marshal(VDC_READ_RESPONSE_MAP)
+	js, _ := json.Marshal(vdcReadResponseMap)
 	resp.Body = ioutil.NopCloser(bytes.NewBuffer(js))
 	return &resp, nil
 }
@@ -318,9 +317,9 @@ func (client VDC_UpdateSuccess_HttpClienterFake) Do(api *API,
 
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
+	resp.Header.Add(httpRespContentType, httpJsonContentType)
 	resp.StatusCode = http.StatusOK
-	js, _ := json.Marshal(VDC_CREATION_MAP)
+	js, _ := json.Marshal(vdcCreationMap)
 	resp.Body = ioutil.NopCloser(bytes.NewBuffer(js))
 	return &resp, nil
 }
@@ -346,7 +345,7 @@ func (client VDC_DeleteSuccess_HttpClienterFake) Do(api *API,
 
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
+	resp.Header.Add(httpRespContentType, httpJsonContentType)
 	resp.StatusCode = http.StatusNoContent
 	return &resp, nil
 }
@@ -373,9 +372,9 @@ func (client VM_CreationSuccess_HttpClienterFake) Do(api *API,
 
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
+	resp.Header.Add(httpRespContentType, httpJsonContentType)
 	resp.StatusCode = http.StatusCreated
-	js, _ := json.Marshal(NO_TEMPLATE_VM_MAP)
+	js, _ := json.Marshal(noTemplateVmMap)
 	resp.Body = ioutil.NopCloser(bytes.NewBuffer(js))
 	return &resp, nil
 }
@@ -402,9 +401,9 @@ func (client VM_ReadSuccess_HttpClienterFake) Do(api *API,
 
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
+	resp.Header.Add(httpRespContentType, httpJsonContentType)
 	resp.StatusCode = http.StatusOK
-	js, _ := json.Marshal(NO_TEMPLATE_VM_MAP)
+	js, _ := json.Marshal(noTemplateVmMap)
 	resp.Body = ioutil.NopCloser(bytes.NewBuffer(js))
 	return &resp, nil
 }
@@ -431,9 +430,9 @@ func (client VM_UpdateSuccess_HttpClienterFake) Do(api *API,
 
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
+	resp.Header.Add(httpRespContentType, httpJsonContentType)
 	resp.StatusCode = http.StatusOK
-	js, _ := json.Marshal(NO_TEMPLATE_VM_MAP)
+	js, _ := json.Marshal(noTemplateVmMap)
 	resp.Body = ioutil.NopCloser(bytes.NewBuffer(js))
 	return &resp, nil
 }
@@ -459,7 +458,7 @@ func (client VM_DeleteSuccess_HttpClienterFake) Do(api *API,
 
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
+	resp.Header.Add(httpRespContentType, httpJsonContentType)
 	resp.StatusCode = http.StatusNoContent
 	return &resp, nil
 }
@@ -485,9 +484,9 @@ func (client DeleteWRONGResponseBody_HttpClienterFake) Do(api *API,
 
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add(HTTP_RESP_CONTENT_TYPE, HTTP_JSON_CONTENT_TYPE)
+	resp.Header.Add(httpRespContentType, httpJsonContentType)
 	resp.StatusCode = http.StatusOK
-	resp.Body = ioutil.NopCloser(bytes.NewBufferString(DESTROY_WRONG_MSG))
+	resp.Body = ioutil.NopCloser(bytes.NewBufferString(destroyWrongMsg))
 	return &resp, nil
 }
 
@@ -512,7 +511,7 @@ func (client CheckRedirectReqFailure_HttpClienterFake) Do(api *API,
 	req *http.Request) (*http.Response, error) {
 
 	resp := http.Response{}
-	return &resp, errors.New(CHECK_REDIRECT_FAILURE)
+	return &resp, errors.New(checkRedirectFailure)
 }
 
 func (client CheckRedirectReqFailure_HttpClienterFake) GetTemplatesList(clientTooler *ClientTooler,
@@ -540,20 +539,20 @@ func (client FakeHttpClienter) Do(api *API, req *http.Request) (*http.Response, 
 	}
 	resp := http.Response{}
 
-	if api.URL != NO_RESP_API_URL {
+	if api.URL != noRespApiUrl {
 		resp.Status = "200 OK"
 		resp.StatusCode = http.StatusOK
 		switch {
-		case api.URL == WRONG_API_URL || api.URL == NOT_JSON_RESP_API_URL:
-			resp.Header = map[string][]string{HTTP_RESP_CONTENT_TYPE: {"text/plain; charset=utf-8"}}
+		case api.URL == wrongApiUrl || api.URL == noRespJsonBodyApiUrl:
+			resp.Header = map[string][]string{httpRespContentType: {"text/plain; charset=utf-8"}}
 			resp.Body = ioutil.NopCloser(bytes.NewBufferString("A plain text."))
-		case api.URL == RIGHT_API_URL:
-			if api.Token != RIGHT_API_TOKEN {
+		case api.URL == rightApiUrl:
+			if api.Token != rightApiToken {
 				resp.Status = "401 Unauthorized"
 				resp.StatusCode = http.StatusUnauthorized
 				resp.Body = ioutil.NopCloser(bytes.NewBufferString("{\"detail\":\"Invalid token.\"}"))
 			} else {
-				resp.Header = map[string][]string{HTTP_RESP_CONTENT_TYPE: {HTTP_JSON_CONTENT_TYPE}}
+				resp.Header = map[string][]string{httpRespContentType: {httpJsonContentType}}
 				bodyJson, _ := json.Marshal(body{detail: ""})
 				resp.Body = ioutil.NopCloser(bytes.NewBuffer(bodyJson))
 			}

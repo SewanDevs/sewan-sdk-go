@@ -25,28 +25,28 @@ func TestFetchTemplateFromList(t *testing.T) {
 		{
 			2,
 			"template2",
-			TEMPLATES_LIST,
-			TEMPLATE2_MAP,
+			templatesList,
+			template2Map,
 			nil,
 		},
 		{
 			3,
 			"lastTemplate",
-			TEMPLATES_LIST,
-			LAST_TEMPLATE_IN_LIST,
+			templatesList,
+			lastTemplateInTemplatesList,
 			nil,
 		},
 		{
 			4,
 			"template 42",
-			TEMPLATES_LIST,
+			templatesList,
 			map[string]interface{}(nil),
 			errors.New("Template \"template 42\" does not exists, please validate it's name."),
 		},
 		{
 			5,
 			"template 42",
-			WRONG_TEMPLATES_LIST,
+			wrongTemplatesList,
 			map[string]interface{}(nil),
 			errors.New("One of the fetch template " +
 				"has a wrong format." +
@@ -114,21 +114,21 @@ func TestValidateTemplate(t *testing.T) {
 		{
 			1,
 			map[string]interface{}{},
-			errors.New("Template missing fields : " + "\"" + NAME_FIELD + "\" " +
-				"\"" + OS_FIELD + "\" " +
-				"\"" + RAM_FIELD + "\" " +
-				"\"" + CPU_FIELD + "\" " +
-				"\"" + ENTERPRISE_FIELD + "\" " +
-				"\"" + DISKS_FIELD + "\" "),
+			errors.New("Template missing fields : " + "\"" + NameField + "\" " +
+				"\"" + OsField + "\" " +
+				"\"" + RamField + "\" " +
+				"\"" + CpuField + "\" " +
+				"\"" + EnterpriseField + "\" " +
+				"\"" + DisksField + "\" "),
 		},
 		{
 			2,
-			VM_CREATION_FROM_TEMPLATE1_SCHEMA,
+			vmCreationFromTemplate1Schema,
 			nil,
 		},
 		{
 			3,
-			VM_CREATION_FROM_TEMPLATE_SCHEMA_PRE_CREATION_WRONG_NICS_INIT_MAP,
+			vmCreationFromTemplate1SchemaPreCreationWrongNicsInitMap,
 			errors.New("Template nics is not a list as required but a string"),
 		},
 	}
@@ -169,18 +169,18 @@ func TestUpdateSchemaFromTemplateOnResourceCreation(t *testing.T) {
 	}{
 		{
 			1,
-			vmSchemaInit(NON_EXISTING_ERROR_VM_SCHEMA_MAP),
-			TEMPLATE2_MAP,
-			NON_EXISTING_ERROR_VM_SCHEMA_MAP,
+			vmSchemaInit(nonExistingErrorVmSchemaMap),
+			template2Map,
+			nonExistingErrorVmSchemaMap,
 			errors.New("Template field should not be set on " +
 				"an existing resource, please review the configuration field." +
 				"\n : The resource schema has not been updated."),
 		},
 		{
 			2,
-			vmSchemaInit(VM_SCHEMA_MAP_PRE_UPDATE_FROM_TEMPLATE),
-			LAST_TEMPLATE_IN_LIST,
-			VM_SCHEMA_MAP_POST_UPDATE_FROM_TEMPLATE,
+			vmSchemaInit(vmSchemaMapPreUpdateFromTemplate),
+			lastTemplateInTemplatesList,
+			vmSchemaMapPostUpdateFromTemplate,
 			nil,
 		},
 	}
@@ -204,7 +204,7 @@ func TestUpdateSchemaFromTemplateOnResourceCreation(t *testing.T) {
 					testCase.Id, err, testCase.Error)
 			}
 			for fieldName, fieldValue := range testCase.DfinalMap {
-				if fieldName == ID_FIELD {
+				if fieldName == IdField {
 					testVal = testCase.Dinit.Id()
 				} else {
 					testVal = testCase.Dinit.Get(fieldName)
@@ -239,7 +239,7 @@ func TestCreateTemplateOverrideConfig(t *testing.T) {
 	}{
 		{
 			1,
-			vmSchemaInit(NO_TEMPLATE_VM_MAP),
+			vmSchemaInit(noTemplateVmMap),
 			map[string]interface{}{},
 			"",
 			map[string]interface{}{},
@@ -248,32 +248,27 @@ func TestCreateTemplateOverrideConfig(t *testing.T) {
 		},
 		{
 			2,
-			vmSchemaInit(VM_CREATION_FROM_TEMPLATE1_SCHEMA),
-			TEMPLATE1_MAP_BIS,
+			vmSchemaInit(vmCreationFromTemplate1Schema),
+			template1MapBis,
 			"template1Template_override.tf.json",
-			RESOURCE_OVERRIDE_JSON_MAP,
+			resourceOverrideJsonMap,
 			nil,
 		},
 		{
 			3,
-			vmSchemaInit(VM_CREATION_N42_FROM_TEMPLATE1_SCHEMA),
-			TEMPLATE1_MAP_BIS,
+			vmSchemaInit(vmCreationN42FromTemplate1Schema),
+			template1MapBis,
 			"template1Template_override.tf.json",
-			RESOURCE_N42_OVERRIDE_JSON_MAP,
+			resourceN42OverrideJsonMap,
 			nil,
 		},
 	}
-	var (
-		err          error
-		overrideFile string
-		jsonDiffs    string
-	)
 	fakeTemplates_tooler := TemplatesTooler{
 		TemplatesTools: Template_Templater{},
 	}
 	for _, testCase := range testCases {
-		err,
-			overrideFile = fakeTemplates_tooler.TemplatesTools.CreateTemplateOverrideConfig(testCase.D,
+		overrideFile,
+			err := fakeTemplates_tooler.TemplatesTools.CreateTemplateOverrideConfig(testCase.D,
 			testCase.Template)
 		switch {
 		case overrideFile != testCase.OverrideFile:
@@ -287,13 +282,13 @@ func TestCreateTemplateOverrideConfig(t *testing.T) {
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
 					testCase.Id, err, testCase.Error)
 			} else {
-				err, jsonDiffs = CompareJsonAndMap(overrideFile,
+				jsonDiffs, err2 := CompareJsonAndMap(overrideFile,
 					testCase.OverrideFileDataStruct)
-				if err != nil {
+				if err2 != nil {
 					t.Errorf("\n\nTC %d : CreateTemplateOverrideConfig() "+
 						" json file and test data struct failed."+
 						"\n\rJson file error : \"%s",
-						testCase.Id, err.Error())
+						testCase.Id, err2.Error())
 				}
 				if jsonDiffs != "" {
 					t.Errorf("\n\nTC %d : CreateTemplateOverrideConfig() generated"+

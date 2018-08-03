@@ -8,7 +8,6 @@ import (
 	"testing"
 )
 
-//------------------------------------------------------------------------------
 func TestResourceInstanceCreate(t *testing.T) {
 	testCases := []struct {
 		Id            int
@@ -21,55 +20,55 @@ func TestResourceInstanceCreate(t *testing.T) {
 	}{
 		{
 			1,
-			vmSchemaInit(NO_TEMPLATE_VM_MAP),
+			vmSchemaInit(noTemplateVmMap),
 			GetTemplatesList_Success_HttpClienterFake{},
 			TemplaterDummy{},
-			VM_RESOURCE_TYPE,
+			VmResourceField,
 			nil,
-			vmInstanceNO_TEMPLATE_VM_MAP(),
+			vmInstanceNoTemplateVmMap(),
 		},
 		{
 			2,
-			vmSchemaInit(EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP),
+			vmSchemaInit(existingTemplateNoAdditionalDiskVmMap),
 			GetTemplatesList_Success_HttpClienterFake{},
-			EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP_TemplaterFake{},
-			VM_RESOURCE_TYPE,
+			existingTemplateNoAdditionalDiskVmMap_TemplaterFake{},
+			VmResourceField,
 			nil,
-			FakeVmInstance_EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP(),
+			FakeVmInstanceExistingTemplateNoAdditionalDiskVmMap(),
 		},
 		{
 			3,
-			vmSchemaInit(EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISKS_VM_MAP),
+			vmSchemaInit(existingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap),
 			GetTemplatesList_Success_HttpClienterFake{},
-			EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISKS_VM_MAP_TemplaterFake{},
-			VM_RESOURCE_TYPE,
+			existingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap_TemplaterFake{},
+			VmResourceField,
 			nil,
-			FakeVmInstance_EXISTING_TEMPLATE_WITH_ADDITIONAL_AND_MODIFIED_NICS_AND_DISKS_VM_MAP(),
+			FakeVmInstanceExistingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap(),
 		},
 		{
 			4,
-			vmSchemaInit(NON_EXISTING_TEMPLATE_VM_MAP),
+			vmSchemaInit(nonExistingTemplateVmMap),
 			GetTemplatesList_Success_HttpClienterFake{},
 			UnexistingTemplate_TemplaterFake{},
-			VM_RESOURCE_TYPE,
+			VmResourceField,
 			errors.New("Unavailable template : windows95"),
 			VM{},
 		},
 		{
 			5,
-			vdcSchemaInit(VDC_CREATION_MAP),
+			vdcSchemaInit(vdcCreationMap),
 			nil,
 			TemplaterDummy{},
-			VDC_RESOURCE_TYPE,
+			VdcResourceField,
 			nil,
-			FakeVdcInstance_VDC_CREATION_MAP(),
+			FakeVdcInstanceVdcCreationMap(),
 		},
 		{
 			6,
-			vdcSchemaInit(VDC_CREATION_MAP),
+			vdcSchemaInit(vdcCreationMap),
 			GetTemplatesList_Success_HttpClienterFake{},
 			TemplaterDummy{},
-			WRONG_RESOURCE_TYPE,
+			wrongResourceType,
 			errors.New("Resource of type \"a_non_supportedResource_type\" not supported," +
 				"list of accepted resource types :\n\r" +
 				"- \"vdc\"\n\r" +
@@ -78,36 +77,36 @@ func TestResourceInstanceCreate(t *testing.T) {
 		},
 		{
 			7,
-			vmSchemaInit(NON_EXISTING_TEMPLATE_VM_MAP),
+			vmSchemaInit(nonExistingTemplateVmMap),
 			GetTemplatesList_Failure_HttpClienterFake{},
 			UnexistingTemplate_TemplaterFake{},
-			VM_RESOURCE_TYPE,
+			VmResourceField,
 			errors.New("GetTemplatesList() error"),
 			VM{},
 		},
 		{
 			8,
-			vmSchemaInit(EXISTING_TEMPLATE_NO_ADDITIONAL_DISK_VM_MAP),
+			vmSchemaInit(existingTemplateNoAdditionalDiskVmMap),
 			GetTemplatesList_Success_HttpClienterFake{},
 			Template_FormatError_TemplaterFake{},
-			VM_RESOURCE_TYPE,
-			errors.New("Template missing fields : " + "\"" + NAME_FIELD + "\" " +
-				"\"" + OS_FIELD + "\" " +
-				"\"" + RAM_FIELD + "\" " +
-				"\"" + CPU_FIELD + "\" " +
-				"\"" + ENTERPRISE_FIELD + "\" " +
-				"\"" + DISKS_FIELD + "\" " +
-				"\"" + DATACENTER_FIELD + "\" "),
+			VmResourceField,
+			errors.New("Template missing fields : " + "\"" + NameField + "\" " +
+				"\"" + OsField + "\" " +
+				"\"" + RamField + "\" " +
+				"\"" + CpuField + "\" " +
+				"\"" + EnterpriseField + "\" " +
+				"\"" + DisksField + "\" " +
+				"\"" + DatacenterField + "\" "),
 			VM{},
 		},
 		{
 			9,
-			vmSchemaInit(INSTANCE_NUMBER_FIELD_UNIT_TEST_VM_INSTANCE),
+			vmSchemaInit(instanceNumberFieldUnitTestVmInstance),
 			GetTemplatesList_Success_HttpClienterFake{},
-			INSTANCE_NUMBER_FIELD_UNIT_TEST_VM_INSTANCE_MAP_TemplaterFake{},
-			VM_RESOURCE_TYPE,
+			instanceNumberFieldUnitTestVmInstance_MAP_TemplaterFake{},
+			VmResourceField,
 			nil,
-			FakeVmInstance_INSTANCE_NUMBER_FIELD_UNIT_TEST_VM_INSTANCE_MAP(),
+			FakeVmInstanceInstanceNumberFieldUnitTestVmInstance_MAP(),
 		},
 	}
 
@@ -117,18 +116,17 @@ func TestResourceInstanceCreate(t *testing.T) {
 		instance interface{}
 		diffs    string
 	)
-	apiTools := APITooler{
-		Api: AirDrumResources_Apier{},
+	fakeResourceTooler := ResourceTooler{
+		Resource: ResourceResourceer{},
 	}
-	fake_client_tooler := ClientTooler{}
+	fakeClientTooler := ClientTooler{}
 	fakeTemplates_tooler := TemplatesTooler{}
 	sewan = &API{Token: "42", URL: "42", Client: &http.Client{}}
-
 	for _, testCase := range testCases {
-		fake_client_tooler.Client = testCase.TC_Clienter
+		fakeClientTooler.Client = testCase.TC_Clienter
 		fakeTemplates_tooler.TemplatesTools = testCase.TC_Templater
-		err, instance = apiTools.Api.ResourceInstanceCreate(testCase.D,
-			&fake_client_tooler,
+		instance, err = fakeResourceTooler.Resource.ResourceInstanceCreate(testCase.D,
+			&fakeClientTooler,
 			&fakeTemplates_tooler,
 			testCase.Resource_type,
 			sewan)
@@ -162,7 +160,6 @@ func TestResourceInstanceCreate(t *testing.T) {
 	}
 }
 
-//------------------------------------------------------------------------------
 func TestGetResourceUrl(t *testing.T) {
 	testCases := []struct {
 		Id     int
@@ -172,33 +169,30 @@ func TestGetResourceUrl(t *testing.T) {
 	}{
 		{1,
 			API{
-				RIGHT_API_TOKEN,
-				RIGHT_API_URL,
+				rightApiToken,
+				rightApiUrl,
 				&http.Client{},
 			},
 			"42",
-			RIGHT_VM_URL_42,
+			rightVmUrlQuaranteDeux,
 		},
 		{2,
 			API{
-				RIGHT_API_TOKEN,
-				RIGHT_API_URL,
+				rightApiToken,
+				rightApiUrl,
 				&http.Client{},
 			},
 			"PATATE",
-			RIGHT_VM_URL_PATATE,
+			rightVmUrlPatate,
 		},
 	}
-
-	apiTools := APITooler{
-		Api: AirDrumResources_Apier{},
+	fakeResourceTooler := ResourceTooler{
+		Resource: ResourceResourceer{},
 	}
-
 	for _, testCase := range testCases {
-		s_vm_url := apiTools.Api.GetResourceUrl(&testCase.api,
-			VM_RESOURCE_TYPE,
+		s_vm_url := fakeResourceTooler.Resource.GetResourceUrl(&testCase.api,
+			VmResourceField,
 			testCase.vm_id)
-
 		switch {
 		case s_vm_url != testCase.vm_url:
 			t.Errorf("VM url was incorrect,\n\rgot: \"%s\"\n\rwant: \"%s\"",
@@ -207,7 +201,6 @@ func TestGetResourceUrl(t *testing.T) {
 	}
 }
 
-//------------------------------------------------------------------------------
 func TestGetResourceCreationUrl(t *testing.T) {
 	testCases := []struct {
 		Id                    int
@@ -216,22 +209,19 @@ func TestGetResourceCreationUrl(t *testing.T) {
 	}{
 		{1,
 			API{
-				RIGHT_API_TOKEN,
-				RIGHT_API_URL,
+				rightApiToken,
+				rightApiUrl,
 				&http.Client{},
 			},
-			RIGHT_VM_CREATION_API_URL,
+			rightVmCreationApiUrl,
 		},
 	}
-
-	apiTools := APITooler{
-		Api: AirDrumResources_Apier{},
+	fakeResourceTooler := ResourceTooler{
+		Resource: ResourceResourceer{},
 	}
-
 	for _, testCase := range testCases {
-		s_resource_creation_url := apiTools.Api.GetResourceCreationUrl(&testCase.api,
-			VM_RESOURCE_TYPE)
-
+		s_resource_creation_url := fakeResourceTooler.Resource.GetResourceCreationUrl(&testCase.api,
+			VmResourceField)
 		switch {
 		case s_resource_creation_url != testCase.resource_creation_url:
 			t.Errorf("resource api creation url was incorrect,"+
@@ -241,7 +231,6 @@ func TestGetResourceCreationUrl(t *testing.T) {
 	}
 }
 
-//------------------------------------------------------------------------------
 func TestValidateStatus(t *testing.T) {
 	testCases := []struct {
 		Id           int
@@ -251,77 +240,74 @@ func TestValidateStatus(t *testing.T) {
 	}{
 		{1,
 			API{
-				RIGHT_API_TOKEN,
-				RIGHT_API_URL,
+				rightApiToken,
+				rightApiUrl,
 				&http.Client{},
 			},
 			nil,
-			VM_RESOURCE_TYPE,
+			VmResourceField,
 		},
 		{2,
 			API{
-				WRONG_API_TOKEN,
-				RIGHT_API_URL,
+				wrongApiToken,
+				rightApiUrl,
 				&http.Client{},
 			},
 			errors.New("401 Unauthorized{\"detail\":\"Invalid token.\"}"),
-			VM_RESOURCE_TYPE,
+			VmResourceField,
 		},
 		{3,
 			API{
-				RIGHT_API_TOKEN,
-				WRONG_API_URL,
+				rightApiToken,
+				wrongApiUrl,
 				&http.Client{},
 			},
 			errors.New("Could not get a proper json response from \"" +
-				WRONG_API_URL + ERROR_API_DOWN_OR_WRONG_API_URL),
-			VM_RESOURCE_TYPE,
+				wrongApiUrl + errApiDownOrWrongApiUrl),
+			VmResourceField,
 		},
 		{4,
 			API{
-				WRONG_API_TOKEN,
-				WRONG_API_URL,
+				wrongApiToken,
+				wrongApiUrl,
 				&http.Client{},
 			},
 			errors.New("Could not get a proper json response from \"" +
-				WRONG_API_URL + ERROR_API_DOWN_OR_WRONG_API_URL),
-			VM_RESOURCE_TYPE,
+				wrongApiUrl + errApiDownOrWrongApiUrl),
+			VmResourceField,
 		},
 		{5,
 			API{
-				RIGHT_API_TOKEN,
-				NO_RESP_BODY_API_URL,
+				rightApiToken,
+				noRespBodyApiUrl,
 				&http.Client{},
 			},
 			errors.New("Could not get a response body from \"" +
-				NO_RESP_BODY_API_URL + ERROR_API_DOWN_OR_WRONG_API_URL),
-			VM_RESOURCE_TYPE,
+				noRespBodyApiUrl + errApiDownOrWrongApiUrl),
+			VmResourceField,
 		},
 		{6,
 			API{
-				RIGHT_API_TOKEN,
-				NO_RESP_API_URL,
+				rightApiToken,
+				noRespApiUrl,
 				&http.Client{},
 			},
 			errors.New("Could not get a response from \"" +
-				NO_RESP_API_URL + ERROR_API_DOWN_OR_WRONG_API_URL),
-			VM_RESOURCE_TYPE,
+				noRespApiUrl + errApiDownOrWrongApiUrl),
+			VmResourceField,
 		},
 	}
-
-	apiTooler := APITooler{
-		Api: AirDrumResources_Apier{},
+	fakeResourceTooler := &ResourceTooler{
+		Resource: ResourceResourceer{},
 	}
 	clientTooler := ClientTooler{
 		Client: FakeHttpClienter{},
 	}
 	var apiClientErr error
-
 	for _, testCase := range testCases {
-		apiClientErr = apiTooler.Api.ValidateStatus(&testCase.Api,
+		apiClientErr = fakeResourceTooler.Resource.ValidateStatus(&testCase.Api,
 			testCase.ResourceType,
 			clientTooler)
-
 		switch {
 		case apiClientErr == nil || testCase.Err == nil:
 			if !(apiClientErr == nil && testCase.Err == nil) {

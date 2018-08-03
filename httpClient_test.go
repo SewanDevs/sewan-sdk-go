@@ -24,7 +24,7 @@ func TestGetTemplatesList(t *testing.T) {
 			1,
 			GetTemplatesList_Success_HttpClienterFake{},
 			"unit test enterprise",
-			TEMPLATES_LIST,
+			templatesList,
 			nil,
 		},
 		{
@@ -39,7 +39,7 @@ func TestGetTemplatesList(t *testing.T) {
 			ErrorResponse_HttpClienterFake{},
 			"unit test enterprise",
 			nil,
-			errors.New(REQ_ERR),
+			errors.New(reqErr),
 		},
 	}
 	var (
@@ -49,13 +49,13 @@ func TestGetTemplatesList(t *testing.T) {
 	)
 	client_tooler := ClientTooler{}
 	client_tooler.Client = HttpClienter{}
-	fake_client_tooler := ClientTooler{}
+	fakeClientTooler := ClientTooler{}
 	apiTooler := APITooler{}
-	api := apiTooler.New(TOKEN_FIELD, "url")
+	api := apiTooler.New(TokenField, "url")
 
 	for _, testCase := range testCases {
-		fake_client_tooler.Client = testCase.TC_clienter
-		templatesList, err = client_tooler.Client.GetTemplatesList(&fake_client_tooler,
+		fakeClientTooler.Client = testCase.TC_clienter
+		templatesList, err = client_tooler.Client.GetTemplatesList(&fakeClientTooler,
 			testCase.Enterprise_slug, api)
 		switch {
 		case err == nil || testCase.Error == nil:
@@ -100,7 +100,7 @@ func TestHandleResponse(t *testing.T) {
 			1,
 			HttpResponseFake_OKJson(),
 			http.StatusOK,
-			HTTP_JSON_CONTENT_TYPE,
+			httpJsonContentType,
 			JsonStub(),
 			nil,
 		},
@@ -108,7 +108,7 @@ func TestHandleResponse(t *testing.T) {
 			2,
 			HttpResponseFake_OKTemplateListJson(),
 			http.StatusOK,
-			HTTP_JSON_CONTENT_TYPE,
+			httpJsonContentType,
 			JsonTemplateListFake(),
 			nil,
 		},
@@ -116,7 +116,7 @@ func TestHandleResponse(t *testing.T) {
 			3,
 			HttpResponseFake_500_texthtml(),
 			http.StatusInternalServerError,
-			HTTP_HTML_TEXT_CONTENT_TYPE,
+			httpHtmlTextContentType,
 			"<h1>Server Error (500)</h1>",
 			nil,
 		},
@@ -124,7 +124,7 @@ func TestHandleResponse(t *testing.T) {
 			4,
 			HttpResponseFake_500Json(),
 			http.StatusInternalServerError,
-			HTTP_HTML_TEXT_CONTENT_TYPE,
+			httpHtmlTextContentType,
 			nil,
 			errors.New("Wrong response content type, \n\r expected :text/html\n\r got :application/json"),
 		},
@@ -132,7 +132,7 @@ func TestHandleResponse(t *testing.T) {
 			5,
 			HttpResponseFake_OKJson(),
 			http.StatusInternalServerError,
-			HTTP_HTML_TEXT_CONTENT_TYPE,
+			httpHtmlTextContentType,
 			nil,
 			errors.New("Wrong response status code, \n\r expected :500\n\r got :200" +
 				"\n\rFull response status : 200 OK"),
@@ -141,7 +141,7 @@ func TestHandleResponse(t *testing.T) {
 			6,
 			HttpResponseFake_OKJson(),
 			http.StatusInternalServerError,
-			HTTP_HTML_TEXT_CONTENT_TYPE,
+			httpHtmlTextContentType,
 			nil,
 			errors.New("Wrong response status code, \n\r expected :500\n\r got :200" +
 				"\n\rFull response status : 200 OK"),
@@ -158,9 +158,9 @@ func TestHandleResponse(t *testing.T) {
 			8,
 			HttpResponseFake_OK_wrongjson(),
 			http.StatusOK,
-			HTTP_JSON_CONTENT_TYPE,
+			httpJsonContentType,
 			nil,
-			errors.New("Response body is not a properly formated json :" +
+			errors.New(errJsonFormat +
 				"invalid character 'a' looking for beginning of value"),
 		},
 		{
@@ -169,8 +169,8 @@ func TestHandleResponse(t *testing.T) {
 			http.StatusOK,
 			"image",
 			nil,
-			errors.New("Unhandled api response type : image" +
-				ERROR_VALIDATE_API_URL),
+			errors.New(errorApiUnhandledImageType +
+				errValidateApiUrl),
 		},
 	}
 

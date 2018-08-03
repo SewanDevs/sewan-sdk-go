@@ -5,7 +5,6 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 	"strings"
 )
 
@@ -50,7 +49,7 @@ func (client HttpClienter) GetTemplatesList(clientTooler *ClientTooler,
 	req, reqError = http.NewRequest("GET",
 		templatesListUrl.String(),
 		nil)
-	req.Header.Add(HTTP_AUTHORIZATION, HTTP_TOKEN_HEADER+api.Token)
+	req.Header.Add(httpAuthorization, httpTokenHeader+api.Token)
 	logger.Println("req = ", req)
 	logger.Println("reqError = ", reqError)
 	if reqError == nil {
@@ -59,7 +58,7 @@ func (client HttpClienter) GetTemplatesList(clientTooler *ClientTooler,
 		if respError == nil {
 			templateList, handlerRespError = clientTooler.Client.HandleResponse(resp,
 				http.StatusOK,
-				HTTP_JSON_CONTENT_TYPE)
+				httpJsonContentType)
 			if templateList != nil {
 				returnTemplateList = templateList.([]interface{})
 			}
@@ -79,53 +78,71 @@ func (client HttpClienter) GetTemplatesList(clientTooler *ClientTooler,
 func (client HttpClienter) HandleResponse(resp *http.Response,
 	expectedCode int,
 	expectedBodyFormat string) (interface{}, error) {
-
-	var (
-		respError      error       = nil
-		responseBody   interface{} = nil
-		contentType    string
-		bodyBytes      []byte
-		respBodyReader interface{}
-		readBodyError  error = nil
-		readJsonError  error = nil
-	)
-
-	if resp.StatusCode == expectedCode {
-		contentType = resp.Header.Get(HTTP_RESP_CONTENT_TYPE)
-
-		if contentType == expectedBodyFormat {
-			switch contentType {
-			case HTTP_JSON_CONTENT_TYPE:
-				bodyBytes, readBodyError = ioutil.ReadAll(resp.Body)
-				readJsonError = json.Unmarshal(bodyBytes, &respBodyReader)
-				switch {
-				case readBodyError != nil:
-					respError = errors.New("Read of response body error " +
-						readBodyError.Error())
-				case readJsonError != nil:
-					respError = errors.New("Response body is not a properly formated json :" +
-						readJsonError.Error())
-				default:
-					responseBody = respBodyReader.(interface{})
-				}
-			case HTTP_HTML_TEXT_CONTENT_TYPE:
-				bodyBytes, readBodyError = ioutil.ReadAll(resp.Body)
-				responseBody = string(bodyBytes)
-			case "":
-				responseBody = nil
-			default:
-				respError = errors.New(ERROR_API_UNHANDLED_RESP_TYPE +
-					resp.Header.Get(HTTP_RESP_CONTENT_TYPE) +
-					ERROR_VALIDATE_API_URL)
-			}
-		} else {
-			respError = errors.New("Wrong response content type, \n\r expected :" +
-				expectedBodyFormat + "\n\r got :" + contentType)
-		}
-	} else {
-		respError = errors.New("Wrong response status code, \n\r expected :" +
-			strconv.Itoa(expectedCode) + "\n\r got :" + strconv.Itoa(resp.StatusCode) +
-			"\n\rFull response status : " + resp.Status)
+	if resp == nil {
+		return "", ErrEmptyResp
 	}
-	return responseBody, respError
+	if resp.Body == nil {
+		return "", ErrEmptyRespBody
+	}
+	defer resp.Body.Close()
+	contentType := resp.Header.Get(httpRespContentType)
+	if contentType != expectedBodyFormat {
+		return nil, ErrRespStatusCodeBuilder(resp, expectedCode,
+			"\nWrong response content type, \n\r expected :"+
+				expectedBodyFormat+"\n\r got :"+contentType)
+	}
+	switch contentType {
+	case httpJsonContentType:
+		return handleJsonContentType(resp, expectedCode)
+	case httpHtmlTextContentType:
+		return handleHtmlContentType(resp, expectedCode)
+	case "":
+		return nil, ErrRespStatusCodeBuilder(resp, expectedCode, "")
+	default:
+		return nil, ErrRespStatusCodeBuilder(resp, expectedCode,
+			errApiUnhandledRespType+
+				resp.Header.Get(httpRespContentType)+
+				errValidateApiUrl)
+	}
+}
+
+func handleJsonContentType(resp *http.Response,
+	expectedCode int) (interface{}, error) {
+	var (
+		respBodyReader interface{}
+	)
+	bodyBytes, err1 := ioutil.ReadAll(resp.Body)
+	if err1 != nil {
+		return nil, ErrRespStatusCodeBuilder(resp, expectedCode,
+			"\nRead of response body error "+err1.Error())
+	}
+	if string(bodyBytes) == "" {
+		return nil, ErrRespStatusCodeBuilder(resp, expectedCode, "")
+	}
+	err2 := json.Unmarshal(bodyBytes, &respBodyReader)
+	if err2 != nil {
+		return nil, ErrRespStatusCodeBuilder(resp, expectedCode,
+			errJsonFormat+err2.Error()+
+				"\nJson :"+string(bodyBytes))
+	}
+	err3 := ErrRespStatusCodeBuilder(resp, expectedCode, "")
+	if err3 != nil {
+		return nil, errors.New(err3.Error() +
+			"\nResponse body error :" + string(bodyBytes))
+	}
+	return respBodyReader.(interface{}), nil
+}
+
+func handleHtmlContentType(resp *http.Response,
+	expectedCode int) (interface{}, error) {
+	bodyBytes, err4 := ioutil.ReadAll(resp.Body)
+	if err4 != nil {
+		return nil, ErrRespStatusCodeBuilder(resp, expectedCode, err4.Error())
+	}
+	err5 := ErrRespStatusCodeBuilder(resp, expectedCode, "")
+	if err5 != nil {
+		return nil, errors.New(err5.Error() +
+			"\nResponse body error :" + string(bodyBytes))
+	}
+	return string(bodyBytes), nil
 }
