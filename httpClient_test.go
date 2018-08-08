@@ -11,7 +11,6 @@ func TestDo(t *testing.T) {
 	//Not tested, ref=TD-35489-UT-35737-1
 }
 
-//------------------------------------------------------------------------------
 func TestGetTemplatesList(t *testing.T) {
 	testCases := []struct {
 		Id              int
@@ -22,40 +21,34 @@ func TestGetTemplatesList(t *testing.T) {
 	}{
 		{
 			1,
-			GetTemplatesList_Success_HttpClienterFake{},
+			GetTemplatesListSuccessHttpClienterFake{},
 			"unit test enterprise",
 			templatesList,
 			nil,
 		},
 		{
 			2,
-			GetTemplatesList_Failure_HttpClienterFake{},
+			GetTemplatesListFailureHttpClienterFake{},
 			"unit test enterprise",
 			nil,
 			errors.New("HandleResponse() error"),
 		},
 		{
 			3,
-			ErrorResponse_HttpClienterFake{},
+			ErrorResponseHttpClienterFake{},
 			"unit test enterprise",
 			nil,
-			errors.New(reqErr),
+			errDoRequest,
 		},
 	}
-	var (
-		templatesList []interface{}
-		err           error
-		diffs         string
-	)
 	client_tooler := ClientTooler{}
 	client_tooler.Client = HttpClienter{}
 	fakeClientTooler := ClientTooler{}
 	apiTooler := APITooler{}
 	api := apiTooler.New(TokenField, "url")
-
 	for _, testCase := range testCases {
 		fakeClientTooler.Client = testCase.TC_clienter
-		templatesList, err = client_tooler.Client.GetTemplatesList(&fakeClientTooler,
+		templatesList, err := client_tooler.Client.GetTemplatesList(&fakeClientTooler,
 			testCase.Enterprise_slug, api)
 		switch {
 		case err == nil || testCase.Error == nil:
@@ -63,7 +56,7 @@ func TestGetTemplatesList(t *testing.T) {
 				t.Errorf("\n\nTC %d : GetTemplatesList() error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"", testCase.Id, err, testCase.Error)
 			} else {
-				diffs = cmp.Diff(testCase.TemplateList, templatesList)
+				diffs := cmp.Diff(testCase.TemplateList, templatesList)
 				switch {
 				case diffs != "":
 					t.Errorf("\n\nTC %d : Wrong template list (-got +want) :\n%s",
@@ -86,7 +79,6 @@ func TestGetTemplatesList(t *testing.T) {
 	}
 }
 
-//------------------------------------------------------------------------------
 func TestHandleResponse(t *testing.T) {
 	testCases := []struct {
 		Id                 int
@@ -126,7 +118,8 @@ func TestHandleResponse(t *testing.T) {
 			http.StatusInternalServerError,
 			httpHtmlTextContentType,
 			nil,
-			errors.New("Wrong response content type, \n\r expected :text/html\n\r got :application/json"),
+			errors.New("Wrong response content type," +
+				"\nexpected :text/html\ngot :application/json"),
 		},
 		{
 			5,
@@ -134,8 +127,10 @@ func TestHandleResponse(t *testing.T) {
 			http.StatusInternalServerError,
 			httpHtmlTextContentType,
 			nil,
-			errors.New("Wrong response status code, \n\r expected :500\n\r got :200" +
-				"\n\rFull response status : 200 OK"),
+			errors.New("Wrong response status code,\nexpected :500\ngot :200\n" +
+				"Full response status : 200 OK" +
+				"\nWrong response content type," +
+				"\nexpected :text/html\ngot :application/json"),
 		},
 		{
 			6,
@@ -143,16 +138,18 @@ func TestHandleResponse(t *testing.T) {
 			http.StatusInternalServerError,
 			httpHtmlTextContentType,
 			nil,
-			errors.New("Wrong response status code, \n\r expected :500\n\r got :200" +
-				"\n\rFull response status : 200 OK"),
+			errors.New("Wrong response status code,\nexpected :500\ngot :200" +
+				"\nFull response status : 200 OK" +
+				"\nWrong response content type," +
+				"\nexpected :text/html\ngot :application/json"),
 		},
 		{
 			7,
-			HttpResponseFake_OK_no_content(),
+			HttpResponseFakeOkNilBody(),
 			http.StatusOK,
 			"",
-			nil,
-			nil,
+			"",
+			errEmptyRespBody,
 		},
 		{
 			8,
@@ -161,7 +158,8 @@ func TestHandleResponse(t *testing.T) {
 			httpJsonContentType,
 			nil,
 			errors.New(errJsonFormat +
-				"invalid character 'a' looking for beginning of value"),
+				"invalid character 'a' looking for beginning of value" +
+				"\nJson :a bad formated json"),
 		},
 		{
 			9,
@@ -173,25 +171,17 @@ func TestHandleResponse(t *testing.T) {
 				errValidateApiUrl),
 		},
 	}
-
-	var (
-		responseBody interface{}
-		err          error
-		diffs        string
-	)
 	clienter := HttpClienter{}
-
 	for _, testCase := range testCases {
-		responseBody, err = clienter.HandleResponse(testCase.Response,
+		responseBody, err := clienter.HandleResponse(testCase.Response,
 			testCase.ExpectedCode, testCase.ExpectedBodyFormat)
-
 		switch {
 		case err == nil || testCase.Error == nil:
 			if !(err == nil && testCase.Error == nil) {
 				t.Errorf("\n\nTC %d : HandleResponse() error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"", testCase.Id, err, testCase.Error)
 			} else {
-				diffs = cmp.Diff(testCase.ResponseBody, responseBody)
+				diffs := cmp.Diff(testCase.ResponseBody, responseBody)
 				switch {
 				case diffs != "":
 					t.Errorf("\n\nTC %d : Wrong response read element (-got +want) :\n%s",
@@ -199,7 +189,7 @@ func TestHandleResponse(t *testing.T) {
 				}
 			}
 		case err != nil && testCase.Error != nil:
-			if responseBody != nil {
+			if (responseBody != nil) && (responseBody != "") {
 				t.Errorf("\n\nTC %d : Wrong response read element,"+
 					" it should be nil as error is not nil,"+
 					"\n\rgot map: \n\r\"%s\"\n\rwant map: \n\r\"%s\"\n\r",

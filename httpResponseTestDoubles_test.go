@@ -60,7 +60,7 @@ func HttpResponseFake_OK_txthtml() *http.Response {
 	return &response
 }
 
-func HttpResponseFake_OK_no_content() *http.Response {
+func HttpResponseFakeOkNilBody() *http.Response {
 	response := http.Response{}
 	response.Status = "200 OK"
 	response.StatusCode = http.StatusOK
@@ -83,5 +83,6 @@ func HttpResponseFake_OK_image() *http.Response {
 	response.StatusCode = http.StatusOK
 	response.Header = map[string][]string{}
 	response.Header.Add(httpRespContentType, "image")
+	response.Body = ioutil.NopCloser(bytes.NewBufferString("a response non empty body"))
 	return &response
 }

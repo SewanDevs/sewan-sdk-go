@@ -79,17 +79,17 @@ func (client HttpClienter) HandleResponse(resp *http.Response,
 	expectedCode int,
 	expectedBodyFormat string) (interface{}, error) {
 	if resp == nil {
-		return "", ErrEmptyResp
+		return "", errEmptyResp
 	}
 	if resp.Body == nil {
-		return "", ErrEmptyRespBody
+		return "", errEmptyRespBody
 	}
 	defer resp.Body.Close()
 	contentType := resp.Header.Get(httpRespContentType)
 	if contentType != expectedBodyFormat {
-		return nil, ErrRespStatusCodeBuilder(resp, expectedCode,
-			"\nWrong response content type, \n\r expected :"+
-				expectedBodyFormat+"\n\r got :"+contentType)
+		return nil, errRespStatusCodeBuilder(resp, expectedCode,
+			"Wrong response content type,\n"+
+				"expected :"+expectedBodyFormat+"\ngot :"+contentType)
 	}
 	switch contentType {
 	case httpJsonContentType:
@@ -97,9 +97,9 @@ func (client HttpClienter) HandleResponse(resp *http.Response,
 	case httpHtmlTextContentType:
 		return handleHtmlContentType(resp, expectedCode)
 	case "":
-		return nil, ErrRespStatusCodeBuilder(resp, expectedCode, "")
+		return nil, errRespStatusCodeBuilder(resp, expectedCode, "")
 	default:
-		return nil, ErrRespStatusCodeBuilder(resp, expectedCode,
+		return nil, errRespStatusCodeBuilder(resp, expectedCode,
 			errApiUnhandledRespType+
 				resp.Header.Get(httpRespContentType)+
 				errValidateApiUrl)
@@ -113,19 +113,19 @@ func handleJsonContentType(resp *http.Response,
 	)
 	bodyBytes, err1 := ioutil.ReadAll(resp.Body)
 	if err1 != nil {
-		return nil, ErrRespStatusCodeBuilder(resp, expectedCode,
+		return nil, errRespStatusCodeBuilder(resp, expectedCode,
 			"\nRead of response body error "+err1.Error())
 	}
 	if string(bodyBytes) == "" {
-		return nil, ErrRespStatusCodeBuilder(resp, expectedCode, "")
+		return nil, errRespStatusCodeBuilder(resp, expectedCode, "")
 	}
 	err2 := json.Unmarshal(bodyBytes, &respBodyReader)
 	if err2 != nil {
-		return nil, ErrRespStatusCodeBuilder(resp, expectedCode,
+		return nil, errRespStatusCodeBuilder(resp, expectedCode,
 			errJsonFormat+err2.Error()+
 				"\nJson :"+string(bodyBytes))
 	}
-	err3 := ErrRespStatusCodeBuilder(resp, expectedCode, "")
+	err3 := errRespStatusCodeBuilder(resp, expectedCode, "")
 	if err3 != nil {
 		return nil, errors.New(err3.Error() +
 			"\nResponse body error :" + string(bodyBytes))
@@ -137,9 +137,9 @@ func handleHtmlContentType(resp *http.Response,
 	expectedCode int) (interface{}, error) {
 	bodyBytes, err4 := ioutil.ReadAll(resp.Body)
 	if err4 != nil {
-		return nil, ErrRespStatusCodeBuilder(resp, expectedCode, err4.Error())
+		return nil, errRespStatusCodeBuilder(resp, expectedCode, err4.Error())
 	}
-	err5 := ErrRespStatusCodeBuilder(resp, expectedCode, "")
+	err5 := errRespStatusCodeBuilder(resp, expectedCode, "")
 	if err5 != nil {
 		return nil, errors.New(err5.Error() +
 			"\nResponse body error :" + string(bodyBytes))

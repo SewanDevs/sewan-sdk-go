@@ -111,11 +111,11 @@ func (templaterFake existingTemplateNoAdditionalDiskVmMap_TemplaterFake) FetchTe
 			},
 		},
 		NicsField: []interface{}{
-			map[string]interface{}{vlanNameField: "unit test vlan1",
+			map[string]interface{}{VlanNameField: "unit test vlan1",
 				MacAdressField: "00:50:56:21:7c:ab",
 				ConnectedField: true,
 			},
-			map[string]interface{}{vlanNameField: "unit test vlan2",
+			map[string]interface{}{VlanNameField: "unit test vlan2",
 				MacAdressField: "00:50:56:21:7c:ac",
 				ConnectedField: true,
 			},
@@ -172,11 +172,11 @@ func (templaterFake instanceNumberFieldUnitTestVmInstance_MAP_TemplaterFake) Fet
 			},
 		},
 		NicsField: []interface{}{
-			map[string]interface{}{vlanNameField: "unit test vlan1",
+			map[string]interface{}{VlanNameField: "unit test vlan1",
 				MacAdressField: "00:50:56:21:7c:ab",
 				ConnectedField: true,
 			},
-			map[string]interface{}{vlanNameField: "unit test vlan2",
+			map[string]interface{}{VlanNameField: "unit test vlan2",
 				MacAdressField: "00:50:56:21:7c:ac",
 				ConnectedField: true,
 			},
@@ -233,11 +233,11 @@ func (templaterFake existingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap_T
 			},
 		},
 		NicsField: []interface{}{
-			map[string]interface{}{vlanNameField: "unit test vlan1",
+			map[string]interface{}{VlanNameField: "unit test vlan1",
 				MacAdressField: "00:50:56:21:7c:ab",
 				ConnectedField: true,
 			},
-			map[string]interface{}{vlanNameField: "unit test vlan2",
+			map[string]interface{}{VlanNameField: "unit test vlan2",
 				MacAdressField: "00:50:56:21:7c:ac",
 				ConnectedField: true,
 			},
@@ -275,12 +275,12 @@ func (templaterFake existingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap_T
 	)
 	d.Set(NicsField, []interface{}{
 		map[string]interface{}{
-			vlanNameField:  "non template vlan 1",
+			VlanNameField:  "non template vlan 1",
 			MacAdressField: "00:21:21:21:21:21",
 			ConnectedField: true,
 		},
 		map[string]interface{}{
-			vlanNameField:  "non template vlan 2",
+			VlanNameField:  "non template vlan 2",
 			MacAdressField: "00:21:21:21:21:22",
 			ConnectedField: true,
 		},

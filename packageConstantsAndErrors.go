@@ -67,25 +67,28 @@ const (
 )
 
 var (
-	ErrEmptyResp                 = errors.New("Empty API response.")
-	ErrEmptyRespBody             = errors.New("Empty API response body.")
+	errDoRequest                 = errors.New("do(request) error")
+	errEmptyResp                 = errors.New("Empty API response.")
+	errEmptyRespBody             = errors.New("Empty API response body.")
 	ErrResourceNotExist          = errors.New("Resource does not exists.")
-	ErrUninitializedExpectedCode = errors.New("Expected code not initialized.")
-	ErrNilResponse               = errors.New("Response is nil.")
-	ErrZeroStatusCode            = errors.New("Response status code is zero.")
+	errUninitializedExpectedCode = errors.New("Expected code not initialized.")
+	errNilResponse               = errors.New("Response is nil.")
+	errZeroStatusCode            = errors.New("Response status code is zero.")
+	err500ServerError            = errors.New("<h1>Server Error (500)</h1>")
+	errHandleResponse            = errors.New("Handle response error")
 )
 
-func ErrRespStatusCodeBuilder(resp *http.Response,
+func errRespStatusCodeBuilder(resp *http.Response,
 	expectedCode int,
 	additionalErrMsg string) error {
 	if expectedCode == 0 {
-		return ErrUninitializedExpectedCode
+		return errUninitializedExpectedCode
 	}
 	if resp == nil {
-		return ErrNilResponse
+		return errNilResponse
 	}
 	if resp.StatusCode == 0 {
-		return ErrZeroStatusCode
+		return errZeroStatusCode
 	}
 	if expectedCode == resp.StatusCode {
 		if additionalErrMsg == "" {
@@ -94,15 +97,16 @@ func ErrRespStatusCodeBuilder(resp *http.Response,
 			return errors.New(additionalErrMsg)
 		}
 	}
-	return errors.New("Wrong response status code, \n\r expected :" +
-		strconv.Itoa(expectedCode) + "\n\r got :" + strconv.Itoa(resp.StatusCode) +
+	return errors.New("Wrong response status code," +
+		"\nexpected :" + strconv.Itoa(expectedCode) +
+		"\ngot :" + strconv.Itoa(resp.StatusCode) +
 		"\nFull response status : " + resp.Status + "\n" + additionalErrMsg)
 }
 
-func ErrCrudRequestsBuilder(crudOperation string,
+func errDoCrudRequestsBuilder(crudOperation string,
 	instanceName string,
 	err error) error {
-	of := "of \""
+	of := " of \""
 	postMsg := "\" failed, POST response reception error : "
 	getMsg := "\" failed, GET response reception error : "
 	deleteMsg := "\" failed, DELETE response reception error : "
@@ -117,16 +121,26 @@ func ErrCrudRequestsBuilder(crudOperation string,
 		return errors.New(creationOperation + of + instanceName +
 			postMsg + err.Error())
 	case readOperation:
-		return errors.New(creationOperation + of + instanceName +
+		return errors.New(readOperation + of + instanceName +
 			getMsg + err.Error())
 	case updateOperation:
 		return errors.New(updateOperation + of + instanceName +
 			postMsg + err.Error())
 	case deleteOperation:
-		return errors.New(creationOperation + of + instanceName +
+		return errors.New(deleteOperation + of + instanceName +
 			deleteMsg + err.Error())
 	default:
 		return errors.New(crudOperation + "is not a crudOperation from list :" +
 			creationOperation + readOperation + updateOperation + deleteOperation)
 	}
+}
+
+func errWrongResourceTypeBuilder(resourceType string) error {
+	if resourceType == "" {
+		return errors.New("No resource type provided.")
+	}
+	return errors.New("Resource of type \"" + resourceType + "\" not supported," +
+		"list of accepted resource types :\n\r" +
+		"- \"" + VdcResourceType + "\"\n\r" +
+		"- \"" + VmResourceType + "\"")
 }

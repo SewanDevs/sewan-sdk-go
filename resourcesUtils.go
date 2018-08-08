@@ -31,7 +31,7 @@ type Resourceer interface {
 }
 type ResourceResourceer struct{}
 
-type DynamicField_struct struct {
+type DynamicFieldStruct struct {
 	TerraformProvisioned    bool          `json:"terraform_provisioned"`
 	CreationTemplate        string        `json:"creationTemplate"`
 	TemplateDisksOnCreation []interface{} `json:"TemplateDisksOnCreation"`
@@ -92,12 +92,10 @@ type VM struct {
 }
 
 func vdcInstanceCreate(d *schema.ResourceData) (VDC, error) {
-
 	var (
-		vdc          VDC
 		resourceName strings.Builder
 	)
-	vdc = VDC{
+	vdc := VDC{
 		Name:          d.Get(NameField).(string),
 		Enterprise:    d.Get(EnterpriseField).(string),
 		Datacenter:    d.Get(DatacenterField).(string),
@@ -105,7 +103,6 @@ func vdcInstanceCreate(d *schema.ResourceData) (VDC, error) {
 		Slug:          d.Get(SlugField).(string),
 		DynamicField:  d.Get(DynamicField).(string),
 	}
-	logger := LoggerCreate("vdcInstanceCreate.log")
 	for index, resource := range vdc.Vdc_resources {
 		resourceName.Reset()
 		resourceName.WriteString(vdc.Enterprise)
@@ -114,7 +111,6 @@ func vdcInstanceCreate(d *schema.ResourceData) (VDC, error) {
 		resource.(map[string]interface{})[ResourceField] = resourceName.String()
 		vdc.Vdc_resources[index] = resource
 	}
-	logger.Println("vdc = ", vdc)
 	return vdc, nil
 }
 
@@ -123,56 +119,42 @@ func getTemplateAndUpdateSchema(templateName string,
 	clientTooler *ClientTooler,
 	templatesTooler *TemplatesTooler,
 	api *API) (map[string]interface{}, error) {
-	var (
-		templateList               []interface{}
-		templateError              error                  = nil
-		getTemplatesListError      error                  = nil
-		fetchTemplateFromListError error                  = nil
-		templateFormatError        error                  = nil
-		template                   map[string]interface{} = nil
-		enterprise                 string                 = d.Get(EnterpriseField).(string)
-	)
-	templateList,
-		getTemplatesListError = clientTooler.Client.GetTemplatesList(clientTooler,
-		enterprise, api)
-	if getTemplatesListError == nil {
-		template,
-			fetchTemplateFromListError = templatesTooler.TemplatesTools.FetchTemplateFromList(templateName,
-			templateList)
-		templateFormatError = templatesTooler.TemplatesTools.ValidateTemplate(template)
-		switch {
-		case fetchTemplateFromListError != nil:
-			templateError = fetchTemplateFromListError
-		case templateFormatError != nil:
-			templateError = templateFormatError
-		default:
-			templateError = templatesTooler.TemplatesTools.UpdateSchemaFromTemplateOnResourceCreation(d,
-				template)
-		}
-	} else {
-		templateError = getTemplatesListError
+	templateList, err1 := clientTooler.Client.GetTemplatesList(clientTooler,
+		d.Get(EnterpriseField).(string),
+		api)
+	if err1 != nil {
+		return map[string]interface{}{}, err1
 	}
-	return template, templateError
+	template, err2 := templatesTooler.TemplatesTools.FetchTemplateFromList(templateName,
+		templateList)
+	if err2 != nil {
+		return map[string]interface{}{}, err2
+	}
+	err3 := templatesTooler.TemplatesTools.ValidateTemplate(template)
+	if err3 != nil {
+		return map[string]interface{}{}, err3
+	}
+	err4 := templatesTooler.TemplatesTools.UpdateSchemaFromTemplateOnResourceCreation(d,
+		template)
+	if err4 != nil {
+		return map[string]interface{}{}, err4
+	}
+	return template, nil
 }
 
 func vmInstanceCreate(d *schema.ResourceData,
 	clientTooler *ClientTooler,
 	templatesTooler *TemplatesTooler,
 	api *API) (VM, error) {
-
 	var (
-		vm                    VM
-		templateError         error                  = nil
-		instanceCreationError error                  = nil
-		template              map[string]interface{} = nil
-		templateName          string                 = d.Get(TemplateField).(string)
-		vmName                strings.Builder
-		instanceNumber        int
+		templateError error                  = nil
+		template      map[string]interface{} = nil
+		templateName  string                 = d.Get(TemplateField).(string)
+		vmName        strings.Builder
 	)
-	logger := LoggerCreate("vminstanceCreate" + d.Id() + ".log")
 	vmName.WriteString(d.Get(NameField).(string))
 	if templateName != "" && d.Id() == "" {
-		instanceNumber = d.Get(InstanceNumberField).(int)
+		instanceNumber := d.Get(InstanceNumberField).(int)
 		vmName.WriteString(resourceNameCountSeparator)
 		vmName.WriteString(strconv.Itoa(instanceNumber))
 		template,
@@ -182,53 +164,51 @@ func vmInstanceCreate(d *schema.ResourceData,
 			templatesTooler,
 			api)
 	}
-	logger.Println("instanceCreationError = ", instanceCreationError)
-	if templateError == nil {
-		vm = VM{
-			Name:          vmName.String(),
-			Enterprise:    d.Get(EnterpriseField).(string),
-			State:         d.Get(StateField).(string),
-			OS:            d.Get(OsField).(string),
-			RAM:           d.Get(RamField).(int),
-			CPU:           d.Get(CpuField).(int),
-			Disks:         d.Get(DisksField).([]interface{}),
-			Nics:          d.Get(NicsField).([]interface{}),
-			Vdc:           d.Get(BootField).(string),
-			Boot:          d.Get(BootField).(string),
-			Storage_class: d.Get(StorageClassField).(string),
-			Slug:          d.Get(SlugField).(string),
-			Token:         d.Get(TokenField).(string),
-			Backup:        d.Get(BackupField).(string),
-			Disk_image:    d.Get(DiskImageField).(string),
-			Platform_name: d.Get(PlatformNameField).(string),
-			Backup_size:   d.Get(BackupSizeField).(int),
-			DynamicField:  d.Get(DynamicField).(string),
-		}
-		logger.Println("vm.Name =", vm.Name)
-		if d.Id() == "" {
-			DynamicFieldStruct := DynamicField_struct{
-				TerraformProvisioned:    true,
-				CreationTemplate:        d.Get(TemplateField).(string),
-				TemplateDisksOnCreation: nil,
-			}
-			if template != nil {
-				DynamicFieldStruct.TemplateDisksOnCreation = template[DisksField].([]interface{})
-				_, overrideError := templatesTooler.TemplatesTools.CreateTemplateOverrideConfig(d,
-					template)
-				if overrideError != nil {
-					instanceCreationError = overrideError
-				}
-				vm.Template = d.Get(TemplateField).(string)
-			}
-			DynamicFieldJson, _ := json.Marshal(DynamicFieldStruct)
-			vm.DynamicField = string(DynamicFieldJson)
-		}
-	} else {
-		instanceCreationError = templateError
+	if templateError != nil {
+		return VM{}, templateError
 	}
-	logger.Println("vm = ", vm)
-	logger.Println("instanceCreationError = ", instanceCreationError)
-	return vm, instanceCreationError
+	vm := VM{
+		Name:          vmName.String(),
+		Enterprise:    d.Get(EnterpriseField).(string),
+		State:         d.Get(StateField).(string),
+		OS:            d.Get(OsField).(string),
+		RAM:           d.Get(RamField).(int),
+		CPU:           d.Get(CpuField).(int),
+		Disks:         d.Get(DisksField).([]interface{}),
+		Nics:          d.Get(NicsField).([]interface{}),
+		Vdc:           d.Get(VdcField).(string),
+		Boot:          d.Get(BootField).(string),
+		Storage_class: d.Get(StorageClassField).(string),
+		Slug:          d.Get(SlugField).(string),
+		Token:         d.Get(TokenField).(string),
+		Backup:        d.Get(BackupField).(string),
+		Disk_image:    d.Get(DiskImageField).(string),
+		Platform_name: d.Get(PlatformNameField).(string),
+		Backup_size:   d.Get(BackupSizeField).(int),
+		DynamicField:  d.Get(DynamicField).(string),
+	}
+	if d.Id() == "" {
+		dynamicFieldStruct := DynamicFieldStruct{
+			TerraformProvisioned:    true,
+			CreationTemplate:        d.Get(TemplateField).(string),
+			TemplateDisksOnCreation: nil,
+		}
+		if template != nil {
+			dynamicFieldStruct.TemplateDisksOnCreation = template[DisksField].([]interface{})
+			_, err := templatesTooler.TemplatesTools.CreateTemplateOverrideConfig(d,
+				template)
+			if err != nil {
+				return VM{}, err
+			}
+			vm.Template = d.Get(TemplateField).(string)
+		}
+		dynamicFieldJson, err2 := json.Marshal(dynamicFieldStruct)
+		if err2 != nil {
+			return VM{}, err2
+		}
+		vm.DynamicField = string(dynamicFieldJson)
+	}
+	return vm, nil
 }
 
 func (resource ResourceResourceer) ResourceInstanceCreate(d *schema.ResourceData,
@@ -237,7 +217,7 @@ func (resource ResourceResourceer) ResourceInstanceCreate(d *schema.ResourceData
 	resourceType string,
 	api *API) (interface{}, error) {
 	switch resourceType {
-	case BootField:
+	case VdcResourceType:
 		return vdcInstanceCreate(d)
 	case VmResourceType:
 		return vmInstanceCreate(d,
@@ -245,25 +225,19 @@ func (resource ResourceResourceer) ResourceInstanceCreate(d *schema.ResourceData
 			templatesTooler,
 			api)
 	default:
-		return resource.ValidateResourceType(resourceType), nil
+		return nil, resource.ValidateResourceType(resourceType)
 	}
 }
 
 func (resource ResourceResourceer) ValidateResourceType(resourceType string) error {
-	var err error
 	switch resourceType {
 	case VdcResourceType:
-		err = nil
+		return nil
 	case VmResourceType:
-		err = nil
+		return nil
 	default:
-		err = errors.New("Resource of type \"" + resourceType + "\" not supported," +
-			"list of accepted resource types :\n\r" +
-			"- \"vdc\"\n\r" +
-			"- \"vm\"")
+		return errWrongResourceTypeBuilder(resourceType)
 	}
-
-	return err
 }
 
 func (resource ResourceResourceer) GetResourceCreationUrl(api *API,

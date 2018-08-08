@@ -14,7 +14,6 @@ const (
 	wrongApiToken              = "a wrong token"
 	wrongTokenError            = "Wrong api token msg"
 	errorApiUnhandledImageType = "Unhandled api response type : image"
-	reqErr                     = "Creation request response error."
 	notFoundRespStatus         = "404 Not Found"
 	notFoundRespMsg            = "404 Not Found{\"detail\":\"Not found.\"}"
 	unauthorizedStatus         = "401 Unauthorized"
@@ -23,6 +22,6 @@ const (
 	checkRedirectFailure       = "CheckRedirectReqFailure"
 	vdcDestroyFailureMsg       = "Destroying the VDC now"
 	vmDestroyFailureMsg        = "Destroying the VM now"
-	wrongResourceType          = "a_non_supportedResource_type"
+	wrongResourceType          = "a non supported ResourceType"
 	enterpriseSlug             = "unit test enterprise"
 )

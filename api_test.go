@@ -3,7 +3,6 @@ package sewan_go_sdk
 import (
 	"errors"
 	"github.com/google/go-cmp/cmp"
-	"github.com/hashicorp/terraform/helper/schema"
 	"net/http"
 	"testing"
 )
@@ -128,100 +127,47 @@ func TestCheckStatus(t *testing.T) {
 }
 
 func TestCreateResource(t *testing.T) {
+	resourceName := "Unit test resource creation"
 	testCases := []struct {
 		Id              int
-		TC_clienter     Clienter
+		TcClienter      Clienter
 		ResourceType    string
 		Creation_Err    error
 		CreatedResource map[string]interface{}
 	}{
 		{
 			1,
-			ErrorResponse_HttpClienterFake{},
-			VmResourceField,
-			errors.New("Creation of \"" + "Unit test resource" +
-				"\" failed, response reception error : " + reqErr),
+			VmCreationSuccessHttpClienterFake{},
+			VmResourceType,
+			nil,
+			noTemplateVmMap,
+		},
+		{
+			2,
+			HttpClienterDummy{},
+			wrongResourceType,
+			errWrongResourceTypeBuilder(wrongResourceType),
 			map[string]interface{}{},
 		},
-		//{
-		//	2,
-		//	BadBodyResponse_StatusCreated_HttpClienterFake{},
-		//	VdcResourceField,
-		//	errors.New(errJsonFormat +
-		//		"\n\r\"invalid character '\"' after object key\""),
-		//	map[string]interface{}{},
-		//},
-		//{
-		//	3,
-		//	Error401_HttpClienterFake{},
-		//	VmResourceField,
-		//	errors.New(unauthorizedMsg),
-		//	map[string]interface{}{},
-		//},
-		//{
-		//	4,
-		//	VDC_CreationSuccess_HttpClienterFake{},
-		//	VdcResourceField,
-		//	nil,
-		//	vdcReadResponseMap,
-		//},
-		//{
-		//	5,
-		//	VM_CreationSuccess_HttpClienterFake{},
-		//	VmResourceField,
-		//	nil,
-		//	noTemplateVmMap,
-		//},
-		//{
-		//	6,
-		//	CheckRedirectReqFailure_HttpClienterFake{},
-		//	VmResourceField,
-		//	errors.New("Creation of \"Unit test resource\" failed, response reception " +
-		//		"error : CheckRedirectReqFailure"),
-		//	map[string]interface{}{},
-		//},
-		//{
-		//	7,
-		//	BadBodyResponseContentType_HttpClienterFake{},
-		//	VmResourceField,
-		//	errors.New(errorApiUnhandledImageType +
-		//		errValidateApiUrl),
-		//	map[string]interface{}{},
-		//},
-		//{
-		//	8,
-		//	StatusInternalServerError_HttpClienterFake{},
-		//	VdcResourceField,
-		//	errors.New("<h1>Server Error (500)</h1>"),
-		//	map[string]interface{}{},
-		//},
-		//{
-		//	8,
-		//	StatusInternalServerError_HttpClienterFake{},
-		//	VdcResourceField,
-		//	errors.New("<h1>Server Error (500)</h1>"),
-		//	map[string]interface{}{},
-		//},
-		//{
-		//	9,
-		//	VM_CreationSuccess_HttpClienterFake{},
-		//	wrongResourceType,
-		//	errors.New("Resource of type \"a_non_supportedResource_type\"" +
-		//		" not supported,list of accepted resource types :\n\r" +
-		//		"- \"vdc\"\n\r" +
-		//		"- \"vm\""),
-		//	map[string]interface{}{},
-		//},
+		{
+			3,
+			ResourceCreationFailureHttpClienterFake,
+			VdcResourceType,
+			errDoCrudRequestsBuilder(creationOperation,
+				resourceName,
+				errEmptyResp),
+			map[string]interface{}{},
+		},
+		{
+			4,
+			HandleRespErrHttpClienterFake{},
+			VmResourceType,
+			errHandleResponse,
+			map[string]interface{}{},
+		},
 	}
-	var (
-		sewan            *API
-		resourceResponse *schema.Resource
-		d                *schema.ResourceData
-		diffs            string
-	)
-	apier := AirDrumResources_Apier{}
-
-	sewan = &API{Token: "42", URL: "42", Client: &http.Client{}}
+	apier := AirDrumResourcesApier{}
+	sewan := &API{Token: "42", URL: "42", Client: &http.Client{}}
 	fakeClientTooler := ClientTooler{}
 	fakeTemplates_tooler := TemplatesTooler{
 		TemplatesTools: Template_Templater{},
@@ -230,19 +176,18 @@ func TestCreateResource(t *testing.T) {
 		Resource: ResourceResourceer{},
 	}
 	for _, testCase := range testCases {
-		resourceResponse = resource(testCase.ResourceType)
-		d = resourceResponse.TestResourceData()
+		resourceResponse := resource(testCase.ResourceType)
+		d := resourceResponse.TestResourceData()
 		d.SetId("UnitTest resource1")
-		d.Set(NameField, "Unit test resource")
-		fakeClientTooler.Client = testCase.TC_clienter
+		d.Set(NameField, resourceName)
+		fakeClientTooler.Client = testCase.TcClienter
 		respCreationMap, err := apier.CreateResource(d,
 			&fakeClientTooler,
 			&fakeTemplates_tooler,
 			&fakeResourceTooler,
 			testCase.ResourceType,
 			sewan)
-
-		diffs = cmp.Diff(testCase.CreatedResource, respCreationMap)
+		diffs := cmp.Diff(testCase.CreatedResource, respCreationMap)
 		switch {
 		case err == nil || testCase.Creation_Err == nil:
 			if !(err == nil && testCase.Creation_Err == nil) {
@@ -250,7 +195,6 @@ func TestCreateResource(t *testing.T) {
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"", testCase.Id, err, testCase.Creation_Err)
 			} else {
 				switch {
-				//case (testCase.CreateResource == map[string]interface{}{}) && (respCreationMap == map[string]interface{}{}):
 				case diffs != "":
 					t.Errorf("\n\nTC %d : Wrong created resource map (-got +want) :\n%s",
 						testCase.Id, diffs)
@@ -269,160 +213,101 @@ func TestCreateResource(t *testing.T) {
 	}
 }
 
-//------------------------------------------------------------------------------
 func TestReadResource(t *testing.T) {
+	resourceName := "Unit test resource read"
 	testCases := []struct {
-		Id              int
-		TC_clienter     Clienter
-		ResourceType    string
-		Read_Err        error
-		ReadResource    map[string]interface{}
-		Resource_exists bool
+		Id           int
+		TcClienter   Clienter
+		ResourceType string
+		ReadError    error
+		ReadResource map[string]interface{}
 	}{
-		//{
-		//	1,
-		//	ErrorResponse_HttpClienterFake{},
-		//	VmResourceField,
-		//	errors.New(reqErr),
-		//	nil,
-		//	true,
-		//},
-		//{
-		//	2,
-		//	BadBodyResponse_StatusOK_HttpClienterFake{},
-		//	VmResourceField,
-		//	errors.New("Read of \"Unit test resource\" failed, response body json " +
-		//		"error :\n\r\"invalid character '\"' after object key\""),
-		//	nil,
-		//	true,
-		//},
-		//{
-		//	3,
-		//	Error401_HttpClienterFake{},
-		//	VdcResourceField,
-		//	errors.New(unauthorizedMsg),
-		//	nil,
-		//	true,
-		//},
-		//{
-		//	4,
-		//	Error404_HttpClienterFake{},
-		//	VmResourceField,
-		//	nil,
-		//	nil,
-		//	false,
-		//},
-		//{
-		//	5,
-		//	CheckRedirectReqFailure_HttpClienterFake{},
-		//	VdcResourceField,
-		//	errors.New("Read of \"Unit test resource\" state failed, response reception " +
-		//		"error : CheckRedirectReqFailure"),
-		//	nil,
-		//	true,
-		//},
-		//{
-		//	6,
-		//	VDC_ReadSuccess_HttpClienterFake{},
-		//	VdcResourceField,
-		//	nil,
-		//	vdcReadResponseMap,
-		//	true,
-		//},
-		//{
-		//	7,
-		//	VM_ReadSuccess_HttpClienterFake{},
-		//	VmResourceField,
-		//	nil,
-		//	noTemplateVmMap,
-		//	true,
-		//},
-		//{
-		//	8,
-		//	BadBodyResponseContentType_HttpClienterFake{},
-		//	VmResourceField,
-		//	errors.New(errorApiUnhandledImageType +
-		//		errValidateApiUrl),
-		//	nil,
-		//	true,
-		//},
-		//{
-		//	9,
-		//	StatusInternalServerError_HttpClienterFake{},
-		//	VmResourceField,
-		//	errors.New("<h1>Server Error (500)</h1>"),
-		//	nil,
-		//	true,
-		//},
-		//{
-		//	10,
-		//	VDC_ReadSuccess_HttpClienterFake{},
-		//	wrongResourceType,
-		//	errors.New("Resource of type \"a_non_supportedResource_type\"" +
-		//		" not supported,list of accepted resource types :\n\r" +
-		//		"- \"vdc\"\n\r" +
-		//		"- \"vm\""),
-		//	nil,
-		//	true,
-		//},
+		{
+			1,
+			VmReadSuccessHttpClienterFake{},
+			VmResourceType,
+			nil,
+			noTemplateVmMap,
+		},
+		{
+			2,
+			VdcReadSuccessHttpClienterFake{},
+			VdcResourceType,
+			nil,
+			vdcReadResponseMap,
+		},
+		{
+			3,
+			HttpClienterDummy{},
+			wrongResourceType,
+			errWrongResourceTypeBuilder(wrongResourceType),
+			map[string]interface{}{},
+		},
+		{
+			4,
+			ResourceReadFailureHttpClienterFake,
+			VdcResourceType,
+			errDoCrudRequestsBuilder(readOperation,
+				resourceName,
+				errEmptyResp),
+			map[string]interface{}{},
+		},
+		{
+			5,
+			Error404HttpClienterFake{},
+			VdcResourceType,
+			ErrResourceNotExist,
+			map[string]interface{}{},
+		},
+		{
+			6,
+			HandleRespErrHttpClienterFake{},
+			VmResourceType,
+			errHandleResponse,
+			map[string]interface{}{},
+		},
 	}
-	var (
-		sewan            *API
-		res_exists       bool
-		resourceResponse *schema.Resource
-		d                *schema.ResourceData
-		diffs            string
-	)
-	Apier := AirDrumResources_Apier{}
-	sewan = &API{Token: "42", URL: "42", Client: &http.Client{}}
+	Apier := AirDrumResourcesApier{}
+	sewan := &API{Token: "42", URL: "42", Client: &http.Client{}}
 	fakeClientTooler := ClientTooler{}
 	fakeResourceTooler := ResourceTooler{
 		Resource: ResourceResourceer{},
 	}
 	for _, testCase := range testCases {
-		resourceResponse = resource(testCase.ResourceType)
-		d = resourceResponse.TestResourceData()
+		resourceResponse := resource(testCase.ResourceType)
+		d := resourceResponse.TestResourceData()
 		d.SetId("UnitTest resource1")
-		d.Set(NameField, "Unit test resource")
-		fakeClientTooler.Client = testCase.TC_clienter
+		d.Set(NameField, resourceName)
+		fakeClientTooler.Client = testCase.TcClienter
 		respCreationMap, err := Apier.ReadResource(d,
 			&fakeClientTooler,
 			&fakeResourceTooler,
 			testCase.ResourceType,
 			sewan)
-		diffs = cmp.Diff(testCase.ReadResource, respCreationMap)
+		diffs := cmp.Diff(respCreationMap, testCase.ReadResource)
 		switch {
-		case err == nil || testCase.Read_Err == nil:
-			if !((err == nil) && (testCase.Read_Err == nil)) {
+		case err == nil || testCase.ReadError == nil:
+			if !((err == nil) && (testCase.ReadError == nil)) {
 				t.Errorf("\n\nTC %d : resource read error was incorrect,"+
-					"\n\rgot: \"%s\"\n\rwant: \"%s\"", testCase.Id, err, testCase.Read_Err)
+					"\n\rgot: \"%s\"\n\rwant: \"%s\"", testCase.Id, err, testCase.ReadError)
 			} else {
-				switch {
-				case res_exists != testCase.Resource_exists:
-					t.Errorf("\n\nTC %d : Wrong read resource exists value"+
-						"\n\rgot: \"%v\"\n\rwant: \"%v\"",
-						testCase.Id, res_exists, testCase.Resource_exists)
-				case diffs != "":
+				if diffs != "" {
 					t.Errorf("\n\nTC %d : Wrong resource read resource map (-got +want) :\n%s",
 						testCase.Id, diffs)
 				}
 			}
-		case err != nil && testCase.Read_Err != nil:
-			if respCreationMap != nil {
+		case err != nil && testCase.ReadError != nil:
+			if cmp.Diff(respCreationMap, map[string]interface{}{}) != "" {
 				t.Errorf("\n\nTC %d : Wrong created resource map,"+
 					" it should be nil as error is not nil,"+
 					"\n\rgot map: \n\r\"%s\"\n\rwant map: \n\r\"%s\"\n\r",
 					testCase.Id, respCreationMap, testCase.ReadResource)
 			}
-			if err.Error() != testCase.Read_Err.Error() {
+			if err.Error() != testCase.ReadError.Error() {
 				t.Errorf("\n\nTC %d : resource read error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-					testCase.Id, err.Error(), testCase.Read_Err.Error())
+					testCase.Id, err.Error(), testCase.ReadError.Error())
 			}
-		case res_exists != testCase.Resource_exists:
-			t.Errorf("\n\nTC %d : Wrong read resource exists value"+
-				"\n\rgot: \"%v\"\n\rwant: \"%v\"",
-				testCase.Id, res_exists, testCase.Resource_exists)
 		case diffs != "":
 			t.Errorf("\n\nTC %d : Wrong resource read resource map (-got +want) :\n%s",
 				testCase.Id, diffs)
@@ -430,89 +315,37 @@ func TestReadResource(t *testing.T) {
 	}
 }
 
-//------------------------------------------------------------------------------
 func TestUpdateResource(t *testing.T) {
+	resourceName := "Unit test resource update"
 	testCases := []struct {
 		Id           int
-		TC_clienter  Clienter
+		TcClienter   Clienter
 		ResourceType string
 		Update_Err   error
 	}{
 		{
 			1,
-			ErrorResponse_HttpClienterFake{},
-			VmResourceField,
-			errors.New(reqErr),
+			ResourceUpdateSuccessHttpClienterFake,
+			VmResourceType,
+			nil,
 		},
 		{
 			2,
-			BadBodyResponse_StatusOK_HttpClienterFake{},
-			VdcResourceField,
-			errors.New("Read of \"Unit test resource\" failed, response body json " +
-				"error :\n\r\"invalid character '\"' after object key"),
+			HttpClienterDummy{},
+			wrongResourceType,
+			errWrongResourceTypeBuilder(wrongResourceType),
 		},
 		{
 			3,
-			Error401_HttpClienterFake{},
-			VmResourceField,
-			errors.New(unauthorizedMsg),
-		},
-		{
-			4,
-			Error404_HttpClienterFake{},
-			VdcResourceField,
-			errors.New(notFoundRespMsg),
-		},
-		{
-			5,
-			CheckRedirectReqFailure_HttpClienterFake{},
-			VmResourceField,
-			errors.New("Update of \"Unit test resource\" state failed, response reception " +
-				"error : CheckRedirectReqFailure"),
-		},
-		{
-			6,
-			VDC_UpdateSuccess_HttpClienterFake{},
-			VdcResourceField,
-			nil,
-		},
-		{
-			7,
-			VM_UpdateSuccess_HttpClienterFake{},
-			VmResourceField,
-			nil,
-		},
-		{
-			8,
-			BadBodyResponseContentType_HttpClienterFake{},
-			VmResourceField,
-			errors.New(errorApiUnhandledImageType +
-				errValidateApiUrl),
-		},
-		{
-			9,
-			StatusInternalServerError_HttpClienterFake{},
-			VmResourceField,
-			errors.New("<h1>Server Error (500)</h1>"),
-		},
-		{
-			10,
-			VDC_UpdateSuccess_HttpClienterFake{},
-			wrongResourceType,
-			errors.New("Resource of type \"a_non_supportedResource_type\"" +
-				" not supported,list of accepted resource types :\n\r" +
-				"- \"vdc\"\n\r" +
-				"- \"vm\""),
+			ResourceUpdateFailureHttpClienterFake,
+			VdcResourceType,
+			errDoCrudRequestsBuilder(updateOperation,
+				resourceName,
+				errEmptyResp),
 		},
 	}
-	Apier := AirDrumResources_Apier{}
-	var (
-		sewan            *API
-		err              error
-		resourceResponse *schema.Resource
-		d                *schema.ResourceData
-	)
-	sewan = &API{Token: "42", URL: "42", Client: &http.Client{}}
+	Apier := AirDrumResourcesApier{}
+	sewan := &API{Token: "42", URL: "42", Client: &http.Client{}}
 	fakeClientTooler := ClientTooler{}
 	fakeTemplates_tooler := TemplatesTooler{
 		TemplatesTools: Template_Templater{},
@@ -521,12 +354,12 @@ func TestUpdateResource(t *testing.T) {
 		Resource: ResourceResourceer{},
 	}
 	for _, testCase := range testCases {
-		resourceResponse = resource(testCase.ResourceType)
-		d = resourceResponse.TestResourceData()
+		resourceResponse := resource(testCase.ResourceType)
+		d := resourceResponse.TestResourceData()
 		d.SetId("UnitTest resource1")
-		d.Set(NameField, "Unit test resource")
-		fakeClientTooler.Client = testCase.TC_clienter
-		err = Apier.UpdateResource(d,
+		d.Set(NameField, resourceName)
+		fakeClientTooler.Client = testCase.TcClienter
+		err := Apier.UpdateResource(d,
 			&fakeClientTooler,
 			&fakeTemplates_tooler,
 			&fakeResourceTooler,
@@ -546,106 +379,48 @@ func TestUpdateResource(t *testing.T) {
 	}
 }
 
-////------------------------------------------------------------------------------
 func TestDeleteResource(t *testing.T) {
+	resourceName := "Unit test resource deletion"
 	testCases := []struct {
 		Id           int
-		TC_clienter  Clienter
+		TcClienter   Clienter
 		ResourceType string
 		Delete_Err   error
 	}{
 		{
 			1,
-			ErrorResponse_HttpClienterFake{},
-			VmResourceField,
-			errors.New(reqErr),
+			ResourceDeletionSuccessHttpClienterFake,
+			VmResourceType,
+			nil,
 		},
 		{
 			2,
-			BadBodyResponse_StatusOK_HttpClienterFake{},
-			VdcResourceField,
-			errors.New("Read of \"Unit test resource\" failed, response body json " +
-				"error :\n\r\"invalid character '\"' after object key"),
+			HttpClienterDummy{},
+			wrongResourceType,
+			errWrongResourceTypeBuilder(wrongResourceType),
 		},
 		{
 			3,
-			Error401_HttpClienterFake{},
-			VmResourceField,
-			errors.New(unauthorizedMsg),
-		},
-		{
-			4,
-			Error404_HttpClienterFake{},
-			VdcResourceField,
-			errors.New(notFoundRespMsg),
-		},
-		{
-			5,
-			CheckRedirectReqFailure_HttpClienterFake{},
-			VmResourceField,
-			errors.New("Deletion of \"Unit test resource\" state failed, response reception " +
-				"error : CheckRedirectReqFailure"),
-		},
-		{
-			6,
-			VDC_DeleteSuccess_HttpClienterFake{},
-			VdcResourceField,
-			nil,
-		},
-		{
-			7,
-			VM_DeleteSuccess_HttpClienterFake{},
-			VmResourceField,
-			nil,
-		},
-		{
-			8,
-			DeleteWRONGResponseBody_HttpClienterFake{},
-			VdcResourceField,
-			errors.New(destroyWrongMsg),
-		},
-		{
-			9,
-			BadBodyResponseContentType_HttpClienterFake{},
-			VmResourceField,
-			errors.New(errorApiUnhandledImageType +
-				errValidateApiUrl),
-		},
-		{
-			10,
-			StatusInternalServerError_HttpClienterFake{},
-			VmResourceField,
-			errors.New("<h1>Server Error (500)</h1>"),
-		},
-		{
-			7,
-			VM_DeleteSuccess_HttpClienterFake{},
-			wrongResourceType,
-			errors.New("Resource of type \"a_non_supportedResource_type\"" +
-				" not supported,list of accepted resource types :\n\r" +
-				"- \"vdc\"\n\r" +
-				"- \"vm\""),
+			ResourceDeletionFailureHttpClienterFake{},
+			VdcResourceType,
+			errDoCrudRequestsBuilder(deleteOperation,
+				resourceName,
+				errEmptyResp),
 		},
 	}
-	var (
-		sewan            *API
-		err              error
-		resourceResponse *schema.Resource
-		d                *schema.ResourceData
-	)
-	Apier := AirDrumResources_Apier{}
-	sewan = &API{Token: "42", URL: "42", Client: &http.Client{}}
+	Apier := AirDrumResourcesApier{}
+	sewan := &API{Token: "42", URL: "42", Client: &http.Client{}}
 	fakeClientTooler := ClientTooler{}
 	fakeResourceTooler := ResourceTooler{
 		Resource: ResourceResourceer{},
 	}
 	for _, testCase := range testCases {
-		resourceResponse = resource(testCase.ResourceType)
-		d = resourceResponse.TestResourceData()
+		resourceResponse := resource(testCase.ResourceType)
+		d := resourceResponse.TestResourceData()
 		d.SetId("UnitTest resource1")
-		d.Set(NameField, "Unit test resource")
-		fakeClientTooler.Client = testCase.TC_clienter
-		err = Apier.DeleteResource(d,
+		d.Set(NameField, resourceName)
+		fakeClientTooler.Client = testCase.TcClienter
+		err := Apier.DeleteResource(d,
 			&fakeClientTooler,
 			&fakeResourceTooler,
 			testCase.ResourceType,

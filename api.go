@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/hashicorp/terraform/helper/schema"
 	"net/http"
+	"strings"
 )
 
 const (
@@ -43,7 +44,7 @@ type APIer interface {
 		resourceType string,
 		sewan *API) error
 }
-type AirDrumResources_Apier struct{}
+type AirDrumResourcesApier struct{}
 
 func (apiTools *APITooler) New(token string, url string) *API {
 	return &API{
@@ -63,7 +64,7 @@ func (apiTools *APITooler) CheckStatus(api *API,
 	return apiClientErr
 }
 
-func (apier AirDrumResources_Apier) CreateResource(d *schema.ResourceData,
+func (apier AirDrumResourcesApier) CreateResource(d *schema.ResourceData,
 	clientTooler *ClientTooler,
 	templatesTooler *TemplatesTooler,
 	resourceTooler *ResourceTooler,
@@ -95,7 +96,7 @@ func (apier AirDrumResources_Apier) CreateResource(d *schema.ResourceData,
 	resp, err4 := clientTooler.Client.Do(sewan, req)
 	switch {
 	case err4 != nil:
-		return map[string]interface{}{}, ErrCrudRequestsBuilder(creationOperation,
+		return map[string]interface{}{}, errDoCrudRequestsBuilder(creationOperation,
 			instanceName, err4)
 	default:
 		createdResource, err5 := clientTooler.Client.HandleResponse(resp,
@@ -109,7 +110,7 @@ func (apier AirDrumResources_Apier) CreateResource(d *schema.ResourceData,
 	}
 }
 
-func (apier AirDrumResources_Apier) ReadResource(d *schema.ResourceData,
+func (apier AirDrumResourcesApier) ReadResource(d *schema.ResourceData,
 	clientTooler *ClientTooler,
 	resourceTooler *ResourceTooler,
 	resourceType string,
@@ -127,24 +128,47 @@ func (apier AirDrumResources_Apier) ReadResource(d *schema.ResourceData,
 	resp, err3 := clientTooler.Client.Do(sewan, req)
 	switch {
 	case err3 != nil:
-		return map[string]interface{}{}, err3
+		return map[string]interface{}{}, errDoCrudRequestsBuilder(readOperation,
+			d.Get(NameField).(string),
+			err3)
 	default:
-		if resp.StatusCode == http.StatusNotFound {
+		if (resp != nil) && (resp.StatusCode == http.StatusNotFound) {
 			return map[string]interface{}{}, ErrResourceNotExist
-		} else {
-			readResource, err4 := clientTooler.Client.HandleResponse(resp,
-				http.StatusOK,
-				httpJsonContentType)
-			if readResource != nil {
-				return readResource.(map[string]interface{}), err4
-			} else {
-				return map[string]interface{}{}, err4
+		}
+		readResource, err4 := clientTooler.Client.HandleResponse(resp,
+			http.StatusOK,
+			httpJsonContentType)
+		if readResource != nil {
+			if resourceType == VdcResourceType {
+				err5 := updateSchemaReadVdcResource(d,
+					readResource.(map[string]interface{}))
+				if err5 != nil {
+					return map[string]interface{}{}, err5
+				}
 			}
+			return readResource.(map[string]interface{}), err4
+		} else {
+			return map[string]interface{}{}, err4
 		}
 	}
 }
 
-func (apier AirDrumResources_Apier) UpdateResource(d *schema.ResourceData,
+func updateSchemaReadVdcResource(d *schema.ResourceData,
+	readResource map[string]interface{}) error {
+	var (
+		resourceNamePrefix strings.Builder
+		resourcesList []interface{}
+	)
+	resourceNamePrefix.WriteString(readResource[EnterpriseField].(string))
+	resourceNamePrefix.WriteString(monoField)
+	for _,resource := range readResource[VdcResourceField].([]interface{}) {
+		resource.(map[string]interface{})[ResourceField] = strings.TrimPrefix(resource.(map[string]interface{})[ResourceField].(string),resourceNamePrefix.String())
+		resourcesList = append(resourcesList,resource)
+	}
+	return d.Set(VdcResourceField,resourcesList)
+}
+
+func (apier AirDrumResourcesApier) UpdateResource(d *schema.ResourceData,
 	clientTooler *ClientTooler,
 	templatesTooler *TemplatesTooler,
 	resourceTooler *ResourceTooler,
@@ -174,7 +198,7 @@ func (apier AirDrumResources_Apier) UpdateResource(d *schema.ResourceData,
 	resp, err4 := clientTooler.Client.Do(sewan, req)
 	switch {
 	case err4 != nil:
-		return ErrCrudRequestsBuilder(updateOperation,
+		return errDoCrudRequestsBuilder(updateOperation,
 			d.Get(NameField).(string),
 			err4)
 	default:
@@ -185,7 +209,7 @@ func (apier AirDrumResources_Apier) UpdateResource(d *schema.ResourceData,
 	}
 }
 
-func (apier AirDrumResources_Apier) DeleteResource(d *schema.ResourceData,
+func (apier AirDrumResourcesApier) DeleteResource(d *schema.ResourceData,
 	clientTooler *ClientTooler,
 	resourceTooler *ResourceTooler,
 	resourceType string,
@@ -203,7 +227,7 @@ func (apier AirDrumResources_Apier) DeleteResource(d *schema.ResourceData,
 	resp, err3 := clientTooler.Client.Do(sewan, req)
 	switch {
 	case err3 != nil:
-		return ErrCrudRequestsBuilder(deleteOperation,
+		return errDoCrudRequestsBuilder(deleteOperation,
 			d.Get(NameField).(string),
 			err3)
 	default:

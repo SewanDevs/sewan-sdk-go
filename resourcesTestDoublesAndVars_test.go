@@ -153,7 +153,7 @@ var (
 	}
 	vmCreationN42FromTemplate1Schema = map[string]interface{}{
 		NameField:           "CreateTemplateOverrideConfig Unit test",
-		instanceNumberField: 42,
+		InstanceNumberField: 42,
 		RamField:            1,
 		CpuField:            1,
 		EnterpriseField:     "unit test enterprise",
@@ -288,33 +288,33 @@ var (
 		VdcResourceField: []interface{}{
 			map[string]interface{}{
 				ResourceField: RamField,
-				UsedField:     "0",
-				TotalField:    "20",
-				SlugField:     "unit test enterprise-dc1-vdc_te-ram",
+				UsedField:     0,
+				TotalField:    20,
+				SlugField:     "unit test enterprise-mono-ram",
 			},
 			map[string]interface{}{
 				ResourceField: CpuField,
-				UsedField:     "0",
-				TotalField:    "1",
-				SlugField:     "unit test enterprise-dc1-vdc_te-cpu",
+				UsedField:     0,
+				TotalField:    1,
+				SlugField:     "unit test enterprise-mono-cpu",
 			},
 			map[string]interface{}{
 				ResourceField: "storage_enterprise",
-				UsedField:     "0",
-				TotalField:    "10",
-				SlugField:     "unit test enterprise-dc1-vdc_te-storage_enterprise",
+				UsedField:     0,
+				TotalField:    10,
+				SlugField:     "unit test enterprise-mono-storage_enterprise",
 			},
 			map[string]interface{}{
 				ResourceField: "storage_performance",
-				UsedField:     "0",
-				TotalField:    "10",
-				SlugField:     "unit test enterprise-dc1-vdc_te-storage_performance",
+				UsedField:     0,
+				TotalField:    10,
+				SlugField:     "unit test enterprise-mono-storage_performance",
 			},
 			map[string]interface{}{
 				ResourceField: "storage_high_performance",
-				UsedField:     "0",
-				TotalField:    "10",
-				SlugField:     "unit test enterprise-dc1-vdc_te-storage_high_performance",
+				UsedField:     0,
+				TotalField:    10,
+				SlugField:     "unit test enterprise-dc1-mono-storage_high_performance",
 			},
 		},
 		SlugField:    "unit test enterprise-dc1-vdc_te",
@@ -345,7 +345,7 @@ var (
 				ConnectedField: true,
 			},
 		},
-		BootField:         BootField,
+		VdcField:          "vdc unit test",
 		BootField:         "on disk",
 		StorageClassField: "storage_enterprise",
 		SlugField:         "42",
@@ -361,7 +361,7 @@ var (
 		EnterpriseField:   "unit test enterprise",
 		TemplateField:     "template1",
 		StateField:        "UP",
-		BootField:         BootField,
+		VdcField:          "vdc unit test",
 		BootField:         "on disk",
 		StorageClassField: "storage_enterprise",
 		SlugField:         "42",
@@ -370,11 +370,11 @@ var (
 	}
 	instanceNumberFieldUnitTestVmInstance = map[string]interface{}{
 		NameField:           "instanceNumberFieldUnitTest",
-		instanceNumberField: 42,
+		InstanceNumberField: 42,
 		EnterpriseField:     "unit test enterprise",
 		TemplateField:       "template1",
 		StateField:          "UP",
-		BootField:           BootField,
+		VdcField:            "vdc unit test",
 		BootField:           "on disk",
 		StorageClassField:   "storage_enterprise",
 		SlugField:           "42",
@@ -408,7 +408,7 @@ var (
 				ConnectedField: true,
 			},
 		},
-		BootField:         BootField,
+		VdcField:          "vdc unit test",
 		BootField:         "on disk",
 		StorageClassField: "storage_enterprise",
 		SlugField:         "42",
@@ -418,40 +418,6 @@ var (
 		PlatformNameField: "42",
 		BackupSizeField:   42,
 		CommentField:      "42",
-	}
-	existingTemplateWithDeletedDiskVmMap = map[string]interface{}{
-		IdField:         "EXISTING_TEMPLATE_AND_VM_INSTANCE_WITH_DELETED_DISK_VM_MAP",
-		NameField:       "existingTemplateWithDeletedDiskVmMap",
-		EnterpriseField: "unit test enterprise",
-		TemplateField:   "template1",
-		StateField:      "UP",
-		OsField:         "Debian",
-		RamField:        8,
-		CpuField:        4,
-		DisksField: []interface{}{
-			map[string]interface{}{
-				NameField:         "template1 disk1",
-				SizeField:         24,
-				StorageClassField: "storage_enterprise",
-			},
-			map[string]interface{}{
-				NameField:         "disk 1",
-				SizeField:         24,
-				StorageClassField: "storage_enterprise",
-			},
-		},
-		NicsField:         []interface{}{},
-		BootField:         BootField,
-		BootField:         "on disk",
-		StorageClassField: "storage_enterprise",
-		SlugField:         "42",
-		TokenField:        "424242",
-		BackupField:       "backup_no_backup",
-		DiskImageField:    "",
-		PlatformNameField: "42",
-		BackupSizeField:   42,
-		CommentField:      "42",
-		DynamicField:      "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"TemplateDisksOnCreation\":null}",
 	}
 	nonExistingTemplateVmMap = map[string]interface{}{
 		NameField:         "windows95 vm",
@@ -460,7 +426,7 @@ var (
 		StateField:        "UP",
 		RamField:          8,
 		CpuField:          4,
-		BootField:         BootField,
+		VdcField:          "vdc unit test",
 		BootField:         "on disk",
 		StorageClassField: "storage_enterprise",
 		SlugField:         "42",
@@ -695,7 +661,7 @@ var (
 				ConnectedField: false,
 			},
 		},
-		BootField:         "vdc update",
+		VdcField:          "vdc update",
 		BootField:         "on disk update",
 		StorageClassField: "storage_enterprise update",
 		SlugField:         "42 update",
@@ -736,7 +702,7 @@ var (
 				ConnectedField: false,
 			},
 		},
-		BootField:         "vdc update",
+		VdcField:          "vdc update",
 		BootField:         "on disk update",
 		StorageClassField: "storage_enterprise update",
 		SlugField:         "42 update",
@@ -777,7 +743,7 @@ var (
 				ConnectedField: false,
 			},
 		},
-		BootField:         "vdc update",
+		VdcField:          "vdc update",
 		BootField:         "on disk update",
 		StorageClassField: "storage_enterprise update",
 		SlugField:         "42 update",
@@ -898,7 +864,7 @@ func resourceVm() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			instanceNumberField: &schema.Schema{
+			InstanceNumberField: &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
@@ -936,7 +902,7 @@ func resourceVm() *schema.Resource {
 				Optional: true,
 				Elem:     resourceVmNic(),
 			},
-			BootField: &schema.Schema{
+			VdcField: &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
@@ -980,7 +946,7 @@ func resourceVm() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			outsourcingField: &schema.Schema{
+			OutsourcingField: &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -1087,7 +1053,7 @@ func vmInstanceNoTemplateVmMap() VM {
 				ConnectedField: true,
 			},
 		},
-		Vdc:           BootField,
+		Vdc:           "vdc unit test",
 		Boot:          "on disk",
 		Storage_class: "storage_enterprise",
 		Slug:          "42",
@@ -1119,7 +1085,7 @@ func FakeVmInstanceExistingTemplateNoAdditionalDiskVmMap() VM {
 			},
 		},
 		Nics:          []interface{}{},
-		Vdc:           BootField,
+		Vdc:           "vdc unit test",
 		Boot:          "on disk",
 		Storage_class: "storage_enterprise",
 		Slug:          "42",
@@ -1147,7 +1113,7 @@ func FakeVmInstanceInstanceNumberFieldUnitTestVmInstance_MAP() VM {
 			},
 		},
 		Nics:          []interface{}{},
-		Vdc:           BootField,
+		Vdc:           "vdc unit test",
 		Boot:          "on disk",
 		Storage_class: "storage_enterprise",
 		Slug:          "42",
@@ -1194,7 +1160,7 @@ func FakeVmInstanceExistingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap() 
 				ConnectedField: true,
 			},
 		},
-		Vdc:           BootField,
+		Vdc:           "vdc unit test",
 		Boot:          "on disk",
 		Storage_class: "storage_enterprise",
 		Slug:          "42",
@@ -1205,39 +1171,6 @@ func FakeVmInstanceExistingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap() 
 		Backup_size:   42,
 		Comment:       "",
 		DynamicField:  "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"TemplateDisksOnCreation\":[{\"name\":\"template1 disk1\",\"size\":20,\"slug\":\"template1 disk1 slug\",\"storage_class\":\"storage_enterprise\"}]}",
-	}
-}
-
-func FakeVmInstanceExistingTemplateWithDeletedDiskVmMap() VM {
-	return VM{
-		Name:       "existingTemplateWithDeletedDiskVmMap",
-		Enterprise: "unit test enterprise",
-		Template:   "",
-		State:      "UP",
-		OS:         "Debian",
-		RAM:        8,
-		CPU:        4,
-		Disks: []interface{}{
-			map[string]interface{}{
-				NameField:         "disk 1",
-				SizeField:         24,
-				StorageClassField: "storage_enterprise",
-				SlugField:         "",
-				VDiskField:        "",
-			},
-		},
-		Nics:          []interface{}{},
-		Vdc:           BootField,
-		Boot:          "on disk",
-		Storage_class: "storage_enterprise",
-		Slug:          "42",
-		Token:         "424242",
-		Backup:        "backup_no_backup",
-		Disk_image:    "",
-		Platform_name: "42",
-		Backup_size:   42,
-		Comment:       "",
-		DynamicField:  "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"TemplateDisksOnCreation\":null}",
 	}
 }
 
@@ -1291,12 +1224,10 @@ func vmInstanceNoTemplateFake() VM {
 
 func vdcSchemaInit(vdc map[string]interface{}) *schema.ResourceData {
 	d := resourceVdc().TestResourceData()
-
 	schemaTooler := SchemaTooler{
 		SchemaTools: Schema_Schemaer{},
 	}
 	schemaTooler.SchemaTools.UpdateLocalResourceState(vdc, d, &schemaTooler)
-
 	return d
 }
 
