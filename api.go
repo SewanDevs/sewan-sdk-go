@@ -102,11 +102,10 @@ func (apier AirDrumResourcesApier) CreateResource(d *schema.ResourceData,
 		createdResource, err5 := clientTooler.Client.HandleResponse(resp,
 			http.StatusCreated,
 			httpJsonContentType)
-		if createdResource != nil {
-			return createdResource.(map[string]interface{}), err5
-		} else {
+		if createdResource == nil {
 			return map[string]interface{}{}, err5
 		}
+		return createdResource.(map[string]interface{}), err5
 	}
 }
 
@@ -138,18 +137,17 @@ func (apier AirDrumResourcesApier) ReadResource(d *schema.ResourceData,
 		readResource, err4 := clientTooler.Client.HandleResponse(resp,
 			http.StatusOK,
 			httpJsonContentType)
-		if readResource != nil {
-			if resourceType == VdcResourceType {
-				err5 := updateSchemaReadVdcResource(d,
-					readResource.(map[string]interface{}))
-				if err5 != nil {
-					return map[string]interface{}{}, err5
-				}
-			}
-			return readResource.(map[string]interface{}), err4
-		} else {
+		if readResource == nil {
 			return map[string]interface{}{}, err4
 		}
+		if resourceType == VdcResourceType {
+			err5 := updateSchemaReadVdcResource(d,
+				readResource.(map[string]interface{}))
+			if err5 != nil {
+				return map[string]interface{}{}, err5
+			}
+		}
+		return readResource.(map[string]interface{}), err4
 	}
 }
 
