@@ -44,7 +44,7 @@ func (templaterFake TemplaterDummy) UpdateSchemaFromTemplateOnResourceCreation(d
 	template map[string]interface{}) error {
 	return nil
 }
-func (templaterFake TemplaterDummy) CreateTemplateOverrideConfig(d *schema.ResourceData,
+func (templaterFake TemplaterDummy) CreateVmTemplateOverrideConfig(d *schema.ResourceData,
 	template map[string]interface{}) (string, error) {
 	return "", nil
 }
@@ -62,7 +62,7 @@ func (templaterFake UnexistingTemplate_TemplaterFake) UpdateSchemaFromTemplateOn
 	template map[string]interface{}) error {
 	return nil
 }
-func (templaterFake UnexistingTemplate_TemplaterFake) CreateTemplateOverrideConfig(d *schema.ResourceData,
+func (templaterFake UnexistingTemplate_TemplaterFake) CreateVmTemplateOverrideConfig(d *schema.ResourceData,
 	template map[string]interface{}) (string, error) {
 	return "", nil
 }
@@ -86,7 +86,7 @@ func (templaterFake Template_FormatError_TemplaterFake) UpdateSchemaFromTemplate
 	template map[string]interface{}) error {
 	return nil
 }
-func (templaterFake Template_FormatError_TemplaterFake) CreateTemplateOverrideConfig(d *schema.ResourceData,
+func (templaterFake Template_FormatError_TemplaterFake) CreateVmTemplateOverrideConfig(d *schema.ResourceData,
 	template map[string]interface{}) (string, error) {
 	return "", nil
 }
@@ -147,7 +147,7 @@ func (templaterFake existingTemplateNoAdditionalDiskVmMap_TemplaterFake) UpdateS
 	d.Set(NicsField, []interface{}{})
 	return nil
 }
-func (templaterFake existingTemplateNoAdditionalDiskVmMap_TemplaterFake) CreateTemplateOverrideConfig(d *schema.ResourceData,
+func (templaterFake existingTemplateNoAdditionalDiskVmMap_TemplaterFake) CreateVmTemplateOverrideConfig(d *schema.ResourceData,
 	template map[string]interface{}) (string, error) {
 	return "", nil
 }
@@ -208,7 +208,7 @@ func (templaterFake instanceNumberFieldUnitTestVmInstance_MAP_TemplaterFake) Upd
 	d.Set(NicsField, []interface{}{})
 	return nil
 }
-func (templaterFake instanceNumberFieldUnitTestVmInstance_MAP_TemplaterFake) CreateTemplateOverrideConfig(d *schema.ResourceData,
+func (templaterFake instanceNumberFieldUnitTestVmInstance_MAP_TemplaterFake) CreateVmTemplateOverrideConfig(d *schema.ResourceData,
 	template map[string]interface{}) (string, error) {
 	return "", nil
 }
@@ -299,7 +299,7 @@ func (templaterFake existingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap_T
 	d.Set("dynamic_field:", "42")
 	return nil
 }
-func (templaterFake existingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap_TemplaterFake) CreateTemplateOverrideConfig(d *schema.ResourceData,
+func (templaterFake existingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap_TemplaterFake) CreateVmTemplateOverrideConfig(d *schema.ResourceData,
 	template map[string]interface{}) (string, error) {
 	return "", nil
 }

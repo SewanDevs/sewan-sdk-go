@@ -56,7 +56,7 @@ func TestNew(t *testing.T) {
 	}
 }
 
-func TestCheckStatus(t *testing.T) {
+func TestCheckCloudDcApiStatus(t *testing.T) {
 	testCases := []struct {
 		Id               int
 		Input_api        *API
@@ -108,7 +108,7 @@ func TestCheckStatus(t *testing.T) {
 	for _, testCase := range testCases {
 		fakeApi_tools.Api = FakeAirDrumResource_APIer{}
 		fakeResourceTooler.Resource = testCase.TCResourceTooler
-		err := fakeApi_tools.CheckStatus(testCase.Input_api,
+		err := fakeApi_tools.CheckCloudDcApiStatus(testCase.Input_api,
 			fakeClientTooler,
 			fakeResourceTooler)
 		switch {

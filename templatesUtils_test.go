@@ -228,7 +228,7 @@ func TestUpdateSchemaFromTemplateOnResourceCreation(t *testing.T) {
 	}
 }
 
-func TestCreateTemplateOverrideConfig(t *testing.T) {
+func TestCreateVmTemplateOverrideConfig(t *testing.T) {
 	testCases := []struct {
 		Id                     int
 		D                      *schema.ResourceData
@@ -268,30 +268,30 @@ func TestCreateTemplateOverrideConfig(t *testing.T) {
 	}
 	for _, testCase := range testCases {
 		overrideFile,
-			err := fakeTemplates_tooler.TemplatesTools.CreateTemplateOverrideConfig(testCase.D,
+			err := fakeTemplates_tooler.TemplatesTools.CreateVmTemplateOverrideConfig(testCase.D,
 			testCase.Template)
 		switch {
 		case overrideFile != testCase.OverrideFile:
-			t.Errorf("\n\nTC %d : CreateTemplateOverrideConfig() created overrideFile"+
+			t.Errorf("\n\nTC %d : CreateVmTemplateOverrideConfig() created overrideFile"+
 				" error."+
 				"\n\rcreatedFile: \"%s\"\n\rexpected: \"%s\"",
 				testCase.Id, overrideFile, testCase.OverrideFile)
 		case err == nil || testCase.Error == nil:
 			if !(err == nil && testCase.Error == nil) {
-				t.Errorf("\n\nTC %d : CreateTemplateOverrideConfig() error was incorrect,"+
+				t.Errorf("\n\nTC %d : CreateVmTemplateOverrideConfig() error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
 					testCase.Id, err, testCase.Error)
 			} else {
 				jsonDiffs, err2 := CompareJsonAndMap(overrideFile,
 					testCase.OverrideFileDataStruct)
 				if err2 != nil {
-					t.Errorf("\n\nTC %d : CreateTemplateOverrideConfig() "+
+					t.Errorf("\n\nTC %d : CreateVmTemplateOverrideConfig() "+
 						" json file and test data struct failed."+
 						"\n\rJson file error : \"%s",
 						testCase.Id, err2.Error())
 				}
 				if jsonDiffs != "" {
-					t.Errorf("\n\nTC %d : CreateTemplateOverrideConfig() generated"+
+					t.Errorf("\n\nTC %d : CreateVmTemplateOverrideConfig() generated"+
 						" json file is incorrect,"+
 						"\n\rDiffs (-got +want) : \"%s",
 						testCase.Id, jsonDiffs)
@@ -300,7 +300,7 @@ func TestCreateTemplateOverrideConfig(t *testing.T) {
 		case err != nil && testCase.Error != nil:
 			switch {
 			case err.Error() != testCase.Error.Error():
-				t.Errorf("\n\nTC %d : CreateTemplateOverrideConfig() error was incorrect,"+
+				t.Errorf("\n\nTC %d : CreateVmTemplateOverrideConfig() error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
 					testCase.Id, err.Error(), testCase.Error.Error())
 			default:

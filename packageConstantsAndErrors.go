@@ -67,15 +67,18 @@ const (
 )
 
 var (
-	errDoRequest                 = errors.New("do(request) error")
-	errEmptyResp                 = errors.New("Empty API response.")
-	errEmptyRespBody             = errors.New("Empty API response body.")
-	ErrResourceNotExist          = errors.New("Resource does not exists.")
-	errUninitializedExpectedCode = errors.New("Expected code not initialized.")
-	errNilResponse               = errors.New("Response is nil.")
-	errZeroStatusCode            = errors.New("Response status code is zero.")
-	err500ServerError            = errors.New("<h1>Server Error (500)</h1>")
-	errHandleResponse            = errors.New("Handle response error")
+	errDoRequest                        = errors.New("do(request) error")
+	errEmptyResp                        = errors.New("Empty API response.")
+	errEmptyRespBody                    = errors.New("Empty API response body.")
+	errEmptyTemplateList                = errors.New("Empty template list.")
+	ErrResourceNotExist                 = errors.New("Resource does not exists.")
+	errUninitializedExpectedCode        = errors.New("Expected code not initialized.")
+	errNilResponse                      = errors.New("Response is nil.")
+	errZeroStatusCode                   = errors.New("Response status code is zero.")
+	err500ServerError                   = errors.New("<h1>Server Error (500)</h1>")
+	errHandleResponse                   = errors.New("Handle response error")
+	errUnexpectedValidateStatusResponse = errors.New("Unexpected response to validate status request.")
+	errCheckRedirectFailure             = errors.New("CheckRedirectReqFailure")
 )
 
 func errRespStatusCodeBuilder(resp *http.Response,

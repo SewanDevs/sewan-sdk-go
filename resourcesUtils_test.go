@@ -10,13 +10,13 @@ import (
 
 func TestResourceInstanceCreate(t *testing.T) {
 	testCases := []struct {
-		Id            int
-		D             *schema.ResourceData
-		TC_Clienter   Clienter
-		TC_Templater  Templater
-		Resource_type string
-		Error         error
-		VmInstance    interface{}
+		Id           int
+		D            *schema.ResourceData
+		Clienter     Clienter
+		Templater    Templater
+		ResourceType string
+		Error        error
+		VmInstance   interface{}
 	}{
 		{
 			1,
@@ -113,12 +113,12 @@ func TestResourceInstanceCreate(t *testing.T) {
 	fakeTemplates_tooler := TemplatesTooler{}
 	sewan := &API{Token: "42", URL: "42", Client: &http.Client{}}
 	for _, testCase := range testCases {
-		fakeClientTooler.Client = testCase.TC_Clienter
-		fakeTemplates_tooler.TemplatesTools = testCase.TC_Templater
+		fakeClientTooler.Client = testCase.Clienter
+		fakeTemplates_tooler.TemplatesTools = testCase.Templater
 		instance, err := fakeResourceTooler.Resource.ResourceInstanceCreate(testCase.D,
 			&fakeClientTooler,
 			&fakeTemplates_tooler,
-			testCase.Resource_type,
+			testCase.ResourceType,
 			sewan)
 		diffs := cmp.Diff(instance, testCase.VmInstance)
 		switch {
@@ -152,10 +152,10 @@ func TestResourceInstanceCreate(t *testing.T) {
 
 func TestGetResourceUrl(t *testing.T) {
 	testCases := []struct {
-		Id     int
-		api    API
-		vm_id  string
-		vm_url string
+		Id    int
+		api   API
+		VmId  string
+		VmUrl string
 	}{
 		{1,
 			API{
@@ -180,22 +180,22 @@ func TestGetResourceUrl(t *testing.T) {
 		Resource: ResourceResourceer{},
 	}
 	for _, testCase := range testCases {
-		s_vm_url := fakeResourceTooler.Resource.GetResourceUrl(&testCase.api,
+		s_VmUrl := fakeResourceTooler.Resource.GetResourceUrl(&testCase.api,
 			VmResourceType,
-			testCase.vm_id)
+			testCase.VmId)
 		switch {
-		case s_vm_url != testCase.vm_url:
+		case s_VmUrl != testCase.VmUrl:
 			t.Errorf("VM url was incorrect,\n\rgot: \"%s\"\n\rwant: \"%s\"",
-				s_vm_url, testCase.vm_url)
+				s_VmUrl, testCase.VmUrl)
 		}
 	}
 }
 
 func TestGetResourceCreationUrl(t *testing.T) {
 	testCases := []struct {
-		Id                    int
-		api                   API
-		resource_creation_url string
+		Id                  int
+		api                 API
+		resourceCreationUrl string
 	}{
 		{1,
 			API{
@@ -210,13 +210,13 @@ func TestGetResourceCreationUrl(t *testing.T) {
 		Resource: ResourceResourceer{},
 	}
 	for _, testCase := range testCases {
-		s_resource_creation_url := fakeResourceTooler.Resource.GetResourceCreationUrl(&testCase.api,
+		s_resourceCreationUrl := fakeResourceTooler.Resource.GetResourceCreationUrl(&testCase.api,
 			VmResourceType)
 		switch {
-		case s_resource_creation_url != testCase.resource_creation_url:
+		case s_resourceCreationUrl != testCase.resourceCreationUrl:
 			t.Errorf("resource api creation url was incorrect,"+
 				"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-				s_resource_creation_url, testCase.resource_creation_url)
+				s_resourceCreationUrl, testCase.resourceCreationUrl)
 		}
 	}
 }
@@ -225,6 +225,7 @@ func TestValidateStatus(t *testing.T) {
 	testCases := []struct {
 		Id           int
 		Api          API
+		Client       Clienter
 		Err          error
 		ResourceType string
 	}{
@@ -234,66 +235,27 @@ func TestValidateStatus(t *testing.T) {
 				rightApiUrl,
 				&http.Client{},
 			},
+			VmReadSuccessHttpClienterFake{},
 			nil,
 			VmResourceType,
 		},
 		{2,
 			API{
-				wrongApiToken,
+				rightApiToken,
 				rightApiUrl,
 				&http.Client{},
 			},
-			errors.New("401 Unauthorized{\"detail\":\"Invalid token.\"}"),
-			VmResourceType,
-		},
-		{3,
-			API{
-				rightApiToken,
-				wrongApiUrl,
-				&http.Client{},
-			},
-			errors.New("Could not get a proper json response from \"" +
-				wrongApiUrl + errApiDownOrWrongApiUrl),
-			VmResourceType,
-		},
-		{4,
-			API{
-				wrongApiToken,
-				wrongApiUrl,
-				&http.Client{},
-			},
-			errors.New("Could not get a proper json response from \"" +
-				wrongApiUrl + errApiDownOrWrongApiUrl),
-			VmResourceType,
-		},
-		{5,
-			API{
-				rightApiToken,
-				noRespBodyApiUrl,
-				&http.Client{},
-			},
-			errors.New("Could not get a response body from \"" +
-				noRespBodyApiUrl + errApiDownOrWrongApiUrl),
-			VmResourceType,
-		},
-		{6,
-			API{
-				rightApiToken,
-				noRespApiUrl,
-				&http.Client{},
-			},
-			errors.New("Could not get a response from \"" +
-				noRespApiUrl + errApiDownOrWrongApiUrl),
+			CheckRedirectReqFailure_HttpClienterFake{},
+			errCheckRedirectFailure,
 			VmResourceType,
 		},
 	}
 	fakeResourceTooler := &ResourceTooler{
 		Resource: ResourceResourceer{},
 	}
-	clientTooler := ClientTooler{
-		Client: FakeHttpClienter{},
-	}
+	clientTooler := ClientTooler{}
 	for _, testCase := range testCases {
+		clientTooler.Client = testCase.Client
 		apiClientErr := fakeResourceTooler.Resource.ValidateStatus(&testCase.Api,
 			testCase.ResourceType,
 			clientTooler)

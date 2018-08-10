@@ -2,9 +2,7 @@ package sewan_go_sdk
 
 import (
 	"encoding/json"
-	"errors"
 	"github.com/hashicorp/terraform/helper/schema"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -195,7 +193,7 @@ func vmInstanceCreate(d *schema.ResourceData,
 		}
 		if template != nil {
 			dynamicFieldStruct.TemplateDisksOnCreation = template[DisksField].([]interface{})
-			_, err := templatesTooler.TemplatesTools.CreateTemplateOverrideConfig(d,
+			_, err := templatesTooler.TemplatesTools.CreateVmTemplateOverrideConfig(d,
 				template)
 			if err != nil {
 				return VM{}, err
@@ -211,6 +209,9 @@ func vmInstanceCreate(d *schema.ResourceData,
 	return vm, nil
 }
 
+// Creation of a resource structure initialized with fields values got from
+// schema.
+// Accepted resource types : "vm", "vdc"
 func (resource ResourceResourceer) ResourceInstanceCreate(d *schema.ResourceData,
 	clientTooler *ClientTooler,
 	templatesTooler *TemplatesTooler,
@@ -229,6 +230,7 @@ func (resource ResourceResourceer) ResourceInstanceCreate(d *schema.ResourceData
 	}
 }
 
+// Validates resource type is list of accepted resource types : "vm", "vdc"
 func (resource ResourceResourceer) ValidateResourceType(resourceType string) error {
 	switch resourceType {
 	case VdcResourceType:
@@ -240,6 +242,9 @@ func (resource ResourceResourceer) ValidateResourceType(resourceType string) err
 	}
 }
 
+// Example of valid urls for resource creation :
+// * https://cloud-datacenter.fr/api/clouddc/vm/
+// * https://cloud-datacenter.fr/api/clouddc/vdc/
 func (resource ResourceResourceer) GetResourceCreationUrl(api *API,
 	resourceType string) string {
 	var resourceUrl strings.Builder
@@ -249,6 +254,9 @@ func (resource ResourceResourceer) GetResourceCreationUrl(api *API,
 	return resourceUrl.String()
 }
 
+// Example of valid resources urls :
+// * https://cloud-datacenter.fr/api/clouddc/vm/<a resource id number>/
+// * https://cloud-datacenter.fr/api/clouddc/vdc/<a resource id number>/
 func (resource ResourceResourceer) GetResourceUrl(api *API,
 	resourceType string,
 	resourceId string) string {
@@ -260,35 +268,20 @@ func (resource ResourceResourceer) GetResourceUrl(api *API,
 	return resourceUrl.String()
 }
 
+// Validate api status by sending a test GET request and validating response
 func (resource ResourceResourceer) ValidateStatus(api *API,
 	resourceType string,
 	clientTooler ClientTooler) error {
-	var apiError error
-	var responseBody string
 	req, _ := http.NewRequest("GET",
 		resource.GetResourceCreationUrl(api, resourceType),
 		nil)
 	req.Header.Add(httpAuthorization, httpTokenHeader+api.Token)
-	resp, apiError := clientTooler.Client.Do(api, req)
-	if apiError == nil {
-		if resp.Body != nil {
-			bodyBytes, _ := ioutil.ReadAll(resp.Body)
-			responseBody = string(bodyBytes)
-			switch {
-			case resp.StatusCode == http.StatusUnauthorized:
-				apiError = errors.New(resp.Status + responseBody)
-			case resp.Header.Get(httpReqContentType) != httpJsonContentType:
-				apiError = errors.New("Could not get a proper json response from \"" +
-					api.URL + errApiDownOrWrongApiUrl)
-			}
-		} else {
-			apiError = errors.New("Could not get a response body from \"" + api.URL +
-				errApiDownOrWrongApiUrl)
-		}
-	} else {
-		apiError = errors.New("Could not get a response from \"" + api.URL +
-			errApiDownOrWrongApiUrl)
+	resp, err1 := clientTooler.Client.Do(api, req)
+	if err1 != nil {
+		return err1
 	}
-
-	return apiError
+	_, err2 := clientTooler.Client.HandleResponse(resp,
+		http.StatusOK,
+		httpJsonContentType)
+	return err2
 }

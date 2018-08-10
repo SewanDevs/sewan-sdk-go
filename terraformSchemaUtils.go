@@ -3,7 +3,6 @@ package sewan_go_sdk
 import (
 	"errors"
 	"github.com/hashicorp/terraform/helper/schema"
-	"log"
 	"reflect"
 	"strconv"
 	"strings"
@@ -17,30 +16,23 @@ type Schemaer interface {
 	UpdateLocalResourceState(resourceState map[string]interface{},
 		d *schema.ResourceData, schemaTools *SchemaTooler) error
 	UpdateVdcResourcesNames(d *schema.ResourceData) error
-	ReadElement(key interface{}, value interface{},
-		logger *log.Logger) (interface{}, error)
+	ReadElement(key interface{}, value interface{}) (interface{}, error)
 }
-type Schema_Schemaer struct{}
+type SchemaSchemaer struct{}
 
-func (schemaer Schema_Schemaer) DeleteTerraformResource(d *schema.ResourceData) {
+func (schemaer SchemaSchemaer) DeleteTerraformResource(d *schema.ResourceData) {
 	d.SetId("")
 }
 
-func (schemaer Schema_Schemaer) UpdateLocalResourceState(resourceState map[string]interface{},
+// Update of resource state in .tfstate file through schema update
+func (schemaer SchemaSchemaer) UpdateLocalResourceState(resourceState map[string]interface{},
 	d *schema.ResourceData, schemaTools *SchemaTooler) error {
-
 	var (
 		updateError error = nil
 		readValue   interface{}
 	)
-	logger := LoggerCreate("update_local_resourceState_" +
-		d.Get(NameField).(string) + ".log")
 	for key, value := range resourceState {
-		readValue,
-			updateError = schemaTools.SchemaTools.ReadElement(key,
-			value,
-			logger)
-		logger.Println("Set \"", key, "\" to \"", readValue, "\"")
+		readValue, updateError = schemaTools.SchemaTools.ReadElement(key, value)
 		if key == IdField {
 			var s_id string = ""
 			switch {
@@ -67,14 +59,15 @@ func (schemaer Schema_Schemaer) UpdateLocalResourceState(resourceState map[strin
 	return updateError
 }
 
-func (schemaer Schema_Schemaer) UpdateVdcResourcesNames(d *schema.ResourceData) error {
+// Trim meaningless part of vdc resource name to store a shorter name locally
+// exemple of a trim : "<enterprise name>-mono-ram" -> "ram"
+func (schemaer SchemaSchemaer) UpdateVdcResourcesNames(d *schema.ResourceData) error {
 	var (
 		vdcResourcesList       []interface{} = d.Get(VdcResourceField).([]interface{})
 		vdcResourcesListUpdate []interface{} = []interface{}{}
 		enterpriseName         string        = d.Get(EnterpriseField).(string)
 		resourceName           string
 	)
-
 	for _, resource := range vdcResourcesList {
 		resourceName = resource.(map[string]interface{})[ResourceField].(string)
 		resourceName = strings.Replace(resourceName,
@@ -84,13 +77,28 @@ func (schemaer Schema_Schemaer) UpdateVdcResourcesNames(d *schema.ResourceData) 
 		resource.(map[string]interface{})[ResourceField] = resourceName
 		vdcResourcesListUpdate = append(vdcResourcesListUpdate, resource)
 	}
-
 	return d.Set(VdcResourceField, vdcResourcesListUpdate)
 }
 
-func (schemaer Schema_Schemaer) ReadElement(key interface{}, value interface{},
-	logger *log.Logger) (interface{}, error) {
-
+// Format Element(key,value) value type to a type accepted by terraform :
+//
+// * value type -> terraform accepted type
+//
+// * string -> string
+//
+// * bool -> bool
+//
+// * float64 -> int (rounded to nearest int)
+//
+// * int -> int
+//
+// * map -> map (recursive call of function for each map element)
+//
+// * slice -> slice (recursive call of function for each slice element)
+//
+// * other types -> return error
+func (schemaer SchemaSchemaer) ReadElement(key interface{},
+	value interface{}) (interface{}, error) {
 	var (
 		readError error = nil
 		readValue interface{}
@@ -111,8 +119,7 @@ func (schemaer Schema_Schemaer) ReadElement(key interface{}, value interface{},
 		for mapKey, mapValue := range valueType {
 			mapItem,
 				readError = schemaer.ReadElement(mapKey,
-				mapValue,
-				logger)
+				mapValue)
 			readMapValue[mapKey] = mapItem
 		}
 		readValue = readMapValue
@@ -122,8 +129,7 @@ func (schemaer Schema_Schemaer) ReadElement(key interface{}, value interface{},
 		for listKey, listValue := range valueType {
 			listItem,
 				readError = schemaer.ReadElement(listKey,
-				listValue,
-				logger)
+				listValue)
 			readListValue = append(readListValue, listItem)
 		}
 		readValue = readListValue

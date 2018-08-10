@@ -54,7 +54,7 @@ func (apiTools *APITooler) New(token string, url string) *API {
 	}
 }
 
-func (apiTools *APITooler) CheckStatus(api *API,
+func (apiTools *APITooler) CheckCloudDcApiStatus(api *API,
 	clientTooler *ClientTooler,
 	resourceTooler *ResourceTooler) error {
 	var apiClientErr error
@@ -157,15 +157,15 @@ func updateSchemaReadVdcResource(d *schema.ResourceData,
 	readResource map[string]interface{}) error {
 	var (
 		resourceNamePrefix strings.Builder
-		resourcesList []interface{}
+		resourcesList      []interface{}
 	)
 	resourceNamePrefix.WriteString(readResource[EnterpriseField].(string))
 	resourceNamePrefix.WriteString(monoField)
-	for _,resource := range readResource[VdcResourceField].([]interface{}) {
-		resource.(map[string]interface{})[ResourceField] = strings.TrimPrefix(resource.(map[string]interface{})[ResourceField].(string),resourceNamePrefix.String())
-		resourcesList = append(resourcesList,resource)
+	for _, resource := range readResource[VdcResourceField].([]interface{}) {
+		resource.(map[string]interface{})[ResourceField] = strings.TrimPrefix(resource.(map[string]interface{})[ResourceField].(string), resourceNamePrefix.String())
+		resourcesList = append(resourcesList, resource)
 	}
-	return d.Set(VdcResourceField,resourcesList)
+	return d.Set(VdcResourceField, resourcesList)
 }
 
 func (apier AirDrumResourcesApier) UpdateResource(d *schema.ResourceData,

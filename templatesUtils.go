@@ -19,7 +19,7 @@ type Templater interface {
 	ValidateTemplate(template map[string]interface{}) error
 	UpdateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
 		template map[string]interface{}) error
-	CreateTemplateOverrideConfig(d *schema.ResourceData,
+	CreateVmTemplateOverrideConfig(d *schema.ResourceData,
 		template map[string]interface{}) (string, error)
 }
 
@@ -49,9 +49,9 @@ type TemplateCreatedVmOverride struct {
 	Disk_image string        `json:"disk_image"`
 }
 
+// Known limitation : Redmine ticket #35489/#36874
 func (templater Template_Templater) FetchTemplateFromList(templateName string,
 	templateList []interface{}) (map[string]interface{}, error) {
-
 	var (
 		template          map[string]interface{} = nil
 		templateListError error                  = nil
@@ -81,6 +81,10 @@ func (templater Template_Templater) FetchTemplateFromList(templateName string,
 	return template, templateListError
 }
 
+// Validate a template is correctly formated  and has the required fields
+// correctly set :
+// "name", "os", "ram", "cpu", "enterprise", "disks"
+// It too alidate that "nics" fields is a slice if exists
 func (templater Template_Templater) ValidateTemplate(template map[string]interface{}) error {
 	var (
 		templateError              error
@@ -111,22 +115,25 @@ func (templater Template_Templater) ValidateTemplate(template map[string]interfa
 
 func (templater Template_Templater) UpdateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
 	template map[string]interface{}) error {
-	var templateHandleError error = nil
-	if d.Id() == "" {
-		for key, value := range template {
-			if reflect.ValueOf(key).IsValid() && reflect.ValueOf(value).IsValid() {
-				updateSchemaFieldOnResourceCreation(d, key, value)
-			}
-		}
-	} else {
-		templateHandleError = errors.New("Template field should not be set on " +
+	if d.Id() != "" {
+		return errors.New("Template field should not be set on " +
 			"an existing resource, please review the configuration field." +
 			"\n : The resource schema has not been updated.")
 	}
-	return templateHandleError
+	for key, value := range template {
+		if reflect.ValueOf(key).IsValid() && reflect.ValueOf(value).IsValid() {
+			updateSchemaFieldOnResourceCreation(d, key, value)
+		}
+	}
+	return nil
 }
 
-func (templater Template_Templater) CreateTemplateOverrideConfig(d *schema.ResourceData,
+// Creation of a json override configuration file with additional vm resource
+// fields fetch from template. An override file is created because it is
+// not possible not wanted to modify initial configuration file.
+// Warning : The override file must be manually deleted after a deletion of all
+// resource created from the template.
+func (templater Template_Templater) CreateVmTemplateOverrideConfig(d *schema.ResourceData,
 	template map[string]interface{}) (string, error) {
 	vm := TemplateCreatedVmOverride{
 		RAM:        d.Get(RamField).(int),
@@ -137,17 +144,15 @@ func (templater Template_Templater) CreateTemplateOverrideConfig(d *schema.Resou
 		Disk_image: d.Get(DiskImageField).(string),
 	}
 	var (
-		schemaer     Schema_Schemaer
+		schemaer     SchemaSchemaer
 		err          error
 		listItem     interface{}
 		overrideFile strings.Builder
 		vmName       strings.Builder
 	)
-	logger := LoggerCreate("CreateTemplateOverrideConfig_" +
-		d.Get(TemplateField).(string) + ".log")
 	switch {
 	case d.Get(TemplateField) == "":
-		err = errors.New("Schema \"Template\" field is empty, " +
+		return "", errors.New("Schema \"Template\" field is empty, " +
 			"can not create a template override configuration.")
 	default:
 		overrideFile.WriteString(d.Get(TemplateField).(string))
@@ -163,9 +168,7 @@ func (templater Template_Templater) CreateTemplateOverrideConfig(d *schema.Resou
 		if _, err := os.Stat(overrideFile.String()); os.IsNotExist(err) {
 			readListValue := []interface{}{}
 			for listKey, listValue := range template[DisksField].([]interface{}) {
-				listItem, _ = schemaer.ReadElement(listKey,
-					listValue,
-					logger)
+				listItem, _ = schemaer.ReadElement(listKey, listValue)
 				disk := DiskModifiableFields{
 					Name:          listItem.(map[string]interface{})[NameField].(string),
 					Size:          listItem.(map[string]interface{})[SizeField].(int),
@@ -176,9 +179,7 @@ func (templater Template_Templater) CreateTemplateOverrideConfig(d *schema.Resou
 			vm.Disks = readListValue
 			readListValue = []interface{}{}
 			for listKey, listValue := range d.Get(NicsField).([]interface{}) {
-				listItem, _ = schemaer.ReadElement(listKey,
-					listValue,
-					logger)
+				listItem, _ = schemaer.ReadElement(listKey, listValue)
 				nic := NicModifiableFields{
 					Vlan:      listItem.(map[string]interface{})[VlanNameField].(string),
 					Connected: listItem.(map[string]interface{})[ConnectedField].(bool),
@@ -193,8 +194,8 @@ func (templater Template_Templater) CreateTemplateOverrideConfig(d *schema.Resou
 			err = ioutil.WriteFile(overrideFile.String(),
 				vmJson, 0644)
 		}
+		return overrideFile.String(), err
 	}
-	return overrideFile.String(), err
 }
 
 func conformizeNicsSliceOnResourceCreation(d *schema.ResourceData,
@@ -224,7 +225,9 @@ func conformizeNicsSliceOnResourceCreation(d *schema.ResourceData,
 	return schemaNicsSlice
 }
 
-func updateSchemaFieldOnResourceCreation(d *schema.ResourceData, key string, value interface{}) {
+func updateSchemaFieldOnResourceCreation(d *schema.ResourceData,
+	key string,
+	value interface{}) {
 	var (
 		templateParamName     string      = reflect.ValueOf(key).String()
 		interfaceTemplateName interface{} = reflect.ValueOf(value).Interface()

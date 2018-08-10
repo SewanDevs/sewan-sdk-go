@@ -25,11 +25,12 @@ func (client HttpClienterDummy) HandleResponse(resp *http.Response,
 }
 
 var (
-	ResourceDeletionSuccessHttpClienterFake = HttpClienterDummy{}
-	ResourceUpdateSuccessHttpClienterFake   = HttpClienterDummy{}
-	ResourceCreationFailureHttpClienterFake = ResourceDeletionFailureHttpClienterFake{}
-	ResourceUpdateFailureHttpClienterFake   = ResourceDeletionFailureHttpClienterFake{}
-	ResourceReadFailureHttpClienterFake     = ResourceDeletionFailureHttpClienterFake{}
+	ResourceDeletionSuccessHttpClienterFake               = HttpClienterDummy{}
+	ResourceUpdateSuccessHttpClienterFake                 = HttpClienterDummy{}
+	ResourceCreationFailureHttpClienterFake               = ResourceDeletionFailureHttpClienterFake{}
+	ResourceUpdateFailureHttpClienterFake                 = ResourceDeletionFailureHttpClienterFake{}
+	ResourceReadFailureHttpClienterFake                   = ResourceDeletionFailureHttpClienterFake{}
+	HandleResponseEmptyReturnTemplateListHttpClienterFake = HttpClienterDummy{}
 )
 
 type ErrorResponseHttpClienterFake struct{}
@@ -189,55 +190,13 @@ type CheckRedirectReqFailure_HttpClienterFake struct{}
 func (client CheckRedirectReqFailure_HttpClienterFake) Do(api *API,
 	req *http.Request) (*http.Response, error) {
 	resp := http.Response{}
-	return &resp, errors.New(checkRedirectFailure)
+	return &resp, errCheckRedirectFailure
 }
 func (client CheckRedirectReqFailure_HttpClienterFake) GetTemplatesList(clientTooler *ClientTooler,
 	enterpriseSlug string, api *API) ([]interface{}, error) {
 	return nil, nil
 }
 func (client CheckRedirectReqFailure_HttpClienterFake) HandleResponse(resp *http.Response,
-	expectedCode int,
-	expectedBodyFormat string) (interface{}, error) {
-	return nil, nil
-}
-
-type FakeHttpClienter struct{}
-
-func (client FakeHttpClienter) Do(api *API, req *http.Request) (*http.Response, error) {
-	var err error
-	err = nil
-	type body struct {
-		detail string `json:"detail"`
-	}
-	resp := http.Response{}
-	if api.URL != noRespApiUrl {
-		resp.Status = "200 OK"
-		resp.StatusCode = http.StatusOK
-		switch {
-		case api.URL == wrongApiUrl || api.URL == noRespJsonBodyApiUrl:
-			resp.Header = map[string][]string{httpRespContentType: {"text/plain; charset=utf-8"}}
-			resp.Body = ioutil.NopCloser(bytes.NewBufferString("A plain text."))
-		case api.URL == rightApiUrl:
-			if api.Token != rightApiToken {
-				resp.Status = "401 Unauthorized"
-				resp.StatusCode = http.StatusUnauthorized
-				resp.Body = ioutil.NopCloser(bytes.NewBufferString("{\"detail\":\"Invalid token.\"}"))
-			} else {
-				resp.Header = map[string][]string{httpRespContentType: {httpJsonContentType}}
-				bodyJson, _ := json.Marshal(body{detail: ""})
-				resp.Body = ioutil.NopCloser(bytes.NewBuffer(bodyJson))
-			}
-		}
-	} else {
-		err = errors.New("No response error.")
-	}
-	return &resp, err
-}
-func (client FakeHttpClienter) GetTemplatesList(clientTooler *ClientTooler,
-	enterpriseSlug string, api *API) ([]interface{}, error) {
-	return nil, nil
-}
-func (client FakeHttpClienter) HandleResponse(resp *http.Response,
 	expectedCode int,
 	expectedBodyFormat string) (interface{}, error) {
 	return nil, nil

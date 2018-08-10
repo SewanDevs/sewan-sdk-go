@@ -11,8 +11,8 @@ var (
 	resourceOverrideJsonMap = map[string]interface{}{
 		"resource": map[string]interface{}{
 			"sewan_clouddc_vm": map[string]interface{}{
-				"CreateTemplateOverrideConfig Unit test": map[string]interface{}{
-					"name": "CreateTemplateOverrideConfig Unit test",
+				"CreateVmTemplateOverrideConfig Unit test": map[string]interface{}{
+					"name": "CreateVmTemplateOverrideConfig Unit test",
 					"disks": []interface{}{
 						map[string]interface{}{
 							"name":          "unit test disk template1",
@@ -44,8 +44,8 @@ var (
 	resourceN42OverrideJsonMap = map[string]interface{}{
 		"resource": map[string]interface{}{
 			"sewan_clouddc_vm": map[string]interface{}{
-				"CreateTemplateOverrideConfig Unit test": map[string]interface{}{
-					"name": "CreateTemplateOverrideConfig Unit test-${count.index + 1}",
+				"CreateVmTemplateOverrideConfig Unit test": map[string]interface{}{
+					"name": "CreateVmTemplateOverrideConfig Unit test-${count.index + 1}",
 					"disks": []interface{}{
 						map[string]interface{}{
 							"name":          "unit test disk template1",
@@ -127,7 +127,7 @@ var (
 		DynamicField: "",
 	}
 	vmCreationFromTemplate1Schema = map[string]interface{}{
-		NameField:       "CreateTemplateOverrideConfig Unit test",
+		NameField:       "CreateVmTemplateOverrideConfig Unit test",
 		RamField:        1,
 		CpuField:        1,
 		EnterpriseField: "unit test enterprise",
@@ -152,7 +152,7 @@ var (
 		DynamicField: "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"TemplateDisksOnCreation\":null}",
 	}
 	vmCreationN42FromTemplate1Schema = map[string]interface{}{
-		NameField:           "CreateTemplateOverrideConfig Unit test",
+		NameField:           "CreateVmTemplateOverrideConfig Unit test",
 		InstanceNumberField: 42,
 		RamField:            1,
 		CpuField:            1,
@@ -1225,7 +1225,7 @@ func vmInstanceNoTemplateFake() VM {
 func vdcSchemaInit(vdc map[string]interface{}) *schema.ResourceData {
 	d := resourceVdc().TestResourceData()
 	schemaTooler := SchemaTooler{
-		SchemaTools: Schema_Schemaer{},
+		SchemaTools: SchemaSchemaer{},
 	}
 	schemaTooler.SchemaTools.UpdateLocalResourceState(vdc, d, &schemaTooler)
 	return d
@@ -1235,7 +1235,7 @@ func vmSchemaInit(vm map[string]interface{}) *schema.ResourceData {
 	d := resourceVm().TestResourceData()
 
 	schemaTooler := SchemaTooler{
-		SchemaTools: Schema_Schemaer{},
+		SchemaTools: SchemaSchemaer{},
 	}
 	schemaTooler.SchemaTools.UpdateLocalResourceState(vm, d, &schemaTooler)
 

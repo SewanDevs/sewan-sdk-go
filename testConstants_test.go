@@ -19,7 +19,6 @@ const (
 	unauthorizedStatus         = "401 Unauthorized"
 	unauthorizedMsg            = "401 Unauthorized{\"detail\":\"Token non valide.\"}"
 	destroyWrongMsg            = "{\"detail\":\"Destroying resource wrong body message\"}"
-	checkRedirectFailure       = "CheckRedirectReqFailure"
 	vdcDestroyFailureMsg       = "Destroying the VDC now"
 	vmDestroyFailureMsg        = "Destroying the VM now"
 	wrongResourceType          = "a non supported ResourceType"

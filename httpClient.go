@@ -21,60 +21,43 @@ type Clienter interface {
 }
 type HttpClienter struct{}
 
+// Wrapper of package net/http for dependency injection
 func (client HttpClienter) Do(api *API, req *http.Request) (*http.Response, error) {
-	resp, err := api.Client.Do(req)
-	return resp, err
+	return api.Client.Do(req)
 }
 
 func (client HttpClienter) GetTemplatesList(clientTooler *ClientTooler,
 	enterpriseSlug string, api *API) ([]interface{}, error) {
-
-	var (
-		reqError           error
-		respError          error
-		handlerRespError   error
-		returnError        error         = nil
-		templateList       interface{}   = nil
-		returnTemplateList []interface{} = nil
-		templatesListUrl   strings.Builder
-	)
-	resp := &http.Response{}
-	req := &http.Request{}
+	var templatesListUrl strings.Builder
 	templatesListUrl.WriteString(api.URL)
 	templatesListUrl.WriteString("template/?enterprise__slug=")
 	templatesListUrl.WriteString(enterpriseSlug)
-	logger := loggerCreate("getTemplatesList.log")
-
-	logger.Println("templatesListUrl.String() = ", templatesListUrl.String())
-	req, reqError = http.NewRequest("GET",
+	req, err1 := http.NewRequest("GET",
 		templatesListUrl.String(),
 		nil)
-	req.Header.Add(httpAuthorization, httpTokenHeader+api.Token)
-	logger.Println("req = ", req)
-	logger.Println("reqError = ", reqError)
-	if reqError == nil {
-		resp, respError = clientTooler.Client.Do(api, req)
-		logger.Println("resp = ", resp)
-		if respError == nil {
-			templateList, handlerRespError = clientTooler.Client.HandleResponse(resp,
-				http.StatusOK,
-				httpJsonContentType)
-			if templateList != nil {
-				returnTemplateList = templateList.([]interface{})
-			}
-			if handlerRespError != nil {
-				returnError = handlerRespError
-			}
-		} else {
-			returnError = respError
-		}
-	} else {
-		returnError = reqError
+	if err1 != nil {
+		return nil, err1
 	}
-	logger.Println("returnTemplateList = ", returnTemplateList)
-	return returnTemplateList, returnError
+	req.Header.Add(httpAuthorization, httpTokenHeader+api.Token)
+	resp, err2 := clientTooler.Client.Do(api, req)
+	if err2 != nil {
+		return nil, err2
+	}
+	templateList, err3 := clientTooler.Client.HandleResponse(resp,
+		http.StatusOK,
+		httpJsonContentType)
+	if err3 != nil {
+		return nil, err3
+	}
+	if templateList == nil {
+		return nil, errEmptyTemplateList
+	}
+	return templateList.([]interface{}), nil
 }
 
+// HandleResponse format a reponse body to the "expectedBodyFormat", test the
+// response status code against the "expectedCode".
+// Handled reponse body format : "application/json", "text/html", ""
 func (client HttpClienter) HandleResponse(resp *http.Response,
 	expectedCode int,
 	expectedBodyFormat string) (interface{}, error) {

@@ -9,7 +9,7 @@ import (
 func TestDeleteTerraformResource(t *testing.T) {
 	d := CreateTestResourceSchema("resource to delete")
 	schemaTooler := SchemaTooler{
-		SchemaTools: Schema_Schemaer{},
+		SchemaTools: SchemaSchemaer{},
 	}
 	schemaTooler.SchemaTools.DeleteTerraformResource(d)
 	if d.Id() != "" {
@@ -44,7 +44,7 @@ func TestUpdateLocalResourceState_AND_ReadElement(t *testing.T) {
 		diffs string
 	)
 	schemaTooler := SchemaTooler{
-		SchemaTools: Schema_Schemaer{},
+		SchemaTools: SchemaSchemaer{},
 	}
 	for _, testCase := range testCases {
 		d = CreateTestResourceSchema(testCase.VmIdString)
@@ -88,7 +88,7 @@ func TestUpdateVdcResourcesNames(t *testing.T) {
 		diffs string
 	)
 	schemaTooler := SchemaTooler{
-		SchemaTools: Schema_Schemaer{},
+		SchemaTools: SchemaSchemaer{},
 	}
 	for _, testCase := range testCases {
 		schemaTooler.SchemaTools.UpdateVdcResourcesNames(testCase.DInit)

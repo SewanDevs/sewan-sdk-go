@@ -40,6 +40,13 @@ func TestGetTemplatesList(t *testing.T) {
 			nil,
 			errDoRequest,
 		},
+		{
+			4,
+			HandleResponseEmptyReturnTemplateListHttpClienterFake,
+			"unit test enterprise",
+			nil,
+			errEmptyTemplateList,
+		},
 	}
 	client_tooler := ClientTooler{}
 	client_tooler.Client = HttpClienter{}
