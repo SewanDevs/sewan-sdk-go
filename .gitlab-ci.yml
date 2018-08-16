@@ -17,7 +17,7 @@ fmt_and_unit_tests:
     - make test
   except:
     refs:
-      - master
+      - github_release
 
 sonarqube_preview:
   image: $DOCKER_REGISTRY/sidevops/docker/utils/sonar-ci:latest
@@ -34,7 +34,7 @@ sonarqube_preview:
       -Dsonar.gitlab.project_id=$CI_PROJECT_PATH
   except:
     refs:
-      - master
+      - github_release
 
 sonarqube:
   image: $DOCKER_REGISTRY/sidevops/docker/utils/sonar-ci:latest
@@ -45,22 +45,29 @@ sonarqube:
       -Dsonar.login=$SONAR_LOGIN
   except:
     refs:
-      - master
+      - github_release
 
 release-process:
-  image: $DOCKER_REGISTRY/sidevops/docker/utils/sonar-ci:latest
+  image: $DOCKER_REGISTRY/sidevops/docker/utils/terraform-ci:latest
   stage: release
   when: manual
   script:
-    - apt-get update
-    - apt-get install git
-    - git checkout master
-    - git merge staging
-    - sed -i 's/gitlab.com/github.com/g' $(gofmt -l $(find . -name '*.go'))
+    - ReleaseBranchName="AutoReleaseOnTag$(date '+%Y-%m-%d_%Hh%Mm%Ss')"
+    - git config --global user.email "robot@robot-ci.sewan"
+    - git config --global user.name "reader@sewan.fr"
+    - git remote set-url origin git@gitlab.priv.sewan.fr:rd/sewan_go_sdk.git
+    - git fetch origin --prune
+    - git checkout -b $ReleaseBranchName
     - rm .gitlab-ci.yml sonar-project.properties
+    - sed -i 's/gitlab.com/github.com/g' $(find . -name '*.go')
+    - gofmt -l $(find . -name '*.go')
     - git add .
     - git commit -m "Gitlab \"release-process\" pipeline job, update import path to match github ones and rm pipeline files."
+    - git checkout github_release
+    - git pull
+    - git merge $ReleaseBranchName
     - git push
   only:
     refs:
-      - staging
+      - master
+      - tags
