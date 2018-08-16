@@ -3,6 +3,7 @@ image: golang
 stages:
   - fmtAndUnitTest
   - sonar
+  - release
 
 # NB about symbolic link : https://redmine.priv.sewan.fr/issues/37334
 fmt_and_unit_tests:
@@ -14,6 +15,9 @@ fmt_and_unit_tests:
     - cd $GOPATH/src/gitlab.com/$CI_PROJECT_NAME
   script:
     - make test
+  except:
+    refs:
+      - master
 
 sonarqube_preview:
   image: $DOCKER_REGISTRY/sidevops/docker/utils/sonar-ci:latest
@@ -28,6 +32,9 @@ sonarqube_preview:
       -Dsonar.gitlab.commit_sha=$CI_BUILD_REF
       -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME
       -Dsonar.gitlab.project_id=$CI_PROJECT_PATH
+  except:
+    refs:
+      - master
 
 sonarqube:
   image: $DOCKER_REGISTRY/sidevops/docker/utils/sonar-ci:latest
@@ -36,3 +43,21 @@ sonarqube:
     - sh /opt/sonar-runner/bin/sonar-runner
       -Dsonar.host.url=$SONAR_URL
       -Dsonar.login=$SONAR_LOGIN
+  except:
+    refs:
+      - master
+
+release-process:
+  image: $DOCKER_REGISTRY/sidevops/docker/utils/sonar-ci:latest
+  stage: release
+  when: manual
+  script:
+    - git checkout master
+    - sed -i 's/gitlab.com/github.com/g' $(gofmt -l $(find . -name '*.go'))
+    - rm .gitlab-ci.yml sonar-project.properties
+    - git add .
+    - git commit -m "Gitlab \"release-process\" pipeline job, update import path to match github ones and rm pipeline files."
+    - git push
+  only:
+    refs:
+      - staging
