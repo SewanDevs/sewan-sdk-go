@@ -52,7 +52,10 @@ release-process:
   stage: release
   when: manual
   script:
+    - apt-get update
+    - apt-get install git
     - git checkout master
+    - git merge staging
     - sed -i 's/gitlab.com/github.com/g' $(gofmt -l $(find . -name '*.go'))
     - rm .gitlab-ci.yml sonar-project.properties
     - git add .
