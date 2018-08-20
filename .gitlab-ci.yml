@@ -50,7 +50,6 @@ sonarqube:
 release-process:
   image: $DOCKER_REGISTRY/sidevops/docker/utils/terraform-ci:latest
   stage: release
-  when: manual
   script:
     - ReleaseBranchName="AutoReleaseOnTag$(date '+%Y-%m-%d_%Hh%Mm%Ss')"
     - git config --global user.email "robot@robot-ci.sewan"
