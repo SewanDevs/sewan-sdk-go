@@ -8,11 +8,11 @@ import (
 )
 
 var (
-	resourceOverrideJsonMap = map[string]interface{}{
+	resourceOverrideJSONMap = map[string]interface{}{
 		"resource": map[string]interface{}{
 			"sewan_clouddc_vm": map[string]interface{}{
-				"CreateVmTemplateOverrideConfig Unit test": map[string]interface{}{
-					"name": "CreateVmTemplateOverrideConfig Unit test",
+				"createVMTemplateOverrideConfig Unit test": map[string]interface{}{
+					"name": "createVMTemplateOverrideConfig Unit test",
 					"disks": []interface{}{
 						map[string]interface{}{
 							"name":          "unit test disk template1",
@@ -41,11 +41,11 @@ var (
 			},
 		},
 	}
-	resourceN42OverrideJsonMap = map[string]interface{}{
+	resourceN42OverrideJSONMap = map[string]interface{}{
 		"resource": map[string]interface{}{
 			"sewan_clouddc_vm": map[string]interface{}{
-				"CreateVmTemplateOverrideConfig Unit test": map[string]interface{}{
-					"name": "CreateVmTemplateOverrideConfig Unit test-${count.index + 1}",
+				"createVMTemplateOverrideConfig Unit test": map[string]interface{}{
+					"name": "createVMTemplateOverrideConfig Unit test-${count.index + 1}",
 					"disks": []interface{}{
 						map[string]interface{}{
 							"name":          "unit test disk template1",
@@ -74,11 +74,11 @@ var (
 			},
 		},
 	}
-	nonExistingErrorVmSchemaMap = map[string]interface{}{
-		IdField:         "an id, same behaviour if it's an int or float",
+	nonExistingErrorVMSchemaMap = map[string]interface{}{
+		IDField:         "an id, same behaviour if it's an int or float",
 		NameField:       "VM schema update unit test",
 		TemplateField:   "template1",
-		RamField:        2,
+		RAMField:        2,
 		EnterpriseField: "unit test enterprise",
 		NicsField: []interface{}{
 			map[string]interface{}{
@@ -91,7 +91,7 @@ var (
 	vmSchemaMapPreUpdateFromTemplate = map[string]interface{}{
 		NameField:       "VM schema update unit test",
 		TemplateField:   "template1",
-		RamField:        2,
+		RAMField:        2,
 		EnterpriseField: "unit test enterprise",
 		NicsField: []interface{}{
 			map[string]interface{}{
@@ -104,8 +104,8 @@ var (
 	vmSchemaMapPostUpdateFromTemplate = map[string]interface{}{
 		NameField:       "VM schema update unit test",
 		TemplateField:   "template1",
-		CpuField:        1,
-		RamField:        2,
+		CPUField:        1,
+		RAMField:        2,
 		EnterpriseField: "unit test enterprise",
 		NicsField: []interface{}{
 			map[string]interface{}{
@@ -127,9 +127,9 @@ var (
 		DynamicField: "",
 	}
 	vmCreationFromTemplate1Schema = map[string]interface{}{
-		NameField:       "CreateVmTemplateOverrideConfig Unit test",
-		RamField:        1,
-		CpuField:        1,
+		NameField:       "createVMTemplateOverrideConfig Unit test",
+		RAMField:        1,
+		CPUField:        1,
 		EnterpriseField: "unit test enterprise",
 		TemplateField:   "template1",
 		OsField:         "Debian",
@@ -152,10 +152,10 @@ var (
 		DynamicField: "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"TemplateDisksOnCreation\":null}",
 	}
 	vmCreationN42FromTemplate1Schema = map[string]interface{}{
-		NameField:           "CreateVmTemplateOverrideConfig Unit test",
+		NameField:           "createVMTemplateOverrideConfig Unit test",
 		InstanceNumberField: 42,
-		RamField:            1,
-		CpuField:            1,
+		RAMField:            1,
+		CPUField:            1,
 		EnterpriseField:     "unit test enterprise",
 		TemplateField:       "template1",
 		OsField:             "Debian",
@@ -178,8 +178,8 @@ var (
 		DynamicField: "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"TemplateDisksOnCreation\":null}",
 	}
 	vmCreationFromTemplate1SchemaPreCreationWrongNicsInitMap = map[string]interface{}{
-		RamField:        1,
-		CpuField:        1,
+		RAMField:        1,
+		CPUField:        1,
 		EnterpriseField: "unit test enterprise",
 		NameField:       "template1",
 		OsField:         "Debian",
@@ -199,11 +199,11 @@ var (
 		EnterpriseField: "enterprise",
 		VdcResourceField: []interface{}{
 			map[string]interface{}{
-				ResourceField: RamField,
+				ResourceField: RAMField,
 				TotalField:    20,
 			},
 			map[string]interface{}{
-				ResourceField: CpuField,
+				ResourceField: CPUField,
 				TotalField:    1,
 			},
 			map[string]interface{}{
@@ -251,13 +251,13 @@ var (
 		EnterpriseField: "enterprise",
 		VdcResourceField: []interface{}{
 			map[string]interface{}{
-				ResourceField: RamField,
+				ResourceField: RAMField,
 				TotalField:    20,
 				UsedField:     0,
 				SlugField:     "",
 			},
 			map[string]interface{}{
-				ResourceField: CpuField,
+				ResourceField: CPUField,
 				TotalField:    1,
 				UsedField:     0,
 				SlugField:     "",
@@ -287,13 +287,13 @@ var (
 		EnterpriseField: "unit test enterprise",
 		VdcResourceField: []interface{}{
 			map[string]interface{}{
-				ResourceField: RamField,
+				ResourceField: RAMField,
 				UsedField:     0,
 				TotalField:    20,
 				SlugField:     "unit test enterprise-mono-ram",
 			},
 			map[string]interface{}{
-				ResourceField: CpuField,
+				ResourceField: CPUField,
 				UsedField:     0,
 				TotalField:    1,
 				SlugField:     "unit test enterprise-mono-cpu",
@@ -320,12 +320,12 @@ var (
 		SlugField:    "unit test enterprise-dc1-vdc_te",
 		DynamicField: "",
 	}
-	noTemplateVmMap = map[string]interface{}{
+	noTemplateVMMap = map[string]interface{}{
 		NameField:  "Unit test no template vm resource",
 		StateField: "UP",
 		OsField:    "Debian",
-		RamField:   8,
-		CpuField:   4,
+		RAMField:   8,
+		CPUField:   4,
 		DisksField: []interface{}{
 			map[string]interface{}{
 				NameField:         "disk 1",
@@ -356,7 +356,7 @@ var (
 		BackupSizeField:   42,
 		CommentField:      "42",
 	}
-	existingTemplateNoAdditionalDiskVmMap = map[string]interface{}{
+	existingTemplateNoAdditionalDiskVMMap = map[string]interface{}{
 		NameField:         "Unit test template no disc add on vm resource",
 		EnterpriseField:   "unit test enterprise",
 		TemplateField:     "template1",
@@ -368,7 +368,7 @@ var (
 		TokenField:        "424242",
 		BackupField:       "backup_no_backup",
 	}
-	instanceNumberFieldUnitTestVmInstance = map[string]interface{}{
+	instanceNumberFieldUnitTestVMInstance = map[string]interface{}{
 		NameField:           "instanceNumberFieldUnitTest",
 		InstanceNumberField: 42,
 		EnterpriseField:     "unit test enterprise",
@@ -381,14 +381,14 @@ var (
 		TokenField:          "424242",
 		BackupField:         "backup_no_backup",
 	}
-	existingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap = map[string]interface{}{
-		NameField:       "existingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap",
+	existingTemplateWithAdditionalAndModifiedDisksAndNicsVMMap = map[string]interface{}{
+		NameField:       "existingTemplateWithAdditionalAndModifiedDisksAndNicsVMMap",
 		EnterpriseField: "unit test enterprise",
 		TemplateField:   "template1",
 		StateField:      "UP",
 		OsField:         "Debian",
-		RamField:        8,
-		CpuField:        4,
+		RAMField:        8,
+		CPUField:        4,
 		DisksField: []interface{}{
 			map[string]interface{}{
 				NameField:         "disk 1",
@@ -419,13 +419,13 @@ var (
 		BackupSizeField:   42,
 		CommentField:      "42",
 	}
-	nonExistingTemplateVmMap = map[string]interface{}{
+	nonExistingTemplateVMMap = map[string]interface{}{
 		NameField:         "windows95 vm",
 		EnterpriseField:   "unit test enterprise",
 		TemplateField:     "windows95",
 		StateField:        "UP",
-		RamField:          8,
-		CpuField:          4,
+		RAMField:          8,
+		CPUField:          4,
 		VdcField:          "vdc unit test",
 		BootField:         "on disk",
 		StorageClassField: "storage_enterprise",
@@ -435,11 +435,11 @@ var (
 		DiskImageField:    "",
 	}
 	template2Map = map[string]interface{}{
-		IdField:         40,
+		IDField:         40,
 		NameField:       "template2",
 		SlugField:       "unit test disk goulouglougoulouglou",
-		RamField:        1,
-		CpuField:        1,
+		RAMField:        1,
+		CPUField:        1,
 		OsField:         "CentOS",
 		EnterpriseField: "unit test enterprise",
 		DisksField: []interface{}{
@@ -456,11 +456,11 @@ var (
 		DynamicField: "",
 	}
 	lastTemplateInTemplatesList = map[string]interface{}{
-		IdField:         69,
+		IDField:         69,
 		NameField:       "lastTemplate",
 		SlugField:       "lastTemplate-slug",
-		RamField:        1,
-		CpuField:        1,
+		RAMField:        1,
+		CPUField:        1,
 		OsField:         "Debian",
 		EnterpriseField: "unit test enterprise",
 		DisksField: []interface{}{
@@ -488,11 +488,11 @@ var (
 		DynamicField: nil,
 	}
 	template1Map = map[string]interface{}{
-		IdField:         82,
+		IDField:         82,
 		NameField:       "template1",
 		SlugField:       "template1 slug",
-		RamField:        1,
-		CpuField:        1,
+		RAMField:        1,
+		CPUField:        1,
 		OsField:         "CentOS",
 		BootField:       "on disk",
 		EnterpriseField: "unit test enterprise",
@@ -519,11 +519,11 @@ var (
 		DynamicField: "",
 	}
 	template1MapBis = map[string]interface{}{
-		IdField:         82,
+		IDField:         82,
 		NameField:       "template1",
 		SlugField:       "template1 slug",
-		RamField:        1,
-		CpuField:        1,
+		RAMField:        1,
+		CPUField:        1,
 		OsField:         "CentOS",
 		BootField:       "on disk",
 		EnterpriseField: "unit test enterprise",
@@ -551,11 +551,11 @@ var (
 		template2Map,
 		template1Map,
 		map[string]interface{}{
-			IdField:         41,
+			IDField:         41,
 			NameField:       "template3",
 			SlugField:       "unit test template3 slug",
-			RamField:        1,
-			CpuField:        1,
+			RAMField:        1,
+			CPUField:        1,
 			OsField:         "Debian",
 			EnterpriseField: "unit test enterprise",
 			DisksField: []interface{}{
@@ -572,11 +572,11 @@ var (
 			DynamicField: "",
 		},
 		map[string]interface{}{
-			IdField:         43,
+			IDField:         43,
 			NameField:       "template4",
 			SlugField:       "tpl-centos7-rd",
-			RamField:        1,
-			CpuField:        1,
+			RAMField:        1,
+			CPUField:        1,
 			OsField:         "CentOS",
 			EnterpriseField: "unit test enterprise",
 			DisksField: []interface{}{
@@ -604,11 +604,11 @@ var (
 			DynamicField: nil,
 		},
 		map[string]interface{}{
-			IdField:         58,
+			IDField:         58,
 			NameField:       "template windaube7",
 			SlugField:       "slug windows7",
-			RamField:        1,
-			CpuField:        1,
+			RAMField:        1,
+			CPUField:        1,
 			OsField:         "Windows Serveur 64bits",
 			EnterpriseField: "unit test enterprise",
 			DisksField: []interface{}{
@@ -631,13 +631,13 @@ var (
 		"Wrongly formated template",
 		lastTemplateInTemplatesList,
 	}
-	testUpdateVmMap = map[string]interface{}{
-		IdField:    "unit test vm",
+	testUpdateVMMap = map[string]interface{}{
+		IDField:    "unit test vm",
 		NameField:  "Unit test vm",
 		StateField: "DOWN",
 		OsField:    "CentOS",
-		RamField:   16,
-		CpuField:   8,
+		RAMField:   16,
+		CPUField:   8,
 		DisksField: []interface{}{
 			map[string]interface{}{
 				NameField:         "disk 1 update",
@@ -672,13 +672,13 @@ var (
 		BackupSizeField:   42,
 		CommentField:      "",
 	}
-	testUpdateVmMapIntId = map[string]interface{}{
-		IdField:    1212,
+	testUpdateVMMapIntID = map[string]interface{}{
+		IDField:    1212,
 		NameField:  "Unit test vm",
 		StateField: "DOWN",
 		OsField:    "CentOS",
-		RamField:   16,
-		CpuField:   8,
+		RAMField:   16,
+		CPUField:   8,
 		DisksField: []interface{}{
 			map[string]interface{}{
 				NameField:         "disk 1 update",
@@ -713,13 +713,13 @@ var (
 		BackupSizeField:   43,
 		CommentField:      "",
 	}
-	testUpdateVmMapFloatId = map[string]interface{}{
-		IdField:    121212.12,
+	testUpdateVMMapFloatID = map[string]interface{}{
+		IDField:    121212.12,
 		NameField:  "Unit test vm",
 		StateField: "DOWN",
 		OsField:    "CentOS",
-		RamField:   16,
-		CpuField:   8,
+		RAMField:   16,
+		CPUField:   8,
 		DisksField: []interface{}{
 			map[string]interface{}{
 				NameField:         "disk 1 update",
@@ -811,7 +811,7 @@ func resourceVdc() *schema.Resource {
 	}
 }
 
-func resourceVmDisk() *schema.Resource {
+func resourceVMDisk() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			NameField: &schema.Schema{
@@ -838,7 +838,7 @@ func resourceVmDisk() *schema.Resource {
 	}
 }
 
-func resourceVmNic() *schema.Resource {
+func resourceVMNic() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			VlanNameField: &schema.Schema{
@@ -857,7 +857,7 @@ func resourceVmNic() *schema.Resource {
 	}
 }
 
-func resourceVm() *schema.Resource {
+func resourceVM() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			NameField: &schema.Schema{
@@ -884,23 +884,23 @@ func resourceVm() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			RamField: &schema.Schema{
+			RAMField: &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
-			CpuField: &schema.Schema{
+			CPUField: &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
 			DisksField: &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
-				Elem:     resourceVmDisk(),
+				Elem:     resourceVMDisk(),
 			},
 			NicsField: &schema.Schema{
 				Type:     schema.TypeList,
 				Optional: true,
-				Elem:     resourceVmNic(),
+				Elem:     resourceVMNic(),
 			},
 			VdcField: &schema.Schema{
 				Type:     schema.TypeString,
@@ -954,11 +954,11 @@ func resourceVm() *schema.Resource {
 	}
 }
 
-func FakeVdcInstanceVdcCreationMap() VDC {
-	return VDC{
+func fakeVdcInstanceVdcCreationMap() vdcStruct {
+	return vdcStruct{
 		Name:       "Unit test vdc resource",
 		Enterprise: "enterprise",
-		Vdc_resources: []interface{}{
+		VdcResources: []interface{}{
 			map[string]interface{}{
 				ResourceField: "enterprise-mono-ram",
 				UsedField:     0,
@@ -995,12 +995,12 @@ func FakeVdcInstanceVdcCreationMap() VDC {
 	}
 }
 
-func vdcInstanceFake() VDC {
-	return VDC{
+func vdcInstanceFake() vdcStruct {
+	return vdcStruct{
 		Name:       "Unit test vdc resource",
 		Enterprise: "Unit Test value",
 		Datacenter: "Unit Test value",
-		Vdc_resources: []interface{}{
+		VdcResources: []interface{}{
 			map[string]interface{}{
 				ResourceField: "Resource1",
 				UsedField:     1,
@@ -1025,8 +1025,8 @@ func vdcInstanceFake() VDC {
 	}
 }
 
-func vmInstanceNoTemplateVmMap() VM {
-	return VM{
+func vmInstanceNoTemplateVMMap() vmStruct {
+	return vmStruct{
 		Name:  "Unit test no template vm resource",
 		State: "UP",
 		OS:    "Debian",
@@ -1053,22 +1053,22 @@ func vmInstanceNoTemplateVmMap() VM {
 				ConnectedField: true,
 			},
 		},
-		Vdc:           "vdc unit test",
-		Boot:          "on disk",
-		Storage_class: "storage_enterprise",
-		Slug:          "42",
-		Token:         "424242",
-		Backup:        "backup_no_backup",
-		Disk_image:    "",
-		Platform_name: "42",
-		Backup_size:   42,
-		Comment:       "",
-		DynamicField:  "{\"terraform_provisioned\":true,\"creationTemplate\":\"\",\"TemplateDisksOnCreation\":null}",
+		Vdc:          "vdc unit test",
+		Boot:         "on disk",
+		StorageClass: "storage_enterprise",
+		Slug:         "42",
+		Token:        "424242",
+		Backup:       "backup_no_backup",
+		DiskImage:    "",
+		PlatformName: "42",
+		BackupSize:   42,
+		Comment:      "",
+		DynamicField: "{\"terraform_provisioned\":true,\"creationTemplate\":\"\",\"TemplateDisksOnCreation\":null}",
 	}
 }
 
-func FakeVmInstanceExistingTemplateNoAdditionalDiskVmMap() VM {
-	return VM{
+func fakeVMInstanceExistingTemplateNoAdditionalDiskVMMap() vmStruct {
+	return vmStruct{
 		Name:       "Unit test template no disc add on vm resource-0",
 		Enterprise: "unit test enterprise",
 		Template:   "template1",
@@ -1084,19 +1084,19 @@ func FakeVmInstanceExistingTemplateNoAdditionalDiskVmMap() VM {
 				VDiskField:        "",
 			},
 		},
-		Nics:          []interface{}{},
-		Vdc:           "vdc unit test",
-		Boot:          "on disk",
-		Storage_class: "storage_enterprise",
-		Slug:          "42",
-		Token:         "424242",
-		Backup:        "backup_no_backup",
-		DynamicField:  "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"TemplateDisksOnCreation\":[{\"name\":\"template1 disk1\",\"size\":20,\"slug\":\"template1 disk1 slug\",\"storage_class\":\"storage_enterprise\"}]}",
+		Nics:         []interface{}{},
+		Vdc:          "vdc unit test",
+		Boot:         "on disk",
+		StorageClass: "storage_enterprise",
+		Slug:         "42",
+		Token:        "424242",
+		Backup:       "backup_no_backup",
+		DynamicField: "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"TemplateDisksOnCreation\":[{\"name\":\"template1 disk1\",\"size\":20,\"slug\":\"template1 disk1 slug\",\"storage_class\":\"storage_enterprise\"}]}",
 	}
 }
 
-func FakeVmInstanceInstanceNumberFieldUnitTestVmInstance_MAP() VM {
-	return VM{
+func fakeVMInstanceInstanceNumberFieldUnitTestVMInstanceMAP() vmStruct {
+	return vmStruct{
 		Name:       "instanceNumberFieldUnitTest-42",
 		Enterprise: "unit test enterprise",
 		Template:   "template1",
@@ -1112,20 +1112,20 @@ func FakeVmInstanceInstanceNumberFieldUnitTestVmInstance_MAP() VM {
 				VDiskField:        "",
 			},
 		},
-		Nics:          []interface{}{},
-		Vdc:           "vdc unit test",
-		Boot:          "on disk",
-		Storage_class: "storage_enterprise",
-		Slug:          "42",
-		Token:         "424242",
-		Backup:        "backup_no_backup",
-		DynamicField:  "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"TemplateDisksOnCreation\":[{\"name\":\"template1 disk1\",\"size\":20,\"slug\":\"template1 disk1 slug\",\"storage_class\":\"storage_enterprise\"}]}",
+		Nics:         []interface{}{},
+		Vdc:          "vdc unit test",
+		Boot:         "on disk",
+		StorageClass: "storage_enterprise",
+		Slug:         "42",
+		Token:        "424242",
+		Backup:       "backup_no_backup",
+		DynamicField: "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"TemplateDisksOnCreation\":[{\"name\":\"template1 disk1\",\"size\":20,\"slug\":\"template1 disk1 slug\",\"storage_class\":\"storage_enterprise\"}]}",
 	}
 }
 
-func FakeVmInstanceExistingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap() VM {
-	return VM{
-		Name:       "existingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap-0",
+func fakeVMInstanceExistingTemplateWithAdditionalAndModifiedDisksAndNicsVMMap() vmStruct {
+	return vmStruct{
+		Name:       "existingTemplateWithAdditionalAndModifiedDisksAndNicsVMMap-0",
 		Enterprise: "unit test enterprise",
 		Template:   "template1",
 		State:      "UP",
@@ -1160,22 +1160,22 @@ func FakeVmInstanceExistingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap() 
 				ConnectedField: true,
 			},
 		},
-		Vdc:           "vdc unit test",
-		Boot:          "on disk",
-		Storage_class: "storage_enterprise",
-		Slug:          "42",
-		Token:         "424242",
-		Backup:        "backup_no_backup",
-		Disk_image:    "",
-		Platform_name: "42",
-		Backup_size:   42,
-		Comment:       "",
-		DynamicField:  "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"TemplateDisksOnCreation\":[{\"name\":\"template1 disk1\",\"size\":20,\"slug\":\"template1 disk1 slug\",\"storage_class\":\"storage_enterprise\"}]}",
+		Vdc:          "vdc unit test",
+		Boot:         "on disk",
+		StorageClass: "storage_enterprise",
+		Slug:         "42",
+		Token:        "424242",
+		Backup:       "backup_no_backup",
+		DiskImage:    "",
+		PlatformName: "42",
+		BackupSize:   42,
+		Comment:      "",
+		DynamicField: "{\"terraform_provisioned\":true,\"creationTemplate\":\"template1\",\"TemplateDisksOnCreation\":[{\"name\":\"template1 disk1\",\"size\":20,\"slug\":\"template1 disk1 slug\",\"storage_class\":\"storage_enterprise\"}]}",
 	}
 }
 
-func vmInstanceNoTemplateFake() VM {
-	return VM{
+func vmInstanceNoTemplateFake() vmStruct {
+	return vmStruct{
 		Name:       "Unit test vm resource",
 		Enterprise: "Unit Test value",
 		Template:   "",
@@ -1209,16 +1209,16 @@ func vmInstanceNoTemplateFake() VM {
 				ConnectedField: false,
 			},
 		},
-		Vdc:           "Unit Test value",
-		Boot:          "Unit Test value",
-		Storage_class: "Unit Test value",
-		Slug:          "Unit Test value",
-		Token:         "Unit Test value",
-		Backup:        "Unit Test value",
-		Disk_image:    "Unit Test value",
-		Platform_name: "Unit Test value",
-		Backup_size:   42,
-		Comment:       "",
+		Vdc:          "Unit Test value",
+		Boot:         "Unit Test value",
+		StorageClass: "Unit Test value",
+		Slug:         "Unit Test value",
+		Token:        "Unit Test value",
+		Backup:       "Unit Test value",
+		DiskImage:    "Unit Test value",
+		PlatformName: "Unit Test value",
+		BackupSize:   42,
+		Comment:      "",
 	}
 }
 
@@ -1232,7 +1232,7 @@ func vdcSchemaInit(vdc map[string]interface{}) *schema.ResourceData {
 }
 
 func vmSchemaInit(vm map[string]interface{}) *schema.ResourceData {
-	d := resourceVm().TestResourceData()
+	d := resourceVM().TestResourceData()
 
 	schemaTooler := SchemaTooler{
 		SchemaTools: SchemaSchemaer{},
@@ -1248,8 +1248,8 @@ func resource(resourceType string) *schema.Resource {
 	switch resourceType {
 	case VdcResourceType:
 		resource = resourceVdc()
-	case VmResourceType:
-		resource = resourceVm()
+	case VMResourceType:
+		resource = resourceVM()
 	default:
 		resource = &schema.Resource{
 			Schema: map[string]*schema.Schema{
@@ -1263,25 +1263,25 @@ func resource(resourceType string) *schema.Resource {
 	return resource
 }
 
-type Resp_Body struct {
+type RespBody struct {
 	Detail string `json:"detail"`
 }
 
-func JsonStub() map[string]interface{} {
+func JSONStub() map[string]interface{} {
 
 	var jsonStub interface{}
-	simpleJson, _ := json.Marshal(Resp_Body{Detail: "a simple json"})
-	jsonBytes := ioutil.NopCloser(bytes.NewBuffer(simpleJson))
+	simpleJSON, _ := json.Marshal(RespBody{Detail: "a simple json"})
+	jsonBytes := ioutil.NopCloser(bytes.NewBuffer(simpleJSON))
 	readBytes, _ := ioutil.ReadAll(jsonBytes)
 	_ = json.Unmarshal(readBytes, &jsonStub)
 
 	return jsonStub.(map[string]interface{})
 }
 
-func JsonTemplateListFake() []interface{} {
+func JSONTemplateListFake() []interface{} {
 	var jsonFake interface{}
-	fakeJson, _ := json.Marshal(templatesList)
-	jsonBytes := ioutil.NopCloser(bytes.NewBuffer(fakeJson))
+	fakeJSON, _ := json.Marshal(templatesList)
+	jsonBytes := ioutil.NopCloser(bytes.NewBuffer(fakeJSON))
 	readBytes, _ := ioutil.ReadAll(jsonBytes)
 	_ = json.Unmarshal(readBytes, &jsonFake)
 

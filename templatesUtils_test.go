@@ -9,7 +9,7 @@ import (
 
 func TestFetchTemplateFromList(t *testing.T) {
 	testCases := []struct {
-		Id           int
+		ID           int
 		TemplateName string
 		TemplateList []interface{}
 		Template     map[string]interface{}
@@ -20,7 +20,7 @@ func TestFetchTemplateFromList(t *testing.T) {
 			"",
 			[]interface{}{},
 			map[string]interface{}(nil),
-			errors.New("Template \"\" does not exists, please validate it's name."),
+			errors.New("template \"\" does not exists, please validate it's name"),
 		},
 		{
 			2,
@@ -41,7 +41,7 @@ func TestFetchTemplateFromList(t *testing.T) {
 			"template 42",
 			templatesList,
 			map[string]interface{}(nil),
-			errors.New("Template \"template 42\" does not exists, please validate it's name."),
+			errors.New("template \"template 42\" does not exists, please validate it's name"),
 		},
 		{
 			5,
@@ -60,11 +60,11 @@ func TestFetchTemplateFromList(t *testing.T) {
 		diffs      string
 		errorError bool
 	)
-	fakeTemplates_tooler := TemplatesTooler{
-		TemplatesTools: Template_Templater{},
+	fakeTemplatesTooler := TemplatesTooler{
+		TemplatesTools: TemplateTemplater{},
 	}
 	for _, testCase := range testCases {
-		template, err = fakeTemplates_tooler.TemplatesTools.FetchTemplateFromList(testCase.TemplateName,
+		template, err = fakeTemplatesTooler.TemplatesTools.FetchTemplateFromList(testCase.TemplateName,
 			testCase.TemplateList)
 		diffs = cmp.Diff(template, testCase.Template)
 		switch {
@@ -76,15 +76,15 @@ func TestFetchTemplateFromList(t *testing.T) {
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"\n"+
 					"\n\nAND Wrong FetchTemplateFromList() template"+
 					" (-got +want) :\n%s",
-					testCase.Id, err, testCase.Error,
+					testCase.ID, err, testCase.Error,
 					diffs)
 			case errorError && (diffs == ""):
 				t.Errorf("\n\nTC %d : FetchTemplateFromList() error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-					testCase.Id, err, testCase.Error)
+					testCase.ID, err, testCase.Error)
 			case !errorError && (diffs != ""):
 				t.Errorf("\n\nTC %d : Wrong FetchTemplateFromList() template"+
-					" (-got +want) :\n%s", testCase.Id, diffs)
+					" (-got +want) :\n%s", testCase.ID, diffs)
 			}
 		case err != nil && testCase.Error != nil:
 			errorError = err.Error() != testCase.Error.Error()
@@ -93,21 +93,21 @@ func TestFetchTemplateFromList(t *testing.T) {
 				t.Errorf("\n\nTC %d : FetchTemplateFromList() error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\""+
 					"AND Wrong FetchTemplateFromList() template (-got +want) :\n%s",
-					testCase.Id, err.Error(), testCase.Error.Error(), diffs)
+					testCase.ID, err.Error(), testCase.Error.Error(), diffs)
 			case errorError && (diffs == ""):
 				t.Errorf("\n\nTC %d : FetchTemplateFromList() error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-					testCase.Id, err.Error(), testCase.Error.Error())
+					testCase.ID, err.Error(), testCase.Error.Error())
 			case !errorError && (diffs != ""):
 				t.Errorf("\n\nTC %d : Wrong FetchTemplateFromList() template"+
-					" (-got +want) :\n%s", testCase.Id, diffs)
+					" (-got +want) :\n%s", testCase.ID, diffs)
 			}
 		}
 	}
 }
 func TestValidateTemplate(t *testing.T) {
 	testCases := []struct {
-		Id       int
+		ID       int
 		Template map[string]interface{}
 		Error    error
 	}{
@@ -116,8 +116,8 @@ func TestValidateTemplate(t *testing.T) {
 			map[string]interface{}{},
 			errors.New("Template missing fields : " + "\"" + NameField + "\" " +
 				"\"" + OsField + "\" " +
-				"\"" + RamField + "\" " +
-				"\"" + CpuField + "\" " +
+				"\"" + RAMField + "\" " +
+				"\"" + CPUField + "\" " +
 				"\"" + EnterpriseField + "\" " +
 				"\"" + DisksField + "\" "),
 		},
@@ -135,24 +135,24 @@ func TestValidateTemplate(t *testing.T) {
 	var (
 		err error
 	)
-	fakeTemplates_tooler := TemplatesTooler{
-		TemplatesTools: Template_Templater{},
+	fakeTemplatesTooler := TemplatesTooler{
+		TemplatesTools: TemplateTemplater{},
 	}
 	for _, testCase := range testCases {
-		err = fakeTemplates_tooler.TemplatesTools.ValidateTemplate(testCase.Template)
+		err = fakeTemplatesTooler.TemplatesTools.validateTemplate(testCase.Template)
 		switch {
 		case err == nil || testCase.Error == nil:
 			if !(err == nil && testCase.Error == nil) {
-				t.Errorf("\n\nTC %d : ValidateTemplate() error was incorrect,"+
+				t.Errorf("\n\nTC %d : validateTemplate() error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-					testCase.Id, err, testCase.Error)
+					testCase.ID, err, testCase.Error)
 			}
 		case err != nil && testCase.Error != nil:
 			switch {
 			case err.Error() != testCase.Error.Error():
-				t.Errorf("\n\nTC %d : ValidateTemplate() error was incorrect,"+
+				t.Errorf("\n\nTC %d : validateTemplate() error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-					testCase.Id, err.Error(), testCase.Error.Error())
+					testCase.ID, err.Error(), testCase.Error.Error())
 			default:
 			}
 		}
@@ -161,7 +161,7 @@ func TestValidateTemplate(t *testing.T) {
 
 func TestUpdateSchemaFromTemplateOnResourceCreation(t *testing.T) {
 	testCases := []struct {
-		Id        int
+		ID        int
 		Dinit     *schema.ResourceData
 		Template  map[string]interface{}
 		DfinalMap map[string]interface{}
@@ -169,9 +169,9 @@ func TestUpdateSchemaFromTemplateOnResourceCreation(t *testing.T) {
 	}{
 		{
 			1,
-			vmSchemaInit(nonExistingErrorVmSchemaMap),
+			vmSchemaInit(nonExistingErrorVMSchemaMap),
 			template2Map,
-			nonExistingErrorVmSchemaMap,
+			nonExistingErrorVMSchemaMap,
 			errors.New("Template field should not be set on " +
 				"an existing resource, please review the configuration field." +
 				"\n : The resource schema has not been updated."),
@@ -190,21 +190,21 @@ func TestUpdateSchemaFromTemplateOnResourceCreation(t *testing.T) {
 		expectedVal interface{}
 		diffs       string
 	)
-	fakeTemplates_tooler := TemplatesTooler{
-		TemplatesTools: Template_Templater{},
+	fakeTemplatesTooler := TemplatesTooler{
+		TemplatesTools: TemplateTemplater{},
 	}
 	for _, testCase := range testCases {
-		err = fakeTemplates_tooler.TemplatesTools.UpdateSchemaFromTemplateOnResourceCreation(testCase.Dinit,
+		err = fakeTemplatesTooler.TemplatesTools.updateSchemaFromTemplateOnResourceCreation(testCase.Dinit,
 			testCase.Template)
 		switch {
 		case err == nil || testCase.Error == nil:
 			if !(err == nil && testCase.Error == nil) {
-				t.Errorf("\n\nTC %d : UpdateSchemaFromTemplateOnResourceCreation() error was incorrect,"+
+				t.Errorf("\n\nTC %d : updateSchemaFromTemplateOnResourceCreation() error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-					testCase.Id, err, testCase.Error)
+					testCase.ID, err, testCase.Error)
 			}
 			for fieldName, fieldValue := range testCase.DfinalMap {
-				if fieldName == IdField {
+				if fieldName == IDField {
 					testVal = testCase.Dinit.Id()
 				} else {
 					testVal = testCase.Dinit.Get(fieldName)
@@ -213,24 +213,24 @@ func TestUpdateSchemaFromTemplateOnResourceCreation(t *testing.T) {
 				diffs = cmp.Diff(testVal, expectedVal)
 				if diffs != "" {
 					t.Errorf("TC %d : Schema update error  (-got +want) :\n%s",
-						testCase.Id, diffs)
+						testCase.ID, diffs)
 				}
 			}
 		case err != nil && testCase.Error != nil:
 			switch {
 			case err.Error() != testCase.Error.Error():
-				t.Errorf("\n\nTC %d : UpdateSchemaFromTemplateOnResourceCreation() error was incorrect,"+
+				t.Errorf("\n\nTC %d : updateSchemaFromTemplateOnResourceCreation() error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-					testCase.Id, err.Error(), testCase.Error.Error())
+					testCase.ID, err.Error(), testCase.Error.Error())
 			default:
 			}
 		}
 	}
 }
 
-func TestCreateVmTemplateOverrideConfig(t *testing.T) {
+func TestCreateVMTemplateOverrideConfig(t *testing.T) {
 	testCases := []struct {
-		Id                     int
+		ID                     int
 		D                      *schema.ResourceData
 		Template               map[string]interface{}
 		OverrideFile           string
@@ -239,7 +239,7 @@ func TestCreateVmTemplateOverrideConfig(t *testing.T) {
 	}{
 		{
 			1,
-			vmSchemaInit(noTemplateVmMap),
+			vmSchemaInit(noTemplateVMMap),
 			map[string]interface{}{},
 			"",
 			map[string]interface{}{},
@@ -251,7 +251,7 @@ func TestCreateVmTemplateOverrideConfig(t *testing.T) {
 			vmSchemaInit(vmCreationFromTemplate1Schema),
 			template1MapBis,
 			"template1_Template_override.tf.json",
-			resourceOverrideJsonMap,
+			resourceOverrideJSONMap,
 			nil,
 		},
 		{
@@ -259,50 +259,50 @@ func TestCreateVmTemplateOverrideConfig(t *testing.T) {
 			vmSchemaInit(vmCreationN42FromTemplate1Schema),
 			template1MapBis,
 			"template1_Template_override.tf.json",
-			resourceN42OverrideJsonMap,
+			resourceN42OverrideJSONMap,
 			nil,
 		},
 	}
-	fakeTemplates_tooler := TemplatesTooler{
-		TemplatesTools: Template_Templater{},
+	fakeTemplatesTooler := TemplatesTooler{
+		TemplatesTools: TemplateTemplater{},
 	}
 	for _, testCase := range testCases {
 		overrideFile,
-			err := fakeTemplates_tooler.TemplatesTools.CreateVmTemplateOverrideConfig(testCase.D,
+			err := fakeTemplatesTooler.TemplatesTools.createVMTemplateOverrideConfig(testCase.D,
 			testCase.Template)
 		switch {
 		case overrideFile != testCase.OverrideFile:
-			t.Errorf("\n\nTC %d : CreateVmTemplateOverrideConfig() created overrideFile"+
+			t.Errorf("\n\nTC %d : createVMTemplateOverrideConfig() created overrideFile"+
 				" error."+
 				"\n\rcreatedFile: \"%s\"\n\rexpected: \"%s\"",
-				testCase.Id, overrideFile, testCase.OverrideFile)
+				testCase.ID, overrideFile, testCase.OverrideFile)
 		case err == nil || testCase.Error == nil:
 			if !(err == nil && testCase.Error == nil) {
-				t.Errorf("\n\nTC %d : CreateVmTemplateOverrideConfig() error was incorrect,"+
+				t.Errorf("\n\nTC %d : createVMTemplateOverrideConfig() error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-					testCase.Id, err, testCase.Error)
+					testCase.ID, err, testCase.Error)
 			} else {
-				jsonDiffs, err2 := CompareJsonAndMap(overrideFile,
+				jsonDiffs, err2 := compareJSONAndMap(overrideFile,
 					testCase.OverrideFileDataStruct)
 				if err2 != nil {
-					t.Errorf("\n\nTC %d : CreateVmTemplateOverrideConfig() "+
+					t.Errorf("\n\nTC %d : createVMTemplateOverrideConfig() "+
 						" json file and test data struct failed."+
 						"\n\rJson file error : \"%s",
-						testCase.Id, err2.Error())
+						testCase.ID, err2.Error())
 				}
 				if jsonDiffs != "" {
-					t.Errorf("\n\nTC %d : CreateVmTemplateOverrideConfig() generated"+
+					t.Errorf("\n\nTC %d : createVMTemplateOverrideConfig() generated"+
 						" json file is incorrect,"+
 						"\n\rDiffs (-got +want) : \"%s",
-						testCase.Id, jsonDiffs)
+						testCase.ID, jsonDiffs)
 				}
 			}
 		case err != nil && testCase.Error != nil:
 			switch {
 			case err.Error() != testCase.Error.Error():
-				t.Errorf("\n\nTC %d : CreateVmTemplateOverrideConfig() error was incorrect,"+
+				t.Errorf("\n\nTC %d : createVMTemplateOverrideConfig() error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-					testCase.Id, err.Error(), testCase.Error.Error())
+					testCase.ID, err.Error(), testCase.Error.Error())
 			default:
 			}
 		}

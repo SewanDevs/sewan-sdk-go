@@ -8,9 +8,14 @@ import (
 	"strings"
 )
 
+// SchemaTooler contains implementation of Schemaer interface
 type SchemaTooler struct {
 	SchemaTools Schemaer
 }
+
+// Schemaer interface is responsible of operations on :
+// * github.com/hashicorp/terraform/helper/schema
+// * terraform state file (.tfstate)
 type Schemaer interface {
 	DeleteTerraformResource(d *schema.ResourceData)
 	UpdateLocalResourceState(resourceState map[string]interface{},
@@ -18,39 +23,42 @@ type Schemaer interface {
 	UpdateVdcResourcesNames(d *schema.ResourceData) error
 	ReadElement(key interface{}, value interface{}) (interface{}, error)
 }
+
+// SchemaSchemaer implements Schemaer interface
 type SchemaSchemaer struct{}
 
+// DeleteTerraformResource deletes a resource from terraform state file (.tfstate)
 func (schemaer SchemaSchemaer) DeleteTerraformResource(d *schema.ResourceData) {
 	d.SetId("")
 }
 
-// Update of resource state in .tfstate file through schema update
+// UpdateLocalResourceState updates resource state in .tfstate file through schema update
 func (schemaer SchemaSchemaer) UpdateLocalResourceState(resourceState map[string]interface{},
 	d *schema.ResourceData, schemaTools *SchemaTooler) error {
 	var (
-		updateError error = nil
+		updateError error
 		readValue   interface{}
 	)
 	for key, value := range resourceState {
 		readValue, updateError = schemaTools.SchemaTools.ReadElement(key, value)
-		if key == IdField {
-			var s_id string = ""
+		if key == IDField {
+			var sID string
 			switch {
 			case reflect.TypeOf(value).Kind() == reflect.Float64:
-				s_id = strconv.FormatFloat(value.(float64), 'f', -1, 64)
+				sID = strconv.FormatFloat(value.(float64), 'f', -1, 64)
 			case reflect.TypeOf(value).Kind() == reflect.Int:
-				s_id = strconv.Itoa(value.(int))
+				sID = strconv.Itoa(value.(int))
 			case reflect.TypeOf(value).Kind() == reflect.String:
 				if value == nil {
-					s_id = ""
+					sID = ""
 				} else {
-					s_id = value.(string)
+					sID = value.(string)
 				}
 			default:
 				updateError = errors.New("Format of " + key + "(" +
 					reflect.TypeOf(value).Kind().String() + ") not handled.")
 			}
-			d.SetId(s_id)
+			d.SetId(sID)
 		} else {
 			updateError = d.Set(key, readValue)
 		}
@@ -59,13 +67,14 @@ func (schemaer SchemaSchemaer) UpdateLocalResourceState(resourceState map[string
 	return updateError
 }
 
-// Trim meaningless part of vdc resource name to store a shorter name locally
-// exemple of a trim : "<enterprise name>-mono-ram" -> "ram"
+// UpdateVdcResourcesNames trims meaningless part of vdc resource name to store
+// a shorter name locally, example :
+// * "<enterprise name>-mono-ram" -> "ram"
 func (schemaer SchemaSchemaer) UpdateVdcResourcesNames(d *schema.ResourceData) error {
 	var (
-		vdcResourcesList       []interface{} = d.Get(VdcResourceField).([]interface{})
-		vdcResourcesListUpdate []interface{} = []interface{}{}
-		enterpriseName         string        = d.Get(EnterpriseField).(string)
+		vdcResourcesList       = d.Get(VdcResourceField).([]interface{})
+		vdcResourcesListUpdate = []interface{}{}
+		enterpriseName         = d.Get(EnterpriseField).(string)
 		resourceName           string
 	)
 	for _, resource := range vdcResourcesList {
@@ -80,7 +89,7 @@ func (schemaer SchemaSchemaer) UpdateVdcResourcesNames(d *schema.ResourceData) e
 	return d.Set(VdcResourceField, vdcResourcesListUpdate)
 }
 
-// Format Element(key,value) value type to a type accepted by terraform :
+// ReadElement formats Element(key,value) value type to a type accepted by terraform :
 //
 // * value type -> terraform accepted type
 //
@@ -100,7 +109,7 @@ func (schemaer SchemaSchemaer) UpdateVdcResourcesNames(d *schema.ResourceData) e
 func (schemaer SchemaSchemaer) ReadElement(key interface{},
 	value interface{}) (interface{}, error) {
 	var (
-		readError error = nil
+		readError error
 		readValue interface{}
 	)
 	switch valueType := value.(type) {

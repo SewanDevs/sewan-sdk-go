@@ -9,64 +9,64 @@ import (
 
 func TestNew(t *testing.T) {
 	testCases := []struct {
-		Id          int
-		Input_token string
-		Input_url   string
-		Output_api  API
+		ID         int
+		InputToken string
+		InputURL   string
+		OutputAPI  API
 	}{
 		{1,
-			wrongApiToken,
-			rightApiUrl,
-			API{wrongApiToken, rightApiUrl, nil},
+			wrongAPIToken,
+			rightAPIURL,
+			API{wrongAPIToken, rightAPIURL, nil},
 		},
 		{2,
-			rightApiToken,
-			wrongApiUrl,
-			API{rightApiToken, wrongApiUrl, nil},
+			rightAPIToken,
+			wrongAPIURL,
+			API{rightAPIToken, wrongAPIURL, nil},
 		},
 		{3,
-			wrongApiToken,
-			wrongApiUrl,
-			API{wrongApiToken, wrongApiUrl, nil},
+			wrongAPIToken,
+			wrongAPIURL,
+			API{wrongAPIToken, wrongAPIURL, nil},
 		},
 		{4,
-			rightApiToken,
-			rightApiUrl,
-			API{rightApiToken, rightApiUrl, nil},
+			rightAPIToken,
+			rightAPIURL,
+			API{rightAPIToken, rightAPIURL, nil},
 		},
 	}
-	fakeApi_tools := APITooler{
-		Api: FakeAirDrumResource_APIer{},
+	fakeAPItools := APITooler{
+		APIImplementer: FakeAirDrumResourceAPIer{},
 	}
 	for _, testCase := range testCases {
-		api := fakeApi_tools.New(
-			testCase.Input_token,
-			testCase.Input_url,
+		api := fakeAPItools.New(
+			testCase.InputToken,
+			testCase.InputURL,
 		)
 		switch {
-		case api.Token != testCase.Output_api.Token:
+		case api.Token != testCase.OutputAPI.Token:
 			t.Errorf("\n\nTC %d : API token error was incorrect,"+
 				"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-				testCase.Id, api.Token, testCase.Output_api.Token)
-		case api.URL != testCase.Output_api.URL:
+				testCase.ID, api.Token, testCase.OutputAPI.Token)
+		case api.URL != testCase.OutputAPI.URL:
 			t.Errorf("\n\nTC %d : API token error was incorrect,"+
 				"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-				testCase.Id, api.URL, testCase.Output_api.URL)
+				testCase.ID, api.URL, testCase.OutputAPI.URL)
 		}
 	}
 }
 
-func TestCheckCloudDcApiStatus(t *testing.T) {
+func TestCheckCloudDcStatus(t *testing.T) {
 	testCases := []struct {
-		Id               int
-		Input_api        *API
+		ID               int
+		InputAPI         *API
 		TCResourceTooler Resourceer
 		Err              error
 	}{
 		{1,
 			&API{
-				wrongApiToken,
-				rightApiUrl,
+				wrongAPIToken,
+				rightAPIURL,
 				&http.Client{},
 			},
 			FakeResourceResourceer{},
@@ -74,41 +74,41 @@ func TestCheckCloudDcApiStatus(t *testing.T) {
 		},
 		{2,
 			&API{
-				rightApiToken,
-				wrongApiUrl,
+				rightAPIToken,
+				wrongAPIURL,
 				&http.Client{},
 			},
 			FakeResourceResourceer{},
-			errors.New(wrongApiUrlError),
+			errors.New(wrongAPIURLError),
 		},
 		{3,
 			&API{
-				wrongApiToken,
-				wrongApiUrl,
+				wrongAPIToken,
+				wrongAPIURL,
 				&http.Client{},
 			},
 			FakeResourceResourceer{},
-			errors.New(wrongApiUrlError),
+			errors.New(wrongAPIURLError),
 		},
 		{4,
 			&API{
-				rightApiToken,
-				rightApiUrl,
+				rightAPIToken,
+				rightAPIURL,
 				&http.Client{},
 			},
 			FakeResourceResourceer{},
 			nil,
 		},
 	}
-	fakeApi_tools := APITooler{}
+	fakeAPItools := APITooler{}
 	fakeClientTooler := &ClientTooler{
-		Client: HttpClienter{},
+		Client: HTTPClienter{},
 	}
 	fakeResourceTooler := &ResourceTooler{}
 	for _, testCase := range testCases {
-		fakeApi_tools.Api = FakeAirDrumResource_APIer{}
+		fakeAPItools.APIImplementer = FakeAirDrumResourceAPIer{}
 		fakeResourceTooler.Resource = testCase.TCResourceTooler
-		err := fakeApi_tools.CheckCloudDcApiStatus(testCase.Input_api,
+		err := fakeAPItools.CheckCloudDcStatus(testCase.InputAPI,
 			fakeClientTooler,
 			fakeResourceTooler)
 		switch {
@@ -116,12 +116,12 @@ func TestCheckCloudDcApiStatus(t *testing.T) {
 			if !(err == nil && testCase.Err == nil) {
 				t.Errorf("\n\nTC %d : Check API error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-					testCase.Id, err, testCase.Err)
+					testCase.ID, err, testCase.Err)
 			}
 		case err.Error() != testCase.Err.Error():
 			t.Errorf("\n\nTC %d : Check API error was incorrect,"+
 				"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-				testCase.Id, err.Error(), testCase.Err.Error())
+				testCase.ID, err.Error(), testCase.Err.Error())
 		}
 	}
 }
@@ -129,29 +129,29 @@ func TestCheckCloudDcApiStatus(t *testing.T) {
 func TestCreateResource(t *testing.T) {
 	resourceName := "Unit test resource creation"
 	testCases := []struct {
-		Id              int
+		ID              int
 		TcClienter      Clienter
 		ResourceType    string
-		Creation_Err    error
+		CreationErr     error
 		CreatedResource map[string]interface{}
 	}{
 		{
 			1,
-			VmCreationSuccessHttpClienterFake{},
-			VmResourceType,
+			VMCreationSuccessHTTPClienterFake{},
+			VMResourceType,
 			nil,
-			noTemplateVmMap,
+			noTemplateVMMap,
 		},
 		{
 			2,
-			HttpClienterDummy{},
+			HTTPClienterDummy{},
 			wrongResourceType,
 			errWrongResourceTypeBuilder(wrongResourceType),
 			map[string]interface{}{},
 		},
 		{
 			3,
-			ResourceCreationFailureHttpClienterFake,
+			ResourceCreationFailureHTTPClienterFake,
 			VdcResourceType,
 			errDoCrudRequestsBuilder(creationOperation,
 				resourceName,
@@ -160,17 +160,17 @@ func TestCreateResource(t *testing.T) {
 		},
 		{
 			4,
-			HandleRespErrHttpClienterFake{},
-			VmResourceType,
+			HandleRespErrHTTPClienterFake{},
+			VMResourceType,
 			errHandleResponse,
 			map[string]interface{}{},
 		},
 	}
-	apier := AirDrumResourcesApier{}
+	apier := AirDrumResourcesAPI{}
 	sewan := &API{Token: "42", URL: "42", Client: &http.Client{}}
 	fakeClientTooler := ClientTooler{}
-	fakeTemplates_tooler := TemplatesTooler{
-		TemplatesTools: Template_Templater{},
+	fakeTemplatesTooler := TemplatesTooler{
+		TemplatesTools: TemplateTemplater{},
 	}
 	fakeResourceTooler := ResourceTooler{
 		Resource: ResourceResourceer{},
@@ -183,32 +183,32 @@ func TestCreateResource(t *testing.T) {
 		fakeClientTooler.Client = testCase.TcClienter
 		respCreationMap, err := apier.CreateResource(d,
 			&fakeClientTooler,
-			&fakeTemplates_tooler,
+			&fakeTemplatesTooler,
 			&fakeResourceTooler,
 			testCase.ResourceType,
 			sewan)
 		diffs := cmp.Diff(testCase.CreatedResource, respCreationMap)
 		switch {
-		case err == nil || testCase.Creation_Err == nil:
-			if !(err == nil && testCase.Creation_Err == nil) {
+		case err == nil || testCase.CreationErr == nil:
+			if !(err == nil && testCase.CreationErr == nil) {
 				t.Errorf("\n\nTC %d : resource creation error was incorrect,"+
-					"\n\rgot: \"%s\"\n\rwant: \"%s\"", testCase.Id, err, testCase.Creation_Err)
+					"\n\rgot: \"%s\"\n\rwant: \"%s\"", testCase.ID, err, testCase.CreationErr)
 			} else {
 				switch {
 				case diffs != "":
 					t.Errorf("\n\nTC %d : Wrong created resource map (-got +want) :\n%s",
-						testCase.Id, diffs)
+						testCase.ID, diffs)
 				}
 			}
-		case err != nil && testCase.Creation_Err != nil:
-			if err.Error() != testCase.Creation_Err.Error() {
+		case err != nil && testCase.CreationErr != nil:
+			if err.Error() != testCase.CreationErr.Error() {
 				t.Errorf("\n\nTC %d : resource creation error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-					testCase.Id, err.Error(), testCase.Creation_Err.Error())
+					testCase.ID, err.Error(), testCase.CreationErr.Error())
 			}
 		case diffs != "":
 			t.Errorf("\n\nTC %d : Wrong created resource map (-got +want) \n%s",
-				testCase.Id, diffs)
+				testCase.ID, diffs)
 		}
 	}
 }
@@ -216,7 +216,7 @@ func TestCreateResource(t *testing.T) {
 func TestReadResource(t *testing.T) {
 	resourceName := "Unit test resource read"
 	testCases := []struct {
-		Id           int
+		ID           int
 		TcClienter   Clienter
 		ResourceType string
 		ReadError    error
@@ -224,28 +224,28 @@ func TestReadResource(t *testing.T) {
 	}{
 		{
 			1,
-			VmReadSuccessHttpClienterFake{},
-			VmResourceType,
+			VMReadSuccessHTTPClienterFake{},
+			VMResourceType,
 			nil,
-			noTemplateVmMap,
+			noTemplateVMMap,
 		},
 		{
 			2,
-			VdcReadSuccessHttpClienterFake{},
+			VdcReadSuccessHTTPClienterFake{},
 			VdcResourceType,
 			nil,
 			vdcReadResponseMap,
 		},
 		{
 			3,
-			HttpClienterDummy{},
+			HTTPClienterDummy{},
 			wrongResourceType,
 			errWrongResourceTypeBuilder(wrongResourceType),
 			map[string]interface{}{},
 		},
 		{
 			4,
-			ResourceReadFailureHttpClienterFake,
+			ResourceReadFailureHTTPClienterFake,
 			VdcResourceType,
 			errDoCrudRequestsBuilder(readOperation,
 				resourceName,
@@ -254,20 +254,20 @@ func TestReadResource(t *testing.T) {
 		},
 		{
 			5,
-			Error404HttpClienterFake{},
+			Error404HTTPClienterFake{},
 			VdcResourceType,
 			ErrResourceNotExist,
 			map[string]interface{}{},
 		},
 		{
 			6,
-			HandleRespErrHttpClienterFake{},
-			VmResourceType,
+			HandleRespErrHTTPClienterFake{},
+			VMResourceType,
 			errHandleResponse,
 			map[string]interface{}{},
 		},
 	}
-	Apier := AirDrumResourcesApier{}
+	APIImplementerer := AirDrumResourcesAPI{}
 	sewan := &API{Token: "42", URL: "42", Client: &http.Client{}}
 	fakeClientTooler := ClientTooler{}
 	fakeResourceTooler := ResourceTooler{
@@ -279,7 +279,7 @@ func TestReadResource(t *testing.T) {
 		d.SetId("UnitTest resource1")
 		d.Set(NameField, resourceName)
 		fakeClientTooler.Client = testCase.TcClienter
-		respCreationMap, err := Apier.ReadResource(d,
+		respCreationMap, err := APIImplementerer.ReadResource(d,
 			&fakeClientTooler,
 			&fakeResourceTooler,
 			testCase.ResourceType,
@@ -289,11 +289,11 @@ func TestReadResource(t *testing.T) {
 		case err == nil || testCase.ReadError == nil:
 			if !((err == nil) && (testCase.ReadError == nil)) {
 				t.Errorf("\n\nTC %d : resource read error was incorrect,"+
-					"\n\rgot: \"%s\"\n\rwant: \"%s\"", testCase.Id, err, testCase.ReadError)
+					"\n\rgot: \"%s\"\n\rwant: \"%s\"", testCase.ID, err, testCase.ReadError)
 			} else {
 				if diffs != "" {
 					t.Errorf("\n\nTC %d : Wrong resource read resource map (-got +want) :\n%s",
-						testCase.Id, diffs)
+						testCase.ID, diffs)
 				}
 			}
 		case err != nil && testCase.ReadError != nil:
@@ -301,16 +301,16 @@ func TestReadResource(t *testing.T) {
 				t.Errorf("\n\nTC %d : Wrong created resource map,"+
 					" it should be nil as error is not nil,"+
 					"\n\rgot map: \n\r\"%s\"\n\rwant map: \n\r\"%s\"\n\r",
-					testCase.Id, respCreationMap, testCase.ReadResource)
+					testCase.ID, respCreationMap, testCase.ReadResource)
 			}
 			if err.Error() != testCase.ReadError.Error() {
 				t.Errorf("\n\nTC %d : resource read error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-					testCase.Id, err.Error(), testCase.ReadError.Error())
+					testCase.ID, err.Error(), testCase.ReadError.Error())
 			}
 		case diffs != "":
 			t.Errorf("\n\nTC %d : Wrong resource read resource map (-got +want) :\n%s",
-				testCase.Id, diffs)
+				testCase.ID, diffs)
 		}
 	}
 }
@@ -318,37 +318,37 @@ func TestReadResource(t *testing.T) {
 func TestUpdateResource(t *testing.T) {
 	resourceName := "Unit test resource update"
 	testCases := []struct {
-		Id           int
+		ID           int
 		TcClienter   Clienter
 		ResourceType string
-		Update_Err   error
+		UpdateErr    error
 	}{
 		{
 			1,
-			ResourceUpdateSuccessHttpClienterFake,
-			VmResourceType,
+			ResourceUpdateSuccessHTTPClienterFake,
+			VMResourceType,
 			nil,
 		},
 		{
 			2,
-			HttpClienterDummy{},
+			HTTPClienterDummy{},
 			wrongResourceType,
 			errWrongResourceTypeBuilder(wrongResourceType),
 		},
 		{
 			3,
-			ResourceUpdateFailureHttpClienterFake,
+			ResourceUpdateFailureHTTPClienterFake,
 			VdcResourceType,
 			errDoCrudRequestsBuilder(updateOperation,
 				resourceName,
 				errEmptyResp),
 		},
 	}
-	Apier := AirDrumResourcesApier{}
+	APIImplementerer := AirDrumResourcesAPI{}
 	sewan := &API{Token: "42", URL: "42", Client: &http.Client{}}
 	fakeClientTooler := ClientTooler{}
-	fakeTemplates_tooler := TemplatesTooler{
-		TemplatesTools: Template_Templater{},
+	fakeTemplatesTooler := TemplatesTooler{
+		TemplatesTools: TemplateTemplater{},
 	}
 	fakeResourceTooler := ResourceTooler{
 		Resource: ResourceResourceer{},
@@ -359,22 +359,22 @@ func TestUpdateResource(t *testing.T) {
 		d.SetId("UnitTest resource1")
 		d.Set(NameField, resourceName)
 		fakeClientTooler.Client = testCase.TcClienter
-		err := Apier.UpdateResource(d,
+		err := APIImplementerer.UpdateResource(d,
 			&fakeClientTooler,
-			&fakeTemplates_tooler,
+			&fakeTemplatesTooler,
 			&fakeResourceTooler,
 			testCase.ResourceType,
 			sewan)
 		switch {
-		case err == nil || testCase.Update_Err == nil:
-			if !(err == nil && testCase.Update_Err == nil) {
+		case err == nil || testCase.UpdateErr == nil:
+			if !(err == nil && testCase.UpdateErr == nil) {
 				t.Errorf("\n\nTC %d : resource read error was incorrect,"+
-					"\n\rgot: \"%s\"\n\rwant: \"%s\"", testCase.Id, err, testCase.Update_Err)
+					"\n\rgot: \"%s\"\n\rwant: \"%s\"", testCase.ID, err, testCase.UpdateErr)
 			}
-		case err.Error() != testCase.Update_Err.Error():
+		case err.Error() != testCase.UpdateErr.Error():
 			t.Errorf("\n\nTC %d : resource read error was incorrect,"+
 				"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-				testCase.Id, err.Error(), testCase.Update_Err.Error())
+				testCase.ID, err.Error(), testCase.UpdateErr.Error())
 		}
 	}
 }
@@ -382,33 +382,33 @@ func TestUpdateResource(t *testing.T) {
 func TestDeleteResource(t *testing.T) {
 	resourceName := "Unit test resource deletion"
 	testCases := []struct {
-		Id           int
+		ID           int
 		TcClienter   Clienter
 		ResourceType string
-		Delete_Err   error
+		DeleteErr    error
 	}{
 		{
 			1,
-			ResourceDeletionSuccessHttpClienterFake,
-			VmResourceType,
+			ResourceDeletionSuccessHTTPClienterFake,
+			VMResourceType,
 			nil,
 		},
 		{
 			2,
-			HttpClienterDummy{},
+			HTTPClienterDummy{},
 			wrongResourceType,
 			errWrongResourceTypeBuilder(wrongResourceType),
 		},
 		{
 			3,
-			ResourceDeletionFailureHttpClienterFake{},
+			ResourceDeletionFailureHTTPClienterFake{},
 			VdcResourceType,
 			errDoCrudRequestsBuilder(deleteOperation,
 				resourceName,
 				errEmptyResp),
 		},
 	}
-	Apier := AirDrumResourcesApier{}
+	APIImplementerer := AirDrumResourcesAPI{}
 	sewan := &API{Token: "42", URL: "42", Client: &http.Client{}}
 	fakeClientTooler := ClientTooler{}
 	fakeResourceTooler := ResourceTooler{
@@ -420,21 +420,21 @@ func TestDeleteResource(t *testing.T) {
 		d.SetId("UnitTest resource1")
 		d.Set(NameField, resourceName)
 		fakeClientTooler.Client = testCase.TcClienter
-		err := Apier.DeleteResource(d,
+		err := APIImplementerer.DeleteResource(d,
 			&fakeClientTooler,
 			&fakeResourceTooler,
 			testCase.ResourceType,
 			sewan)
 		switch {
-		case err == nil || testCase.Delete_Err == nil:
-			if !(err == nil && testCase.Delete_Err == nil) {
+		case err == nil || testCase.DeleteErr == nil:
+			if !(err == nil && testCase.DeleteErr == nil) {
 				t.Errorf("\n\nTC %d : resource read error was incorrect,"+
-					"\n\rgot: \"%s\"\n\rwant: \"%s\"", testCase.Id, err, testCase.Delete_Err)
+					"\n\rgot: \"%s\"\n\rwant: \"%s\"", testCase.ID, err, testCase.DeleteErr)
 			}
-		case err.Error() != testCase.Delete_Err.Error():
+		case err.Error() != testCase.DeleteErr.Error():
 			t.Errorf("\n\nTC %d : resource read error was incorrect,"+
 				"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-				testCase.Id, err.Error(), testCase.Delete_Err.Error())
+				testCase.ID, err.Error(), testCase.DeleteErr.Error())
 		}
 	}
 }
