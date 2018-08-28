@@ -1,4 +1,4 @@
-package sewan_go_sdk
+package sewansdk
 
 import (
 	"github.com/google/go-cmp/cmp"

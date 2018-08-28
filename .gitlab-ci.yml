@@ -10,8 +10,8 @@ fmt_and_unit_tests:
   image: $DOCKER_REGISTRY/sidevops/docker/utils/terraform-ci:latest
   stage: fmtAndUnitTest
   before_script:
-    - rm -rf $GOPATH/src/gitlab.com/sewan_go_sdk
-    - mkdir $GOPATH/src/gitlab.com/rd/
+    - rm -rf $GOPATH/src/gitlab.com/rd/sewan-sdk-go
+    - mkdir $GOPATH/src/gitlab.com/rd
     - ln -s $CI_PROJECT_DIR $GOPATH/src/gitlab.com/rd/
     - cd $GOPATH/src/gitlab.com/rd/$CI_PROJECT_NAME
   script:
@@ -55,7 +55,7 @@ release-process:
     - ReleaseBranchName="AutoReleaseOnTag$(date '+%Y-%m-%d_%Hh%Mm%Ss')"
     - git config --global user.email "robot@robot-ci.sewan"
     - git config --global user.name "reader@sewan.fr"
-    - git remote set-url origin git@gitlab.priv.sewan.fr:rd/sewan_go_sdk.git
+    - git remote set-url origin git@gitlab.priv.sewan.fr:rd/sewan-sdk-go.git
     - git fetch origin --prune
     - git checkout -b $ReleaseBranchName
     - rm .gitlab-ci.yml
