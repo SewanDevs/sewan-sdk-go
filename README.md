@@ -2,8 +2,8 @@ Sewan's cloud data center go sdk
 ================================
 
 - Website: https://www.sewan.fr/
-- Travis build : [![Build Status](https://travis-ci.com/SewanDevs/sewan_go_sdk.svg?branch=github_release)](https://travis-ci.com/SewanDevs/sewan_go_sdk)
-- SonarQube analysis : ![Sonar Status](https://sonarcloud.io/api/project_badges/measure?project=sewan_go_sdk&metric=alert_status)
+- Travis build : [![Build Status](https://travis-ci.com/SewanDevs/sewan-sdk-go.svg?branch=github_release)](https://travis-ci.com/SewanDevs/sewan-sdk-go)
+- SonarQube analysis : ![Sonar Status](https://sonarcloud.io/api/project_badges/measure?project=sewan-sdk-go&metric=alert_status)
 
 <img src="http://entreprises.smallizbeautiful.fr/logo/Sewan-Communications.jpg" width="500px">
 

@@ -1,4 +1,4 @@
-package sewan_go_sdk
+package sewansdk
 
 const (
 	rightAPIURL                = "https://apiURL/api/bonjour/"
