@@ -10,57 +10,64 @@ import (
 	"strings"
 )
 
+// TemplatesTooler contains implementation of Templater interface
 type TemplatesTooler struct {
 	TemplatesTools Templater
 }
+
+// Templater interface is responsible of operations on :
+// * Sewan's clouddc managed templates (see user doc : https://github.com/SewanDevs/terraform-provider-sewan/blob/github_release/website/docs/r/vm.html.md)
 type Templater interface {
 	FetchTemplateFromList(templateName string,
 		templateList []interface{}) (map[string]interface{}, error)
-	ValidateTemplate(template map[string]interface{}) error
-	UpdateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
+	validateTemplate(template map[string]interface{}) error
+	updateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
 		template map[string]interface{}) error
-	CreateVmTemplateOverrideConfig(d *schema.ResourceData,
+	createVMTemplateOverrideConfig(d *schema.ResourceData,
 		template map[string]interface{}) (string, error)
 }
 
-type Template_Templater struct{}
+// TemplateTemplater implements Templater interface
+type TemplateTemplater struct{}
 
-type DiskModifiableFields struct {
-	Name          string `json:"name"`
-	Size          int    `json:"size"`
-	Storage_class string `json:"storage_class"`
+type diskModifiableFields struct {
+	Name         string `json:"name"`
+	Size         int    `json:"size"`
+	StorageClass string `json:"storage_class"`
 }
 
-type NicModifiableFields struct {
+type nicModifiableFields struct {
 	Vlan      string `json:"vlan"`
 	Connected bool   `json:"connected"`
 }
 
-type TemplateCreatedVmOverride struct {
-	Name       string        `json:"name"`
-	OS         string        `json:"os"`
-	RAM        int           `json:"ram"`
-	CPU        int           `json:"cpu"`
-	Disks      []interface{} `json:"disks,omitempty"`
-	Nics       []interface{} `json:"nics,omitempty"`
-	Vdc        string        `json:"vdc"`
-	Boot       string        `json:"boot"`
-	Backup     string        `json:"backup"`
-	Disk_image string        `json:"disk_image"`
+type templateCreatedVMOverride struct {
+	Name      string        `json:"name"`
+	OS        string        `json:"os"`
+	RAM       int           `json:"ram"`
+	CPU       int           `json:"cpu"`
+	Disks     []interface{} `json:"disks,omitempty"`
+	Nics      []interface{} `json:"nics,omitempty"`
+	Vdc       string        `json:"vdc"`
+	Boot      string        `json:"boot"`
+	Backup    string        `json:"backup"`
+	DiskImage string        `json:"disk_image"`
 }
 
-// Known limitation : Redmine ticket #35489/#36874
-func (templater Template_Templater) FetchTemplateFromList(templateName string,
+// FetchTemplateFromList extracts a template from the received list
+// Known implementation limitation :
+//  * Redmine ticket #35489/#36874
+func (templater TemplateTemplater) FetchTemplateFromList(templateName string,
 	templateList []interface{}) (map[string]interface{}, error) {
 	var (
-		template          map[string]interface{} = nil
-		templateListError error                  = nil
+		template          map[string]interface{}
+		templateListError error
 	)
 	for i := 0; i < len(templateList); i++ {
 		switch reflect.TypeOf(templateList[i]).Kind() {
 		case reflect.Map:
 			var (
-				listTemplateName string = templateList[i].(map[string]interface{})[NameField].(string)
+				listTemplateName = templateList[i].(map[string]interface{})[NameField].(string)
 			)
 			if listTemplateName == templateName {
 				template = templateList[i].(map[string]interface{})
@@ -75,8 +82,8 @@ func (templater Template_Templater) FetchTemplateFromList(templateName string,
 		}
 	}
 	if template == nil && templateListError == nil {
-		templateListError = errors.New("Template \"" + templateName +
-			"\" does not exists, please validate it's name.")
+		templateListError = errors.New("template \"" + templateName +
+			"\" does not exists, please validate it's name")
 	}
 	return template, templateListError
 }
@@ -85,11 +92,11 @@ func (templater Template_Templater) FetchTemplateFromList(templateName string,
 // correctly set :
 // "name", "os", "ram", "cpu", "enterprise", "disks"
 // It too alidate that "nics" fields is a slice if exists
-func (templater Template_Templater) ValidateTemplate(template map[string]interface{}) error {
+func (templater TemplateTemplater) validateTemplate(template map[string]interface{}) error {
 	var (
 		templateError              error
-		templateRequiredFieldSlice []string = []string{NameField, OsField, RamField,
-			CpuField, EnterpriseField, DisksField}
+		templateRequiredFieldSlice = []string{NameField, OsField, RAMField,
+			CPUField, EnterpriseField, DisksField}
 		missingFieldsList strings.Builder
 	)
 	for _, elem := range templateRequiredFieldSlice {
@@ -113,7 +120,7 @@ func (templater Template_Templater) ValidateTemplate(template map[string]interfa
 	return templateError
 }
 
-func (templater Template_Templater) UpdateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
+func (templater TemplateTemplater) updateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
 	template map[string]interface{}) error {
 	if d.Id() != "" {
 		return errors.New("Template field should not be set on " +
@@ -133,15 +140,15 @@ func (templater Template_Templater) UpdateSchemaFromTemplateOnResourceCreation(d
 // not possible not wanted to modify initial configuration file.
 // Warning : The override file must be manually deleted after a deletion of all
 // resource created from the template.
-func (templater Template_Templater) CreateVmTemplateOverrideConfig(d *schema.ResourceData,
+func (templater TemplateTemplater) createVMTemplateOverrideConfig(d *schema.ResourceData,
 	template map[string]interface{}) (string, error) {
-	vm := TemplateCreatedVmOverride{
-		RAM:        d.Get(RamField).(int),
-		CPU:        d.Get(CpuField).(int),
-		Vdc:        d.Get(VdcField).(string),
-		Boot:       d.Get(BootField).(string),
-		Backup:     d.Get(BackupField).(string),
-		Disk_image: d.Get(DiskImageField).(string),
+	vm := templateCreatedVMOverride{
+		RAM:       d.Get(RAMField).(int),
+		CPU:       d.Get(CPUField).(int),
+		Vdc:       d.Get(VdcField).(string),
+		Boot:      d.Get(BootField).(string),
+		Backup:    d.Get(BackupField).(string),
+		DiskImage: d.Get(DiskImageField).(string),
 	}
 	var (
 		schemaer     SchemaSchemaer
@@ -169,10 +176,10 @@ func (templater Template_Templater) CreateVmTemplateOverrideConfig(d *schema.Res
 			readListValue := []interface{}{}
 			for listKey, listValue := range template[DisksField].([]interface{}) {
 				listItem, _ = schemaer.ReadElement(listKey, listValue)
-				disk := DiskModifiableFields{
-					Name:          listItem.(map[string]interface{})[NameField].(string),
-					Size:          listItem.(map[string]interface{})[SizeField].(int),
-					Storage_class: listItem.(map[string]interface{})[StorageClassField].(string),
+				disk := diskModifiableFields{
+					Name:         listItem.(map[string]interface{})[NameField].(string),
+					Size:         listItem.(map[string]interface{})[SizeField].(int),
+					StorageClass: listItem.(map[string]interface{})[StorageClassField].(string),
 				}
 				readListValue = append(readListValue, disk)
 			}
@@ -180,7 +187,7 @@ func (templater Template_Templater) CreateVmTemplateOverrideConfig(d *schema.Res
 			readListValue = []interface{}{}
 			for listKey, listValue := range d.Get(NicsField).([]interface{}) {
 				listItem, _ = schemaer.ReadElement(listKey, listValue)
-				nic := NicModifiableFields{
+				nic := nicModifiableFields{
 					Vlan:      listItem.(map[string]interface{})[VlanNameField].(string),
 					Connected: listItem.(map[string]interface{})[ConnectedField].(bool),
 				}
@@ -190,9 +197,9 @@ func (templater Template_Templater) CreateVmTemplateOverrideConfig(d *schema.Res
 			vmFieldsMap := map[string]interface{}{d.Get(NameField).(string): vm}
 			vmMap := map[string]interface{}{"sewan_clouddc_vm": vmFieldsMap}
 			resourcesMap := map[string]interface{}{"resource": vmMap}
-			vmJson, _ := json.Marshal(resourcesMap)
+			vmJSON, _ := json.Marshal(resourcesMap)
 			err = ioutil.WriteFile(overrideFile.String(),
-				vmJson, 0644)
+				vmJSON, 0644)
 		}
 		return overrideFile.String(), err
 	}
@@ -229,14 +236,14 @@ func updateSchemaFieldOnResourceCreation(d *schema.ResourceData,
 	key string,
 	value interface{}) {
 	var (
-		templateParamName     string      = reflect.ValueOf(key).String()
+		templateParamName                 = reflect.ValueOf(key).String()
 		interfaceTemplateName interface{} = reflect.ValueOf(value).Interface()
-		templateParamValue    string      = reflect.ValueOf(value).String()
+		templateParamValue                = reflect.ValueOf(value).String()
 	)
 	switch reflect.TypeOf(value).Kind() {
 	case reflect.String:
 		switch {
-		case templateParamName == IdField:
+		case templateParamName == IDField:
 		case templateParamName == OsField:
 		case templateParamName == NameField:
 		case templateParamName == DatacenterField:
@@ -246,7 +253,7 @@ func updateSchemaFieldOnResourceCreation(d *schema.ResourceData,
 		}
 	case reflect.Int:
 		switch {
-		case templateParamName == IdField:
+		case templateParamName == IDField:
 		case d.Get(templateParamName).(int) == 0:
 			d.Set(templateParamName, int(interfaceTemplateName.(int)))
 		default:

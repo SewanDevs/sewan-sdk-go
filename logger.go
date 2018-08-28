@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// This wrapper is used only for plugin developpment debug purpose,
+// LoggerCreate is a wrapper used only for plugin developpment debug purpose,
 // it must be removed at the end of the develpment cycle, before delivery to prod.
 // It creates a logger that write logs to files in sdk-logs/ folder, stored in
 // current folder.
@@ -20,12 +20,12 @@ func loggerCreate(logFile string) *log.Logger {
 	var logFilePath strings.Builder
 	logFilePath.WriteString(logFolder)
 	logFilePath.WriteString(logFile)
-	_, folder_existsError := os.Stat(logFolder)
-	if folder_existsError != nil {
+	_, folderExistsError := os.Stat(logFolder)
+	if folderExistsError != nil {
 		os.Mkdir(logFolder, 0777)
 	}
-	var _, file_existsError = os.Stat(logFilePath.String())
-	if file_existsError == nil {
+	var _, fileExistsError = os.Stat(logFilePath.String())
+	if fileExistsError == nil {
 		os.Remove(logFilePath.String())
 	}
 	os.Create(logFilePath.String())

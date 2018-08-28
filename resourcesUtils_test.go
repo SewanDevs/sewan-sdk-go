@@ -10,49 +10,49 @@ import (
 
 func TestResourceInstanceCreate(t *testing.T) {
 	testCases := []struct {
-		Id           int
+		ID           int
 		D            *schema.ResourceData
 		Clienter     Clienter
 		Templater    Templater
 		ResourceType string
 		Error        error
-		VmInstance   interface{}
+		VMInstance   interface{}
 	}{
 		{
 			1,
-			vmSchemaInit(noTemplateVmMap),
-			GetTemplatesListSuccessHttpClienterFake{},
+			vmSchemaInit(noTemplateVMMap),
+			getTemplatesListSuccessHTTPClienterFake{},
 			TemplaterDummy{},
-			VmResourceType,
+			VMResourceType,
 			nil,
-			vmInstanceNoTemplateVmMap(),
+			vmInstanceNoTemplateVMMap(),
 		},
 		{
 			2,
-			vmSchemaInit(existingTemplateNoAdditionalDiskVmMap),
-			GetTemplatesListSuccessHttpClienterFake{},
-			existingTemplateNoAdditionalDiskVmMap_TemplaterFake{},
-			VmResourceType,
+			vmSchemaInit(existingTemplateNoAdditionalDiskVMMap),
+			getTemplatesListSuccessHTTPClienterFake{},
+			existingTemplateNoAdditionalDiskVMMapTemplaterFake{},
+			VMResourceType,
 			nil,
-			FakeVmInstanceExistingTemplateNoAdditionalDiskVmMap(),
+			fakeVMInstanceExistingTemplateNoAdditionalDiskVMMap(),
 		},
 		{
 			3,
-			vmSchemaInit(existingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap),
-			GetTemplatesListSuccessHttpClienterFake{},
-			existingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap_TemplaterFake{},
-			VmResourceType,
+			vmSchemaInit(existingTemplateWithAdditionalAndModifiedDisksAndNicsVMMap),
+			getTemplatesListSuccessHTTPClienterFake{},
+			existingTemplateWithAdditionalAndModifiedDisksAndNicsVMMapTemplaterFake{},
+			VMResourceType,
 			nil,
-			FakeVmInstanceExistingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap(),
+			fakeVMInstanceExistingTemplateWithAdditionalAndModifiedDisksAndNicsVMMap(),
 		},
 		{
 			4,
-			vmSchemaInit(nonExistingTemplateVmMap),
-			GetTemplatesListSuccessHttpClienterFake{},
-			UnexistingTemplate_TemplaterFake{},
-			VmResourceType,
+			vmSchemaInit(nonExistingTemplateVMMap),
+			getTemplatesListSuccessHTTPClienterFake{},
+			UnexistingTemplateTemplaterFake{},
+			VMResourceType,
 			errors.New("Unavailable template : windows95"),
-			VM{},
+			vmStruct{},
 		},
 		{
 			5,
@@ -61,12 +61,12 @@ func TestResourceInstanceCreate(t *testing.T) {
 			TemplaterDummy{},
 			VdcResourceType,
 			nil,
-			FakeVdcInstanceVdcCreationMap(),
+			fakeVdcInstanceVdcCreationMap(),
 		},
 		{
 			6,
 			vdcSchemaInit(vdcCreationMap),
-			GetTemplatesListSuccessHttpClienterFake{},
+			getTemplatesListSuccessHTTPClienterFake{},
 			TemplaterDummy{},
 			wrongResourceType,
 			errWrongResourceTypeBuilder(wrongResourceType),
@@ -74,180 +74,180 @@ func TestResourceInstanceCreate(t *testing.T) {
 		},
 		{
 			7,
-			vmSchemaInit(nonExistingTemplateVmMap),
-			GetTemplatesListFailureHttpClienterFake{},
-			UnexistingTemplate_TemplaterFake{},
-			VmResourceType,
-			errors.New("GetTemplatesList() error"),
-			VM{},
+			vmSchemaInit(nonExistingTemplateVMMap),
+			getTemplatesListFailureHTTPClienterFake{},
+			UnexistingTemplateTemplaterFake{},
+			VMResourceType,
+			errors.New("getTemplatesList() error"),
+			vmStruct{},
 		},
 		{
 			8,
-			vmSchemaInit(existingTemplateNoAdditionalDiskVmMap),
-			GetTemplatesListSuccessHttpClienterFake{},
-			Template_FormatError_TemplaterFake{},
-			VmResourceType,
+			vmSchemaInit(existingTemplateNoAdditionalDiskVMMap),
+			getTemplatesListSuccessHTTPClienterFake{},
+			TemplateFormatErrorTemplaterFake{},
+			VMResourceType,
 			errors.New("Template missing fields : " + "\"" + NameField + "\" " +
 				"\"" + OsField + "\" " +
-				"\"" + RamField + "\" " +
-				"\"" + CpuField + "\" " +
+				"\"" + RAMField + "\" " +
+				"\"" + CPUField + "\" " +
 				"\"" + EnterpriseField + "\" " +
 				"\"" + DisksField + "\" " +
 				"\"" + DatacenterField + "\" "),
-			VM{},
+			vmStruct{},
 		},
 		{
 			9,
-			vmSchemaInit(instanceNumberFieldUnitTestVmInstance),
-			GetTemplatesListSuccessHttpClienterFake{},
-			instanceNumberFieldUnitTestVmInstance_MAP_TemplaterFake{},
-			VmResourceType,
+			vmSchemaInit(instanceNumberFieldUnitTestVMInstance),
+			getTemplatesListSuccessHTTPClienterFake{},
+			instanceNumberFieldUnitTestVMInstanceMAPTemplaterFake{},
+			VMResourceType,
 			nil,
-			FakeVmInstanceInstanceNumberFieldUnitTestVmInstance_MAP(),
+			fakeVMInstanceInstanceNumberFieldUnitTestVMInstanceMAP(),
 		},
 	}
 	fakeResourceTooler := ResourceTooler{
 		Resource: ResourceResourceer{},
 	}
 	fakeClientTooler := ClientTooler{}
-	fakeTemplates_tooler := TemplatesTooler{}
+	fakeTemplatesTooler := TemplatesTooler{}
 	sewan := &API{Token: "42", URL: "42", Client: &http.Client{}}
 	for _, testCase := range testCases {
 		fakeClientTooler.Client = testCase.Clienter
-		fakeTemplates_tooler.TemplatesTools = testCase.Templater
-		instance, err := fakeResourceTooler.Resource.ResourceInstanceCreate(testCase.D,
+		fakeTemplatesTooler.TemplatesTools = testCase.Templater
+		instance, err := fakeResourceTooler.Resource.resourceInstanceCreate(testCase.D,
 			&fakeClientTooler,
-			&fakeTemplates_tooler,
+			&fakeTemplatesTooler,
 			testCase.ResourceType,
 			sewan)
-		diffs := cmp.Diff(instance, testCase.VmInstance)
+		diffs := cmp.Diff(instance, testCase.VMInstance)
 		switch {
 		case err == nil || testCase.Error == nil:
 			if !(err == nil && testCase.Error == nil) {
-				t.Errorf("\n\nTC %d : ResourceInstanceCreate() error was incorrect,"+
+				t.Errorf("\n\nTC %d : resourceInstanceCreate() error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-					testCase.Id, err, testCase.Error)
+					testCase.ID, err, testCase.Error)
 			} else {
 				switch {
 				case diffs != "":
-					t.Errorf("\n\nTC %d : Wrong ResourceInstanceCreate() "+
+					t.Errorf("\n\nTC %d : Wrong resourceInstanceCreate() "+
 						"created instance (-got +want) :\n%s",
-						testCase.Id, diffs)
+						testCase.ID, diffs)
 				}
 			}
 		case err != nil && testCase.Error != nil:
 			switch {
 			case diffs != "":
-				t.Errorf("\n\nTC %d : Wrong ResourceInstanceCreate() "+
+				t.Errorf("\n\nTC %d : Wrong resourceInstanceCreate() "+
 					"created instance (-got +want) :\n%s",
-					testCase.Id, diffs)
+					testCase.ID, diffs)
 			case err.Error() != testCase.Error.Error():
 				t.Errorf("\n\nTC %d : resource creation error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-					testCase.Id, err.Error(), testCase.Error.Error())
+					testCase.ID, err.Error(), testCase.Error.Error())
 			}
 		}
 	}
 }
 
-func TestGetResourceUrl(t *testing.T) {
+func TestGetResourceCreationURLetResourceURL(t *testing.T) {
 	testCases := []struct {
-		Id    int
+		ID    int
 		api   API
-		VmId  string
-		VmUrl string
+		VMID  string
+		VMURL string
 	}{
 		{1,
 			API{
-				rightApiToken,
-				rightApiUrl,
+				rightAPIToken,
+				rightAPIURL,
 				&http.Client{},
 			},
 			"42",
-			rightVmUrlQuaranteDeux,
+			rightVMURLQuaranteDeux,
 		},
 		{2,
 			API{
-				rightApiToken,
-				rightApiUrl,
+				rightAPIToken,
+				rightAPIURL,
 				&http.Client{},
 			},
 			"PATATE",
-			rightVmUrlPatate,
+			rightVMURLPatate,
 		},
 	}
 	fakeResourceTooler := ResourceTooler{
 		Resource: ResourceResourceer{},
 	}
 	for _, testCase := range testCases {
-		s_VmUrl := fakeResourceTooler.Resource.GetResourceUrl(&testCase.api,
-			VmResourceType,
-			testCase.VmId)
+		sVMURL := fakeResourceTooler.Resource.getResourceURL(&testCase.api,
+			VMResourceType,
+			testCase.VMID)
 		switch {
-		case s_VmUrl != testCase.VmUrl:
+		case sVMURL != testCase.VMURL:
 			t.Errorf("VM url was incorrect,\n\rgot: \"%s\"\n\rwant: \"%s\"",
-				s_VmUrl, testCase.VmUrl)
+				sVMURL, testCase.VMURL)
 		}
 	}
 }
 
-func TestGetResourceCreationUrl(t *testing.T) {
+func TestGetResourceCreationURL(t *testing.T) {
 	testCases := []struct {
-		Id                  int
+		ID                  int
 		api                 API
-		resourceCreationUrl string
+		resourceCreationURL string
 	}{
 		{1,
 			API{
-				rightApiToken,
-				rightApiUrl,
+				rightAPIToken,
+				rightAPIURL,
 				&http.Client{},
 			},
-			rightVmCreationApiUrl,
+			rightVMCreationAPIURL,
 		},
 	}
 	fakeResourceTooler := ResourceTooler{
 		Resource: ResourceResourceer{},
 	}
 	for _, testCase := range testCases {
-		s_resourceCreationUrl := fakeResourceTooler.Resource.GetResourceCreationUrl(&testCase.api,
-			VmResourceType)
+		sResourceCreationURL := fakeResourceTooler.Resource.getResourceCreationURL(&testCase.api,
+			VMResourceType)
 		switch {
-		case s_resourceCreationUrl != testCase.resourceCreationUrl:
+		case sResourceCreationURL != testCase.resourceCreationURL:
 			t.Errorf("resource api creation url was incorrect,"+
 				"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-				s_resourceCreationUrl, testCase.resourceCreationUrl)
+				sResourceCreationURL, testCase.resourceCreationURL)
 		}
 	}
 }
 
 func TestValidateStatus(t *testing.T) {
 	testCases := []struct {
-		Id           int
-		Api          API
+		ID           int
+		TcAPI        API
 		Client       Clienter
 		Err          error
 		ResourceType string
 	}{
 		{1,
 			API{
-				rightApiToken,
-				rightApiUrl,
+				rightAPIToken,
+				rightAPIURL,
 				&http.Client{},
 			},
-			VmReadSuccessHttpClienterFake{},
+			VMReadSuccessHTTPClienterFake{},
 			nil,
-			VmResourceType,
+			VMResourceType,
 		},
 		{2,
 			API{
-				rightApiToken,
-				rightApiUrl,
+				rightAPIToken,
+				rightAPIURL,
 				&http.Client{},
 			},
-			CheckRedirectReqFailure_HttpClienterFake{},
+			CheckRedirectReqFailureHTTPClienterFake{},
 			errCheckRedirectFailure,
-			VmResourceType,
+			VMResourceType,
 		},
 	}
 	fakeResourceTooler := &ResourceTooler{
@@ -256,27 +256,27 @@ func TestValidateStatus(t *testing.T) {
 	clientTooler := ClientTooler{}
 	for _, testCase := range testCases {
 		clientTooler.Client = testCase.Client
-		apiClientErr := fakeResourceTooler.Resource.ValidateStatus(&testCase.Api,
+		apiClientErr := fakeResourceTooler.Resource.validateStatus(&testCase.TcAPI,
 			testCase.ResourceType,
 			clientTooler)
 		switch {
 		case apiClientErr == nil || testCase.Err == nil:
 			if !(apiClientErr == nil && testCase.Err == nil) {
-				t.Errorf("\n\nTC %d : ValidateStatus() error was incorrect,"+
+				t.Errorf("\n\nTC %d : validateStatus() error was incorrect,"+
 					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-					testCase.Id, apiClientErr, testCase.Err)
+					testCase.ID, apiClientErr, testCase.Err)
 			}
 		case apiClientErr.Error() != testCase.Err.Error():
-			t.Errorf("\n\nTC %d : ValidateStatus() error was incorrect,"+
+			t.Errorf("\n\nTC %d : validateStatus() error was incorrect,"+
 				"\n\rgot: \"%s\"\n\rwant: \"%s\"",
-				testCase.Id, apiClientErr.Error(), testCase.Err.Error())
+				testCase.ID, apiClientErr.Error(), testCase.Err.Error())
 		}
 	}
 }
 
 func CreateTestResourceSchema(id interface{}) *schema.ResourceData {
-	vm_res := resourceVm()
-	d := vm_res.TestResourceData()
+	vmRes := resourceVM()
+	d := vmRes.TestResourceData()
 	d.SetId(id.(string))
 	return d
 }

@@ -4,9 +4,9 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
-type FakeAirDrumResource_APIer struct{}
+type FakeAirDrumResourceAPIer struct{}
 
-func (apier FakeAirDrumResource_APIer) CreateResource(d *schema.ResourceData,
+func (apier FakeAirDrumResourceAPIer) CreateResource(d *schema.ResourceData,
 	clientTooler *ClientTooler,
 	templatesTooler *TemplatesTooler,
 	resourceTooler *ResourceTooler,
@@ -14,14 +14,14 @@ func (apier FakeAirDrumResource_APIer) CreateResource(d *schema.ResourceData,
 	sewan *API) (map[string]interface{}, error) {
 	return map[string]interface{}{}, nil
 }
-func (apier FakeAirDrumResource_APIer) ReadResource(d *schema.ResourceData,
+func (apier FakeAirDrumResourceAPIer) ReadResource(d *schema.ResourceData,
 	clientTooler *ClientTooler,
 	resourceTooler *ResourceTooler,
 	resourceType string,
 	sewan *API) (map[string]interface{}, error) {
 	return map[string]interface{}{}, nil
 }
-func (apier FakeAirDrumResource_APIer) UpdateResource(d *schema.ResourceData,
+func (apier FakeAirDrumResourceAPIer) UpdateResource(d *schema.ResourceData,
 	clientTooler *ClientTooler,
 	templatesTooler *TemplatesTooler,
 	resourceTooler *ResourceTooler,
@@ -29,7 +29,7 @@ func (apier FakeAirDrumResource_APIer) UpdateResource(d *schema.ResourceData,
 	sewan *API) error {
 	return nil
 }
-func (apier FakeAirDrumResource_APIer) DeleteResource(d *schema.ResourceData,
+func (apier FakeAirDrumResourceAPIer) DeleteResource(d *schema.ResourceData,
 	clientTooler *ClientTooler,
 	resourceTooler *ResourceTooler,
 	resourceType string,

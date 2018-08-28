@@ -19,23 +19,23 @@ func TestDeleteTerraformResource(t *testing.T) {
 
 func TestUpdateLocalResourceState_AND_ReadElement(t *testing.T) {
 	testCases := []struct {
-		Id         int
-		VmMap      map[string]interface{}
-		VmIdString string
+		ID         int
+		VMMap      map[string]interface{}
+		VMIDString string
 	}{
 		{
 			1,
-			testUpdateVmMap,
+			testUpdateVMMap,
 			"unit test vm",
 		},
 		{
 			2,
-			testUpdateVmMapFloatId,
+			testUpdateVMMapFloatID,
 			"121212.12",
 		},
 		{
 			3,
-			testUpdateVmMapIntId,
+			testUpdateVMMapIntID,
 			"1212",
 		},
 	}
@@ -47,23 +47,23 @@ func TestUpdateLocalResourceState_AND_ReadElement(t *testing.T) {
 		SchemaTools: SchemaSchemaer{},
 	}
 	for _, testCase := range testCases {
-		d = CreateTestResourceSchema(testCase.VmIdString)
-		schemaTooler.SchemaTools.UpdateLocalResourceState(testCase.VmMap,
+		d = CreateTestResourceSchema(testCase.VMIDString)
+		schemaTooler.SchemaTools.UpdateLocalResourceState(testCase.VMMap,
 			d,
 			&schemaTooler)
-		for key, value := range testCase.VmMap {
+		for key, value := range testCase.VMMap {
 			diffs = cmp.Diff(d.Get(key), value)
 			switch {
-			case key != IdField:
+			case key != IDField:
 				if diffs != "" {
 					t.Errorf("\n\nTC %d : Update of %s field failed (-got +want) :\n%s",
-						testCase.Id, key, diffs)
+						testCase.ID, key, diffs)
 				}
 			default:
-				if d.Id() != testCase.VmIdString {
-					t.Errorf("\n\nTC %d : Update of Id reserved field failed "+
+				if d.Id() != testCase.VMIDString {
+					t.Errorf("\n\nTC %d : Update of ID reserved field failed "+
 						errTestResultDiffs,
-						testCase.Id, d.Id(), testCase.VmIdString)
+						testCase.ID, d.Id(), testCase.VMIDString)
 				}
 			}
 		}
@@ -72,7 +72,7 @@ func TestUpdateLocalResourceState_AND_ReadElement(t *testing.T) {
 
 func TestUpdateVdcResourcesNames(t *testing.T) {
 	testCases := []struct {
-		Id        int
+		ID        int
 		DInit     *schema.ResourceData
 		DFinalMap map[string]interface{}
 		Err       error
@@ -96,7 +96,7 @@ func TestUpdateVdcResourcesNames(t *testing.T) {
 			diffs = cmp.Diff(testCase.DInit.Get(key), value)
 			if diffs != "" {
 				t.Errorf("\n\nTC %d : Update of %s field failed (-got +want) :\n%s",
-					testCase.Id, key, diffs)
+					testCase.ID, key, diffs)
 			}
 		}
 	}

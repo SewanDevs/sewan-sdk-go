@@ -20,15 +20,15 @@
 \begin{center}
   \begin{tikzpicture}
     \begin{umlpackage}{sewan-go-sdk}
-      \umlbasiccomponent[x=0,y=0]{<<Apier>>}
+      \umlbasiccomponent[x=0,y=0]{<<APIImplementerer>>}
       \umlbasiccomponent[x=7,y=0]{<<Templater>>}
       \umlbasiccomponent[x=7,y=-4]{<<Schemaer>>}
       \umlbasiccomponent[x=0,y=-4]{<<Clienter>>}
-      \umlassemblyconnector[interface=consume]{<<Apier>>-east-port}{<<Schemaer>>-west-port}
-      \umlassemblyconnector[interface=consume]{<<Apier>>-east-port}{<<Templater>>}
-      \umlassemblyconnector[interface=consume]{<<Apier>>-south-port}{<<Clienter>>-north-port}
+      \umlassemblyconnector[interface=consume]{<<APIImplementerer>>-east-port}{<<Schemaer>>-west-port}
+      \umlassemblyconnector[interface=consume]{<<APIImplementerer>>-east-port}{<<Templater>>}
+      \umlassemblyconnector[interface=consume]{<<APIImplementerer>>-south-port}{<<Clienter>>-north-port}
       \umlassemblyconnector[interface=consume]{<<Templater>>-south-port}{<<Schemaer>>-north-port}
-      \umlnote[x=-5,y=0,width=13em]{<<Apier>>}{Responsibilities :\newline
+      \umlnote[x=-5,y=0,width=13em]{<<APIImplementerer>>}{Responsibilities :\newline
       * resources CRUD operations\newline
       * validate api state\newline
       * handle api URLs}

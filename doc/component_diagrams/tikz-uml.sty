@@ -3849,7 +3849,7 @@
 }{%
   % draw lifelines of each object
   \begin{pgfonlayer}{lifelines}%
-  \foreach \id in \tikzumlIdList {%
+  \foreach \id in \tikzumlIDList {%
     \draw (\csname tikzumlLastChild@\id \endcsname)+(0,-2.5ex) node[inner sep=0, name=end-\id] {};%
     \draw[dotted] (\id) -- (end-\id);%
   }%
@@ -3967,10 +3967,10 @@
   \expandafter\xdef\csname tikzumlLastChild@\tikzumlObjectName \endcsname{\tikzumlObjectName}%
   %
   \ifnum\thetikzumlObjectNum=1%
-    \xdef\tikzumlIdList{\tikzumlObjectName}%
+    \xdef\tikzumlIDList{\tikzumlObjectName}%
   \else%
-    \let\tikzumlIdListOld\tikzumlIdList%
-    \expandafter\xdef\expandafter\tikzumlIdList\expandafter{\tikzumlIdListOld,\tikzumlObjectName}%
+    \let\tikzumlIDListOld\tikzumlIDList%
+    \expandafter\xdef\expandafter\tikzumlIDList\expandafter{\tikzumlIDListOld,\tikzumlObjectName}%
   \fi%
   %
   \tikzstyle{tikzuml object box style}=[rectangle, text=\tikzumlObjectTextColor, font=\tikzumlDefaultFont]%

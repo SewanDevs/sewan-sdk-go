@@ -8,195 +8,195 @@ import (
 	"net/http"
 )
 
-type HttpClienterDummy struct{}
+type HTTPClienterDummy struct{}
 
-func (client HttpClienterDummy) Do(api *API,
+func (client HTTPClienterDummy) do(api *API,
 	req *http.Request) (*http.Response, error) {
 	return nil, nil
 }
-func (client HttpClienterDummy) GetTemplatesList(clientTooler *ClientTooler,
+func (client HTTPClienterDummy) getTemplatesList(clientTooler *ClientTooler,
 	enterpriseSlug string, api *API) ([]interface{}, error) {
 	return nil, nil
 }
-func (client HttpClienterDummy) HandleResponse(resp *http.Response,
+func (client HTTPClienterDummy) handleResponse(resp *http.Response,
 	expectedCode int,
 	expectedBodyFormat string) (interface{}, error) {
 	return nil, nil
 }
 
 var (
-	ResourceDeletionSuccessHttpClienterFake               = HttpClienterDummy{}
-	ResourceUpdateSuccessHttpClienterFake                 = HttpClienterDummy{}
-	ResourceCreationFailureHttpClienterFake               = ResourceDeletionFailureHttpClienterFake{}
-	ResourceUpdateFailureHttpClienterFake                 = ResourceDeletionFailureHttpClienterFake{}
-	ResourceReadFailureHttpClienterFake                   = ResourceDeletionFailureHttpClienterFake{}
-	HandleResponseEmptyReturnTemplateListHttpClienterFake = HttpClienterDummy{}
+	ResourceDeletionSuccessHTTPClienterFake               = HTTPClienterDummy{}
+	ResourceUpdateSuccessHTTPClienterFake                 = HTTPClienterDummy{}
+	ResourceCreationFailureHTTPClienterFake               = ResourceDeletionFailureHTTPClienterFake{}
+	ResourceUpdateFailureHTTPClienterFake                 = ResourceDeletionFailureHTTPClienterFake{}
+	ResourceReadFailureHTTPClienterFake                   = ResourceDeletionFailureHTTPClienterFake{}
+	handleResponseEmptyReturnTemplateListHTTPClienterFake = HTTPClienterDummy{}
 )
 
-type ErrorResponseHttpClienterFake struct{}
+type ErrorResponseHTTPClienterFake struct{}
 
-func (client ErrorResponseHttpClienterFake) Do(api *API,
+func (client ErrorResponseHTTPClienterFake) do(api *API,
 	req *http.Request) (*http.Response, error) {
 	return nil, errDoRequest
 }
-func (client ErrorResponseHttpClienterFake) GetTemplatesList(clientTooler *ClientTooler,
+func (client ErrorResponseHTTPClienterFake) getTemplatesList(clientTooler *ClientTooler,
 	enterpriseSlug string, api *API) ([]interface{}, error) {
 	return nil, nil
 }
-func (client ErrorResponseHttpClienterFake) HandleResponse(resp *http.Response,
+func (client ErrorResponseHTTPClienterFake) handleResponse(resp *http.Response,
 	expectedCode int,
 	expectedBodyFormat string) (interface{}, error) {
 	return nil, nil
 }
 
-type GetTemplatesListFailureHttpClienterFake struct{}
+type getTemplatesListFailureHTTPClienterFake struct{}
 
-func (client GetTemplatesListFailureHttpClienterFake) Do(api *API,
+func (client getTemplatesListFailureHTTPClienterFake) do(api *API,
 	req *http.Request) (*http.Response, error) {
 	return nil, nil
 }
-func (client GetTemplatesListFailureHttpClienterFake) GetTemplatesList(clientTooler *ClientTooler,
+func (client getTemplatesListFailureHTTPClienterFake) getTemplatesList(clientTooler *ClientTooler,
 	enterpriseSlug string, api *API) ([]interface{}, error) {
-	return nil, errors.New("GetTemplatesList() error")
+	return nil, errors.New("getTemplatesList() error")
 }
-func (client GetTemplatesListFailureHttpClienterFake) HandleResponse(resp *http.Response,
+func (client getTemplatesListFailureHTTPClienterFake) handleResponse(resp *http.Response,
 	expectedCode int,
 	expectedBodyFormat string) (interface{}, error) {
-	return nil, errors.New("HandleResponse() error")
+	return nil, errors.New("handleResponse() error")
 }
 
-type GetTemplatesListSuccessHttpClienterFake struct{}
+type getTemplatesListSuccessHTTPClienterFake struct{}
 
-func (client GetTemplatesListSuccessHttpClienterFake) Do(api *API,
+func (client getTemplatesListSuccessHTTPClienterFake) do(api *API,
 	req *http.Request) (*http.Response, error) {
 	return nil, nil
 }
-func (client GetTemplatesListSuccessHttpClienterFake) GetTemplatesList(clientTooler *ClientTooler,
+func (client getTemplatesListSuccessHTTPClienterFake) getTemplatesList(clientTooler *ClientTooler,
 	enterpriseSlug string, api *API) ([]interface{}, error) {
 	return templatesList, nil
 }
-func (client GetTemplatesListSuccessHttpClienterFake) HandleResponse(resp *http.Response,
+func (client getTemplatesListSuccessHTTPClienterFake) handleResponse(resp *http.Response,
 	expectedCode int,
 	expectedBodyFormat string) (interface{}, error) {
 	return templatesList, nil
 }
 
-type HandleRespErrHttpClienterFake struct{}
+type HandleRespErrHTTPClienterFake struct{}
 
-func (client HandleRespErrHttpClienterFake) Do(api *API,
+func (client HandleRespErrHTTPClienterFake) do(api *API,
 	req *http.Request) (*http.Response, error) {
 	return nil, nil
 }
-func (client HandleRespErrHttpClienterFake) GetTemplatesList(clientTooler *ClientTooler,
+func (client HandleRespErrHTTPClienterFake) getTemplatesList(clientTooler *ClientTooler,
 	enterpriseSlug string, api *API) ([]interface{}, error) {
 	return nil, nil
 }
-func (client HandleRespErrHttpClienterFake) HandleResponse(resp *http.Response,
+func (client HandleRespErrHTTPClienterFake) handleResponse(resp *http.Response,
 	expectedCode int,
 	expectedBodyFormat string) (interface{}, error) {
 	return nil, errHandleResponse
 }
 
-type Error404HttpClienterFake struct{}
+type Error404HTTPClienterFake struct{}
 
-func (client Error404HttpClienterFake) Do(api *API,
+func (client Error404HTTPClienterFake) do(api *API,
 	req *http.Request) (*http.Response, error) {
 	resp := http.Response{}
 	resp.Header = map[string][]string{}
-	resp.Header.Add(httpRespContentType, httpJsonContentType)
+	resp.Header.Add(httpRespContentType, httpJSONContentType)
 	resp.StatusCode = http.StatusNotFound
 	resp.Status = notFoundRespStatus
-	body := Resp_Body{"Not found."}
+	body := RespBody{"Not found."}
 	js, _ := json.Marshal(body)
 	resp.Body = ioutil.NopCloser(bytes.NewBuffer(js))
 	return &resp, nil
 }
-func (client Error404HttpClienterFake) GetTemplatesList(clientTooler *ClientTooler,
+func (client Error404HTTPClienterFake) getTemplatesList(clientTooler *ClientTooler,
 	enterpriseSlug string, api *API) ([]interface{}, error) {
 	return nil, nil
 }
-func (client Error404HttpClienterFake) HandleResponse(resp *http.Response,
+func (client Error404HTTPClienterFake) handleResponse(resp *http.Response,
 	expectedCode int,
 	expectedBodyFormat string) (interface{}, error) {
 	return nil, nil
 }
 
-type VmCreationSuccessHttpClienterFake struct{}
+type VMCreationSuccessHTTPClienterFake struct{}
 
-func (client VmCreationSuccessHttpClienterFake) Do(api *API,
+func (client VMCreationSuccessHTTPClienterFake) do(api *API,
 	req *http.Request) (*http.Response, error) {
 	return nil, nil
 }
-func (client VmCreationSuccessHttpClienterFake) GetTemplatesList(clientTooler *ClientTooler,
+func (client VMCreationSuccessHTTPClienterFake) getTemplatesList(clientTooler *ClientTooler,
 	enterpriseSlug string, api *API) ([]interface{}, error) {
 	return nil, nil
 }
-func (client VmCreationSuccessHttpClienterFake) HandleResponse(resp *http.Response,
+func (client VMCreationSuccessHTTPClienterFake) handleResponse(resp *http.Response,
 	expectedCode int,
 	expectedBodyFormat string) (interface{}, error) {
-	return noTemplateVmMap, nil
+	return noTemplateVMMap, nil
 }
 
-type VmReadSuccessHttpClienterFake struct{}
+type VMReadSuccessHTTPClienterFake struct{}
 
-func (client VmReadSuccessHttpClienterFake) Do(api *API,
+func (client VMReadSuccessHTTPClienterFake) do(api *API,
 	req *http.Request) (*http.Response, error) {
 	return nil, nil
 }
-func (client VmReadSuccessHttpClienterFake) GetTemplatesList(clientTooler *ClientTooler,
+func (client VMReadSuccessHTTPClienterFake) getTemplatesList(clientTooler *ClientTooler,
 	enterpriseSlug string, api *API) ([]interface{}, error) {
 	return nil, nil
 }
-func (client VmReadSuccessHttpClienterFake) HandleResponse(resp *http.Response,
+func (client VMReadSuccessHTTPClienterFake) handleResponse(resp *http.Response,
 	expectedCode int,
 	expectedBodyFormat string) (interface{}, error) {
-	return noTemplateVmMap, nil
+	return noTemplateVMMap, nil
 }
 
-type VdcReadSuccessHttpClienterFake struct{}
+type VdcReadSuccessHTTPClienterFake struct{}
 
-func (client VdcReadSuccessHttpClienterFake) Do(api *API,
+func (client VdcReadSuccessHTTPClienterFake) do(api *API,
 	req *http.Request) (*http.Response, error) {
 	return nil, nil
 }
-func (client VdcReadSuccessHttpClienterFake) GetTemplatesList(clientTooler *ClientTooler,
+func (client VdcReadSuccessHTTPClienterFake) getTemplatesList(clientTooler *ClientTooler,
 	enterpriseSlug string, api *API) ([]interface{}, error) {
 	return nil, nil
 }
-func (client VdcReadSuccessHttpClienterFake) HandleResponse(resp *http.Response,
+func (client VdcReadSuccessHTTPClienterFake) handleResponse(resp *http.Response,
 	expectedCode int,
 	expectedBodyFormat string) (interface{}, error) {
 	return vdcReadResponseMap, nil
 }
 
-type ResourceDeletionFailureHttpClienterFake struct{}
+type ResourceDeletionFailureHTTPClienterFake struct{}
 
-func (client ResourceDeletionFailureHttpClienterFake) Do(api *API,
+func (client ResourceDeletionFailureHTTPClienterFake) do(api *API,
 	req *http.Request) (*http.Response, error) {
 	return nil, errEmptyResp
 }
-func (client ResourceDeletionFailureHttpClienterFake) GetTemplatesList(clientTooler *ClientTooler,
+func (client ResourceDeletionFailureHTTPClienterFake) getTemplatesList(clientTooler *ClientTooler,
 	enterpriseSlug string, api *API) ([]interface{}, error) {
 	return nil, nil
 }
-func (client ResourceDeletionFailureHttpClienterFake) HandleResponse(resp *http.Response,
+func (client ResourceDeletionFailureHTTPClienterFake) handleResponse(resp *http.Response,
 	expectedCode int,
 	expectedBodyFormat string) (interface{}, error) {
 	return nil, nil
 }
 
-type CheckRedirectReqFailure_HttpClienterFake struct{}
+type CheckRedirectReqFailureHTTPClienterFake struct{}
 
-func (client CheckRedirectReqFailure_HttpClienterFake) Do(api *API,
+func (client CheckRedirectReqFailureHTTPClienterFake) do(api *API,
 	req *http.Request) (*http.Response, error) {
 	resp := http.Response{}
 	return &resp, errCheckRedirectFailure
 }
-func (client CheckRedirectReqFailure_HttpClienterFake) GetTemplatesList(clientTooler *ClientTooler,
+func (client CheckRedirectReqFailureHTTPClienterFake) getTemplatesList(clientTooler *ClientTooler,
 	enterpriseSlug string, api *API) ([]interface{}, error) {
 	return nil, nil
 }
-func (client CheckRedirectReqFailure_HttpClienterFake) HandleResponse(resp *http.Response,
+func (client CheckRedirectReqFailureHTTPClienterFake) handleResponse(resp *http.Response,
 	expectedCode int,
 	expectedBodyFormat string) (interface{}, error) {
 	return nil, nil

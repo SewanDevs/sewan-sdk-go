@@ -10,12 +10,12 @@ import (
 )
 
 //------------------------------------------------------------------------------
-func CompareJsonAndMap(jsonFile string,
+func compareJSONAndMap(jsonFile string,
 	fileDataMap map[string]interface{}) (string, error) {
 	var (
 		err        error
 		jsonData   []byte
-		diffs      string = ""
+		diffs      string
 		dataStruct interface{}
 	)
 	jsonData, err = ioutil.ReadFile(jsonFile)
@@ -37,70 +37,70 @@ func (templaterFake TemplaterDummy) FetchTemplateFromList(templateName string,
 	templateList []interface{}) (map[string]interface{}, error) {
 	return map[string]interface{}{}, nil
 }
-func (templaterFake TemplaterDummy) ValidateTemplate(template map[string]interface{}) error {
+func (templaterFake TemplaterDummy) validateTemplate(template map[string]interface{}) error {
 	return nil
 }
-func (templaterFake TemplaterDummy) UpdateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
+func (templaterFake TemplaterDummy) updateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
 	template map[string]interface{}) error {
 	return nil
 }
-func (templaterFake TemplaterDummy) CreateVmTemplateOverrideConfig(d *schema.ResourceData,
+func (templaterFake TemplaterDummy) createVMTemplateOverrideConfig(d *schema.ResourceData,
 	template map[string]interface{}) (string, error) {
 	return "", nil
 }
 
-type UnexistingTemplate_TemplaterFake struct{}
+type UnexistingTemplateTemplaterFake struct{}
 
-func (templaterFake UnexistingTemplate_TemplaterFake) FetchTemplateFromList(templateName string,
+func (templaterFake UnexistingTemplateTemplaterFake) FetchTemplateFromList(templateName string,
 	templateList []interface{}) (map[string]interface{}, error) {
 	return map[string]interface{}{}, errors.New("Unavailable template : windows95")
 }
-func (templaterFake UnexistingTemplate_TemplaterFake) ValidateTemplate(template map[string]interface{}) error {
+func (templaterFake UnexistingTemplateTemplaterFake) validateTemplate(template map[string]interface{}) error {
 	return nil
 }
-func (templaterFake UnexistingTemplate_TemplaterFake) UpdateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
+func (templaterFake UnexistingTemplateTemplaterFake) updateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
 	template map[string]interface{}) error {
 	return nil
 }
-func (templaterFake UnexistingTemplate_TemplaterFake) CreateVmTemplateOverrideConfig(d *schema.ResourceData,
+func (templaterFake UnexistingTemplateTemplaterFake) createVMTemplateOverrideConfig(d *schema.ResourceData,
 	template map[string]interface{}) (string, error) {
 	return "", nil
 }
 
-type Template_FormatError_TemplaterFake struct{}
+type TemplateFormatErrorTemplaterFake struct{}
 
-func (templaterFake Template_FormatError_TemplaterFake) FetchTemplateFromList(templateName string,
+func (templaterFake TemplateFormatErrorTemplaterFake) FetchTemplateFromList(templateName string,
 	templateList []interface{}) (map[string]interface{}, error) {
 	return map[string]interface{}{}, nil
 }
-func (templaterFake Template_FormatError_TemplaterFake) ValidateTemplate(template map[string]interface{}) error {
+func (templaterFake TemplateFormatErrorTemplaterFake) validateTemplate(template map[string]interface{}) error {
 	return errors.New("Template missing fields : " + "\"" + NameField + "\" " +
 		"\"" + OsField + "\" " +
-		"\"" + RamField + "\" " +
-		"\"" + CpuField + "\" " +
+		"\"" + RAMField + "\" " +
+		"\"" + CPUField + "\" " +
 		"\"" + EnterpriseField + "\" " +
 		"\"" + DisksField + "\" " +
 		"\"" + DatacenterField + "\" ")
 }
-func (templaterFake Template_FormatError_TemplaterFake) UpdateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
+func (templaterFake TemplateFormatErrorTemplaterFake) updateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
 	template map[string]interface{}) error {
 	return nil
 }
-func (templaterFake Template_FormatError_TemplaterFake) CreateVmTemplateOverrideConfig(d *schema.ResourceData,
+func (templaterFake TemplateFormatErrorTemplaterFake) createVMTemplateOverrideConfig(d *schema.ResourceData,
 	template map[string]interface{}) (string, error) {
 	return "", nil
 }
 
-type existingTemplateNoAdditionalDiskVmMap_TemplaterFake struct{}
+type existingTemplateNoAdditionalDiskVMMapTemplaterFake struct{}
 
-func (templaterFake existingTemplateNoAdditionalDiskVmMap_TemplaterFake) FetchTemplateFromList(templateName string,
+func (templaterFake existingTemplateNoAdditionalDiskVMMapTemplaterFake) FetchTemplateFromList(templateName string,
 	templateList []interface{}) (map[string]interface{}, error) {
 	return map[string]interface{}{
-		IdField:         82,
+		IDField:         82,
 		NameField:       "template1",
 		SlugField:       "centos7-rd-dc1",
-		RamField:        1,
-		CpuField:        1,
+		RAMField:        1,
+		CPUField:        1,
 		OsField:         "CentOS",
 		EnterpriseField: "unit test enterprise",
 		DisksField: []interface{}{
@@ -125,16 +125,16 @@ func (templaterFake existingTemplateNoAdditionalDiskVmMap_TemplaterFake) FetchTe
 		DynamicField: "",
 	}, nil
 }
-func (templaterFake existingTemplateNoAdditionalDiskVmMap_TemplaterFake) ValidateTemplate(template map[string]interface{}) error {
+func (templaterFake existingTemplateNoAdditionalDiskVMMapTemplaterFake) validateTemplate(template map[string]interface{}) error {
 	return nil
 }
-func (templaterFake existingTemplateNoAdditionalDiskVmMap_TemplaterFake) UpdateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
+func (templaterFake existingTemplateNoAdditionalDiskVMMapTemplaterFake) updateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
 	template map[string]interface{}) error {
 	d.Set(NameField, "Unit test template no disc add on vm resource")
 	d.Set(EnterpriseField, "unit test enterprise")
 	d.Set(TemplateField, "template1")
-	d.Set(RamField, 1)
-	d.Set(CpuField, 1)
+	d.Set(RAMField, 1)
+	d.Set(CPUField, 1)
 	d.Set(DisksField,
 		[]interface{}{
 			map[string]interface{}{NameField: "template1 disk1",
@@ -147,21 +147,21 @@ func (templaterFake existingTemplateNoAdditionalDiskVmMap_TemplaterFake) UpdateS
 	d.Set(NicsField, []interface{}{})
 	return nil
 }
-func (templaterFake existingTemplateNoAdditionalDiskVmMap_TemplaterFake) CreateVmTemplateOverrideConfig(d *schema.ResourceData,
+func (templaterFake existingTemplateNoAdditionalDiskVMMapTemplaterFake) createVMTemplateOverrideConfig(d *schema.ResourceData,
 	template map[string]interface{}) (string, error) {
 	return "", nil
 }
 
-type instanceNumberFieldUnitTestVmInstance_MAP_TemplaterFake struct{}
+type instanceNumberFieldUnitTestVMInstanceMAPTemplaterFake struct{}
 
-func (templaterFake instanceNumberFieldUnitTestVmInstance_MAP_TemplaterFake) FetchTemplateFromList(templateName string,
+func (templaterFake instanceNumberFieldUnitTestVMInstanceMAPTemplaterFake) FetchTemplateFromList(templateName string,
 	templateList []interface{}) (map[string]interface{}, error) {
 	return map[string]interface{}{
-		IdField:         82,
+		IDField:         82,
 		NameField:       "template1",
 		SlugField:       "centos7-rd-dc1",
-		RamField:        1,
-		CpuField:        1,
+		RAMField:        1,
+		CPUField:        1,
 		OsField:         "CentOS",
 		EnterpriseField: "unit test enterprise",
 		DisksField: []interface{}{
@@ -186,16 +186,16 @@ func (templaterFake instanceNumberFieldUnitTestVmInstance_MAP_TemplaterFake) Fet
 		DynamicField: "",
 	}, nil
 }
-func (templaterFake instanceNumberFieldUnitTestVmInstance_MAP_TemplaterFake) ValidateTemplate(template map[string]interface{}) error {
+func (templaterFake instanceNumberFieldUnitTestVMInstanceMAPTemplaterFake) validateTemplate(template map[string]interface{}) error {
 	return nil
 }
-func (templaterFake instanceNumberFieldUnitTestVmInstance_MAP_TemplaterFake) UpdateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
+func (templaterFake instanceNumberFieldUnitTestVMInstanceMAPTemplaterFake) updateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
 	template map[string]interface{}) error {
 	d.Set(NameField, "instanceNumberFieldUnitTest")
 	d.Set(EnterpriseField, "unit test enterprise")
 	d.Set(TemplateField, "template1")
-	d.Set(RamField, 1)
-	d.Set(CpuField, 1)
+	d.Set(RAMField, 1)
+	d.Set(CPUField, 1)
 	d.Set(DisksField,
 		[]interface{}{
 			map[string]interface{}{NameField: "template1 disk1",
@@ -208,21 +208,21 @@ func (templaterFake instanceNumberFieldUnitTestVmInstance_MAP_TemplaterFake) Upd
 	d.Set(NicsField, []interface{}{})
 	return nil
 }
-func (templaterFake instanceNumberFieldUnitTestVmInstance_MAP_TemplaterFake) CreateVmTemplateOverrideConfig(d *schema.ResourceData,
+func (templaterFake instanceNumberFieldUnitTestVMInstanceMAPTemplaterFake) createVMTemplateOverrideConfig(d *schema.ResourceData,
 	template map[string]interface{}) (string, error) {
 	return "", nil
 }
 
-type existingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap_TemplaterFake struct{}
+type existingTemplateWithAdditionalAndModifiedDisksAndNicsVMMapTemplaterFake struct{}
 
-func (templaterFake existingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap_TemplaterFake) FetchTemplateFromList(templateName string,
+func (templaterFake existingTemplateWithAdditionalAndModifiedDisksAndNicsVMMapTemplaterFake) FetchTemplateFromList(templateName string,
 	templateList []interface{}) (map[string]interface{}, error) {
 	return map[string]interface{}{
-		IdField:         82,
+		IDField:         82,
 		NameField:       "template1",
 		SlugField:       "centos7-rd-dc1",
-		RamField:        1,
-		CpuField:        1,
+		RAMField:        1,
+		CPUField:        1,
 		OsField:         "CentOS",
 		EnterpriseField: "unit test enterprise",
 		DisksField: []interface{}{
@@ -247,16 +247,16 @@ func (templaterFake existingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap_T
 		DynamicField: "",
 	}, nil
 }
-func (templaterFake existingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap_TemplaterFake) ValidateTemplate(template map[string]interface{}) error {
+func (templaterFake existingTemplateWithAdditionalAndModifiedDisksAndNicsVMMapTemplaterFake) validateTemplate(template map[string]interface{}) error {
 	return nil
 }
-func (templaterFake existingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap_TemplaterFake) UpdateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
+func (templaterFake existingTemplateWithAdditionalAndModifiedDisksAndNicsVMMapTemplaterFake) updateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
 	template map[string]interface{}) error {
-	d.Set(NameField, "existingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap")
+	d.Set(NameField, "existingTemplateWithAdditionalAndModifiedDisksAndNicsVMMap")
 	d.Set(EnterpriseField, "unit test enterprise")
 	d.Set(TemplateField, "template1")
-	d.Set(RamField, 8)
-	d.Set(CpuField, 4)
+	d.Set(RAMField, 8)
+	d.Set(CPUField, 4)
 	d.Set(DisksField,
 		[]interface{}{
 			map[string]interface{}{
@@ -299,7 +299,7 @@ func (templaterFake existingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap_T
 	d.Set("dynamic_field:", "42")
 	return nil
 }
-func (templaterFake existingTemplateWithAdditionalAndModifiedDisksAndNicsVmMap_TemplaterFake) CreateVmTemplateOverrideConfig(d *schema.ResourceData,
+func (templaterFake existingTemplateWithAdditionalAndModifiedDisksAndNicsVMMapTemplaterFake) createVMTemplateOverrideConfig(d *schema.ResourceData,
 	template map[string]interface{}) (string, error) {
 	return "", nil
 }

@@ -7,14 +7,14 @@ import (
 
 type FakeResourceResourceer struct{}
 
-func (resourceer FakeResourceResourceer) ValidateStatus(api *API,
+func (resourceer FakeResourceResourceer) validateStatus(api *API,
 	resourceType string,
 	clientTooler ClientTooler) error {
 	var err error
 	switch {
-	case api.URL != rightApiUrl:
-		err = errors.New(wrongApiUrlError)
-	case api.Token != rightApiToken:
+	case api.URL != rightAPIURL:
+		err = errors.New(wrongAPIURLError)
+	case api.Token != rightAPIToken:
 		err = errors.New(wrongTokenError)
 	default:
 		err = nil
@@ -22,11 +22,11 @@ func (resourceer FakeResourceResourceer) ValidateStatus(api *API,
 	return err
 }
 
-func (resourceer FakeResourceResourceer) ValidateResourceType(resourceType string) error {
+func (resourceer FakeResourceResourceer) validateResourceType(resourceType string) error {
 	return nil
 }
 
-func (resourceer FakeResourceResourceer) ResourceInstanceCreate(d *schema.ResourceData,
+func (resourceer FakeResourceResourceer) resourceInstanceCreate(d *schema.ResourceData,
 	clientTooler *ClientTooler,
 	templatesTooler *TemplatesTooler,
 	resourceType string,
@@ -35,13 +35,13 @@ func (resourceer FakeResourceResourceer) ResourceInstanceCreate(d *schema.Resour
 	return "", nil
 }
 
-func (resourceer FakeResourceResourceer) GetResourceCreationUrl(api *API,
+func (resourceer FakeResourceResourceer) getResourceCreationURL(api *API,
 	resourceType string) string {
 
 	return ""
 }
 
-func (resourceer FakeResourceResourceer) GetResourceUrl(api *API,
+func (resourceer FakeResourceResourceer) getResourceURL(api *API,
 	resourceType string,
 	id string) string {
 

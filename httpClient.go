@@ -8,44 +8,49 @@ import (
 	"strings"
 )
 
+// ClientTooler contains implementation of Clienter interface
 type ClientTooler struct {
 	Client Clienter
 }
+
+// Clienter interface is responsible of HTTP operations
 type Clienter interface {
-	Do(api *API, req *http.Request) (*http.Response, error)
-	GetTemplatesList(clientTooler *ClientTooler,
+	do(api *API, req *http.Request) (*http.Response, error)
+	getTemplatesList(clientTooler *ClientTooler,
 		enterpriseSlug string, api *API) ([]interface{}, error)
-	HandleResponse(resp *http.Response,
+	handleResponse(resp *http.Response,
 		expectedCode int,
 		expectedBodyFormat string) (interface{}, error)
 }
-type HttpClienter struct{}
 
-// Wrapper of package net/http for dependency injection
-func (client HttpClienter) Do(api *API, req *http.Request) (*http.Response, error) {
+// HTTPClienter implements Clienter interface
+type HTTPClienter struct{}
+
+// Do is a wrapper of package net/http/Do method for dependency injection
+func (client HTTPClienter) do(api *API, req *http.Request) (*http.Response, error) {
 	return api.Client.Do(req)
 }
 
-func (client HttpClienter) GetTemplatesList(clientTooler *ClientTooler,
+func (client HTTPClienter) getTemplatesList(clientTooler *ClientTooler,
 	enterpriseSlug string, api *API) ([]interface{}, error) {
-	var templatesListUrl strings.Builder
-	templatesListUrl.WriteString(api.URL)
-	templatesListUrl.WriteString("template/?enterprise__slug=")
-	templatesListUrl.WriteString(enterpriseSlug)
+	var templatesListURL strings.Builder
+	templatesListURL.WriteString(api.URL)
+	templatesListURL.WriteString("template/?enterprise__slug=")
+	templatesListURL.WriteString(enterpriseSlug)
 	req, err1 := http.NewRequest("GET",
-		templatesListUrl.String(),
+		templatesListURL.String(),
 		nil)
 	if err1 != nil {
 		return nil, err1
 	}
 	req.Header.Add(httpAuthorization, httpTokenHeader+api.Token)
-	resp, err2 := clientTooler.Client.Do(api, req)
+	resp, err2 := clientTooler.Client.do(api, req)
 	if err2 != nil {
 		return nil, err2
 	}
-	templateList, err3 := clientTooler.Client.HandleResponse(resp,
+	templateList, err3 := clientTooler.Client.handleResponse(resp,
 		http.StatusOK,
-		httpJsonContentType)
+		httpJSONContentType)
 	if err3 != nil {
 		return nil, err3
 	}
@@ -55,10 +60,10 @@ func (client HttpClienter) GetTemplatesList(clientTooler *ClientTooler,
 	return templateList.([]interface{}), nil
 }
 
-// HandleResponse format a reponse body to the "expectedBodyFormat", test the
+// handleResponse formats a reponse body to the "expectedBodyFormat", tests the
 // response status code against the "expectedCode".
 // Handled reponse body format : "application/json", "text/html", ""
-func (client HttpClienter) HandleResponse(resp *http.Response,
+func (client HTTPClienter) handleResponse(resp *http.Response,
 	expectedCode int,
 	expectedBodyFormat string) (interface{}, error) {
 	if resp == nil {
@@ -75,21 +80,21 @@ func (client HttpClienter) HandleResponse(resp *http.Response,
 				"expected :"+expectedBodyFormat+"\ngot :"+contentType)
 	}
 	switch contentType {
-	case httpJsonContentType:
-		return handleJsonContentType(resp, expectedCode)
-	case httpHtmlTextContentType:
-		return handleHtmlContentType(resp, expectedCode)
+	case httpJSONContentType:
+		return handleJSONContentType(resp, expectedCode)
+	case httpHTMLTextContentType:
+		return handleHTMLContentType(resp, expectedCode)
 	case "":
 		return nil, errRespStatusCodeBuilder(resp, expectedCode, "")
 	default:
 		return nil, errRespStatusCodeBuilder(resp, expectedCode,
-			errApiUnhandledRespType+
+			errAPIUnhandledRespType+
 				resp.Header.Get(httpRespContentType)+
-				errValidateApiUrl)
+				errValidateAPIURL)
 	}
 }
 
-func handleJsonContentType(resp *http.Response,
+func handleJSONContentType(resp *http.Response,
 	expectedCode int) (interface{}, error) {
 	var (
 		respBodyReader interface{}
@@ -105,7 +110,7 @@ func handleJsonContentType(resp *http.Response,
 	err2 := json.Unmarshal(bodyBytes, &respBodyReader)
 	if err2 != nil {
 		return nil, errRespStatusCodeBuilder(resp, expectedCode,
-			errJsonFormat+err2.Error()+
+			errJSONFormat+err2.Error()+
 				"\nJson :"+string(bodyBytes))
 	}
 	err3 := errRespStatusCodeBuilder(resp, expectedCode, "")
@@ -116,7 +121,7 @@ func handleJsonContentType(resp *http.Response,
 	return respBodyReader.(interface{}), nil
 }
 
-func handleHtmlContentType(resp *http.Response,
+func handleHTMLContentType(resp *http.Response,
 	expectedCode int) (interface{}, error) {
 	bodyBytes, err4 := ioutil.ReadAll(resp.Body)
 	if err4 != nil {
