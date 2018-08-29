@@ -1,23 +1,27 @@
 image: golang
 
 stages:
-  - golintFmtAndUnitTest
+  - golintSnykFmtUnitTest
   - sonar
   - release
 
 # NB about symbolic link : https://redmine.priv.sewan.fr/issues/37334
-golint_fmt_and_unit_tests:
+golint_snyk_fmt_unit_tests:
   image: $DOCKER_REGISTRY/sidevops/docker/utils/terraform-ci:latest
-  stage: golintFmtAndUnitTest
+  stage: golintSnykFmtUnitTest
   before_script:
-    - go get -u golang.org/x/lint/golint
+    - curl -sL https://deb.nodesource.com/setup_10.x | bash -
+    - apt-get install -y nodejs
+    - npm install -g snyk
     - rm -rf $GOPATH/src/gitlab.com/rd/sewan-sdk-go
     - mkdir $GOPATH/src/gitlab.com/rd
     - ln -s $CI_PROJECT_DIR $GOPATH/src/gitlab.com/rd/
     - cd $GOPATH/src/gitlab.com/rd/$CI_PROJECT_NAME
+    - snyk auth
   script:
     - golint -set_exit_status
     - make test
+    - snyk test
   except:
     refs:
       - github_release
