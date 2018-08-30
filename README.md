@@ -4,6 +4,10 @@ Sewan's cloud data center go sdk
 - Website: https://www.sewan.fr/
 - Travis build : [![Build Status](https://travis-ci.com/SewanDevs/sewan-sdk-go.svg?branch=github_release)](https://travis-ci.com/SewanDevs/sewan-sdk-go)
 - SonarQube analysis : ![Sonar Status](https://sonarcloud.io/api/project_badges/measure?project=sewan-sdk-go&metric=alert_status)
+- Snyk security audit :
+[![Known Vulnerabilities](https://snyk.io/test/github/SewanDevs/sewan-sdk-go/badge.svg)](https://snyk.io/test/github/SewanDevs/sewan-sdk-go)
+- [![Go Report Card](https://goreportcard.com/badge/github.com/SewanDevs/sewan-sdk-go)](https://goreportcard.com/report/github.com/SewanDevs/sewan-sdk-go)
+
 
 <img src="http://entreprises.smallizbeautiful.fr/logo/Sewan-Communications.jpg" width="500px">
 
@@ -21,4 +25,11 @@ Requirements
 
 Doc
 --------------------
-Available under doc folder, it contains sequence diagrams and a module diagram.
+
+* Architecture doc : Available under doc folder, it contains sequence diagrams and a module diagram.
+* Standard golang sdk doc :
+> prerequisite : current repository have been cloned in GOPATH
+> ```sh
+> run godoc -http=:6060
+> ```
+> Open the webpage "http://localhost:6060/pkg/" and navigate through the tree to sewan-sdk-go package

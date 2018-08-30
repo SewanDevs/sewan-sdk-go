@@ -12,7 +12,7 @@ const (
 	defaultResourceType = VMResourceType
 )
 
-// API contains interfaces that consumes it, and authotentification token with URL
+// API struct represents distant Sewan clouddc API
 type API struct {
 	Token  string
 	URL    string
@@ -24,8 +24,8 @@ type APITooler struct {
 	APIImplementer APIer
 }
 
-// APIer interface is responsible of CRUD operations on clouddc resources,
-// they are done through AirDrumAPI conumption.
+// APIer interface is responsible of CRUD operations on Sewan's clouddc resources,
+// they are done through AirDrumAPI consumption.
 type APIer interface {
 	CreateResource(d *schema.ResourceData,
 		clientTooler *ClientTooler,
@@ -63,7 +63,7 @@ func (apiTools *APITooler) New(token string, url string) *API {
 	}
 }
 
-// CheckCloudDcStatus checks availability of clouddc
+// CheckCloudDcStatus checks availability of clouddc through its API
 func (apiTools *APITooler) CheckCloudDcStatus(api *API,
 	clientTooler *ClientTooler,
 	resourceTooler *ResourceTooler) error {
@@ -75,7 +75,9 @@ func (apiTools *APITooler) CheckCloudDcStatus(api *API,
 }
 
 // CreateResource creates Sewan clouddc resource
+//
 // * input data : schema.ResourceData (godoc.org/github.com/hashicorp/terraform/helper/schema#ResourceData)
+//
 // * return map of created resource or eventual creation error
 func (apier AirDrumResourcesAPI) CreateResource(d *schema.ResourceData,
 	clientTooler *ClientTooler,
@@ -123,7 +125,9 @@ func (apier AirDrumResourcesAPI) CreateResource(d *schema.ResourceData,
 }
 
 // ReadResource reads Sewan clouddc resource's state and update terraform's resource's state
+//
 // * input data : schema.ResourceData (with existing id) (godoc.org/github.com/hashicorp/terraform/helper/schema#ResourceData)
+//
 // * return map of read resource or eventual read error
 func (apier AirDrumResourcesAPI) ReadResource(d *schema.ResourceData,
 	clientTooler *ClientTooler,
@@ -168,6 +172,7 @@ func (apier AirDrumResourcesAPI) ReadResource(d *schema.ResourceData,
 }
 
 // updateSchemaReadVdcResource handle VDC resource names
+//
 // AirDrum use complex vdc resource names (example : <enterprise name>-mono-<resource name>),
 // the aim of this function is to rm "<enterprise name>-mono-" name part to
 // simplify terraform user experience
@@ -188,7 +193,9 @@ func updateSchemaReadVdcResource(d *schema.ResourceData,
 }
 
 // UpdateResource update Sewan clouddc resource's
+//
 // * input data : schema.ResourceData (with existing id) (godoc.org/github.com/hashicorp/terraform/helper/schema#ResourceData)
+//
 // * return map of updated resource or eventual update error
 func (apier AirDrumResourcesAPI) UpdateResource(d *schema.ResourceData,
 	clientTooler *ClientTooler,
@@ -232,7 +239,9 @@ func (apier AirDrumResourcesAPI) UpdateResource(d *schema.ResourceData,
 }
 
 // DeleteResource deletes a Sewan clouddc resource
+//
 // * input data : schema.ResourceData (with existing id) (godoc.org/github.com/hashicorp/terraform/helper/schema#ResourceData)
+//
 // * return eventual deletion error
 func (apier AirDrumResourcesAPI) DeleteResource(d *schema.ResourceData,
 	clientTooler *ClientTooler,
