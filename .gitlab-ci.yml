@@ -57,6 +57,7 @@ release-process:
   image: $DOCKER_REGISTRY/sidevops/docker/utils/terraform-ci:latest
   stage: release
   script:
+    - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
     - ReleaseBranchName="AutoReleaseOnTag$(date '+%Y-%m-%d_%Hh%Mm%Ss')"
     - git config --global user.email "robot@robot-ci.sewan"
     - git config --global user.name "reader@sewan.fr"
