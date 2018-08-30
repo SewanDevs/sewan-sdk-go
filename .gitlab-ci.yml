@@ -72,6 +72,7 @@ release-process:
     - git checkout github_release
     - git pull
     - git merge --strategy-option theirs --no-edit $ReleaseBranchName
+    - dep ensure -update
     - make fmt
     - git add *
     - git commit --amend --no-edit

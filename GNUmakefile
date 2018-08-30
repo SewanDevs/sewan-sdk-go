@@ -8,7 +8,7 @@ default: build
 build: fmtcheck
 	go install
 
-test: fmtcheck
+test: fmtcheck vet golint
 	go test -i $(TEST) || exit 1
 	echo $(TEST) | \
 		xargs -t -n4 go test -coverprofile=coverage.out -json > report.json $(TESTARGS) -timeout=30s -parallel=4
@@ -18,11 +18,19 @@ testacc: fmtcheck
 
 vet:
 	@echo "go vet ."
-	@go vet $$(go list ./... | grep -v vendor/) ; if [ $$? -eq 1 ]; then \
+	@go vet $$(go list ./... | grep -v vendor/) ; if [ $$? -ne 0 ]; then \
 		echo ""; \
 		echo "Vet found suspicious constructs. Please check the reported constructs"; \
 		echo "and fix them if necessary before submitting the code for review."; \
 		exit 1; \
+	fi
+
+golint:
+	@echo "golint"
+	@golint -set_exit_status $$(go list ./... | grep -v vendor/) ; if [ $$? -eq 0 ]; then \
+		golint > golint-report.out; \
+	else \
+		golint -set_exit_status; \
 	fi
 
 fmt:

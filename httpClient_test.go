@@ -11,7 +11,7 @@ func TestDo(t *testing.T) {
 	//Not tested, ref=TD-35489-UT-35737-1
 }
 
-func TestgetTemplatesList(t *testing.T) {
+func TestGetTemplatesList(t *testing.T) {
 	testCases := []struct {
 		ID             int
 		TCClienter     Clienter
