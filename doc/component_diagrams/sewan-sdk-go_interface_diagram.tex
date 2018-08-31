@@ -9,7 +9,7 @@
 \sloppy
 \hyphenpenalty 10000000
 
-\title{Sewan\_go\_sdk package interfaces diagram}
+\title{sewan-sdk-go package interfaces diagram}
 \author{Sewan}
 
 \begin{document}
@@ -19,20 +19,20 @@
 
 \begin{center}
   \begin{tikzpicture}
-    \begin{umlpackage}{sewan-go-sdk}
+    \begin{umlpackage}{sewan-sdk-go}
       \umlbasiccomponent[x=0,y=0]{<<APIImplementerer>>}
       \umlbasiccomponent[x=7,y=0]{<<Templater>>}
+      \umlbasiccomponent[x=3.5,y=-4]{<<Resourceer>>}
       \umlbasiccomponent[x=7,y=-4]{<<Schemaer>>}
       \umlbasiccomponent[x=0,y=-4]{<<Clienter>>}
-      \umlassemblyconnector[interface=consume]{<<APIImplementerer>>-east-port}{<<Schemaer>>-west-port}
+      \umlassemblyconnector[interface=consume]{<<APIImplementerer>>-south-port}{<<Schemaer>>-north-port}
       \umlassemblyconnector[interface=consume]{<<APIImplementerer>>-east-port}{<<Templater>>}
       \umlassemblyconnector[interface=consume]{<<APIImplementerer>>-south-port}{<<Clienter>>-north-port}
+      \umlassemblyconnector[interface=consume]{<<APIImplementerer>>-south-port}{<<Resourceer>>-north-port}
       \umlassemblyconnector[interface=consume]{<<Templater>>-south-port}{<<Schemaer>>-north-port}
       \umlnote[x=-5,y=0,width=13em]{<<APIImplementerer>>}{Responsibilities :\newline
-      * resources CRUD operations\newline
-      * validate api state\newline
-      * handle api URLs}
-      \umlnote[x=13,y=0,width=13em]{<<Templater>>}{Responsibilities :\newline
+      * resources CRUD operations\newline}
+	\umlnote[x=13,y=0,width=13em]{<<Templater>>}{Responsibilities :\newline
       * handle vm resource template logic (getTemplateList, create vm from template, 
       create configuration override file etc.)}
       \umlnote[x=13,y=-7,width=13em]{<<Schemaer>>}{Responsibilities :\newline
@@ -40,6 +40,9 @@
       after a read on configuration plan file or CRUD operation on distant resource, 
       it is too used as a media before updating resource state file.tfstate)\newline
       * handle resource dynamic field logic}
+      \umlnote[x=3.5,y=-10,width=13em]{<<Resourceer>>}{Responsibilities :\newline
+      * validate api state\newline
+      * handle api URLs}
       \umlnote[x=0,y=-7,width=13em]{<<Clienter>>}{Responsibilities :\newline
       * HTTP request and response creation/emission/reception}
     \end{umlpackage}

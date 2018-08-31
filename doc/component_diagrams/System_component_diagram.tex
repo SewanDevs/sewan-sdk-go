@@ -36,14 +36,16 @@
       \begin{umlpackage}[x=0,y=3,fill=white]{/helper/schema}
       \end{umlpackage}
     \end{umlpackage}
-    \begin{umlpackage}[x=11,y=0]{sewan-go-sdk}
+    \begin{umlpackage}[x=11,y=0]{sewan-sdk-go}
       \umlbasiccomponent[x=0,y=0]{<<APIImplementerer>>}
       \umlbasiccomponent[x=7,y=0]{<<Templater>>}
+      \umlbasiccomponent[x=3.5,y=-4]{<<Resourceer>>}
       \umlbasiccomponent[x=7,y=-4]{<<Schemaer>>}
       \umlbasiccomponent[x=0,y=-4]{<<Clienter>>}
-      \umlassemblyconnector[interface=consume]{<<APIImplementerer>>-east-port}{<<Schemaer>>-west-port}
+      \umlassemblyconnector[interface=consume]{<<APIImplementerer>>-south-port}{<<Schemaer>>-north-port}
       \umlassemblyconnector[interface=consume]{<<APIImplementerer>>-east-port}{<<Templater>>}
       \umlassemblyconnector[interface=consume]{<<APIImplementerer>>-south-port}{<<Clienter>>-north-port}
+      \umlassemblyconnector[interface=consume]{<<APIImplementerer>>-south-port}{<<Resourceer>>-north-port}
       \umlassemblyconnector[interface=consume]{<<Templater>>-south-port}{<<Schemaer>>-north-port}
     \end{umlpackage}
     \begin{umlpackage}[x=12,y=-9]{SewanCloudDataCenter}
