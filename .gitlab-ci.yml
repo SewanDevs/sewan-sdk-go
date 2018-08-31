@@ -21,6 +21,7 @@ golint_govet_snyk_gofmt_unit_tests:
   script:
     - make test # contains gofmt, golint and go vet
     - snyk test
+    - snyk monitor
   except:
     refs:
       - github_release
