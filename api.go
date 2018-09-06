@@ -14,14 +14,22 @@ const (
 
 // API struct represents distant Sewan clouddc API
 type API struct {
-	Token  string
-	URL    string
-	Client *http.Client
+	Token      string
+	URL        string
+	Enterprise string
+	Client     *http.Client
 }
 
 // APITooler contains implementation of APIer interface
 type APITooler struct {
 	APIImplementer APIer
+}
+
+// APIMeta stores specific meta data about a clouddc environment
+type APIMeta struct {
+	NonCriticalResourceList []interface{}
+	CriticalResourceList    []interface{}
+	OtherResourceList       []interface{}
 }
 
 // APIer interface is responsible of CRUD operations on Sewan's clouddc resources,
@@ -55,11 +63,12 @@ type APIer interface {
 type AirDrumResourcesAPI struct{}
 
 // New creates an API instance
-func (apiTools *APITooler) New(token string, url string) *API {
+func (apiTools *APITooler) New(token string, url string, enterprise string) *API {
 	return &API{
-		Token:  token,
-		URL:    url,
-		Client: &http.Client{},
+		Token:      token,
+		URL:        url,
+		Enterprise: enterprise,
+		Client:     &http.Client{},
 	}
 }
 
@@ -67,11 +76,48 @@ func (apiTools *APITooler) New(token string, url string) *API {
 func (apiTools *APITooler) CheckCloudDcStatus(api *API,
 	clientTooler *ClientTooler,
 	resourceTooler *ResourceTooler) error {
-	var apiClientErr error
-	apiClientErr = resourceTooler.Resource.validateStatus(api,
+	return resourceTooler.Resource.validateStatus(api,
 		defaultResourceType,
 		*clientTooler)
-	return apiClientErr
+}
+
+// GetClouddcEnvMeta gets Clouddc environnements meta data :
+// * physical clouddc resource lists :
+//		- non critical resource list
+//		- critical resource list (redondant resource for critic uses)
+//		- other resource list (Windows server license, RedHat licenses, etc.)
+func (apiTools *APITooler) GetClouddcEnvMeta(api *API,
+	clientTooler *ClientTooler) (*APIMeta, error) {
+	var (
+		apiMeta                 APIMeta
+		nonCriticalResourceList []interface{}
+		criticalResourceList    []interface{}
+		otherResourceList       []interface{}
+	)
+	resourceMetaDataList,
+		err := clientTooler.Client.getPhysicalResourcesMeta(clientTooler,
+		api)
+	if err != nil {
+		return nil, err
+	}
+	for _, resource := range resourceMetaDataList {
+		switch resource.(map[string]interface{})["cos"] {
+		case "Mono":
+			nonCriticalResourceList = append(nonCriticalResourceList,
+				resource.(map[string]interface{}))
+		case "HA":
+			criticalResourceList = append(criticalResourceList,
+				resource.(map[string]interface{}))
+		default:
+			otherResourceList = append(otherResourceList,
+				resource.(map[string]interface{}))
+		}
+	}
+	apiMeta.NonCriticalResourceList = nonCriticalResourceList
+	apiMeta.CriticalResourceList = criticalResourceList
+	apiMeta.OtherResourceList = otherResourceList
+	// redmine ticket #37823 : resource's lists validation lack
+	return &apiMeta, err
 }
 
 // CreateResource creates Sewan clouddc resource

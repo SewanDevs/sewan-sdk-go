@@ -125,7 +125,6 @@ func getTemplateAndUpdateSchema(templateName string,
 	templatesTooler *TemplatesTooler,
 	api *API) (map[string]interface{}, error) {
 	templateList, err1 := clientTooler.Client.getTemplatesList(clientTooler,
-		d.Get(EnterpriseField).(string),
 		api)
 	if err1 != nil {
 		return map[string]interface{}{}, err1

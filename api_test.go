@@ -9,30 +9,35 @@ import (
 
 func TestNew(t *testing.T) {
 	testCases := []struct {
-		ID         int
-		InputToken string
-		InputURL   string
-		OutputAPI  API
+		ID                  int
+		InputToken          string
+		InputURL            string
+		InputEnterpriseSlug string
+		OutputAPI           API
 	}{
 		{1,
 			wrongAPIToken,
 			rightAPIURL,
-			API{wrongAPIToken, rightAPIURL, nil},
+			enterpriseSlug,
+			API{wrongAPIToken, rightAPIURL, enterpriseSlug, nil},
 		},
 		{2,
 			rightAPIToken,
 			wrongAPIURL,
-			API{rightAPIToken, wrongAPIURL, nil},
+			enterpriseSlug,
+			API{rightAPIToken, wrongAPIURL, enterpriseSlug, nil},
 		},
 		{3,
 			wrongAPIToken,
 			wrongAPIURL,
-			API{wrongAPIToken, wrongAPIURL, nil},
+			enterpriseSlug,
+			API{wrongAPIToken, wrongAPIURL, enterpriseSlug, nil},
 		},
 		{4,
 			rightAPIToken,
 			rightAPIURL,
-			API{rightAPIToken, rightAPIURL, nil},
+			enterpriseSlug,
+			API{rightAPIToken, rightAPIURL, enterpriseSlug, nil},
 		},
 	}
 	fakeAPItools := APITooler{
@@ -42,16 +47,21 @@ func TestNew(t *testing.T) {
 		api := fakeAPItools.New(
 			testCase.InputToken,
 			testCase.InputURL,
+			testCase.InputEnterpriseSlug,
 		)
 		switch {
 		case api.Token != testCase.OutputAPI.Token:
-			t.Errorf("\n\nTC %d : API token error was incorrect,"+
+			t.Errorf("\n\nTC %d : API token was incorrect,"+
 				"\n\rgot: \"%s\"\n\rwant: \"%s\"",
 				testCase.ID, api.Token, testCase.OutputAPI.Token)
 		case api.URL != testCase.OutputAPI.URL:
-			t.Errorf("\n\nTC %d : API token error was incorrect,"+
+			t.Errorf("\n\nTC %d : API URL was incorrect,"+
 				"\n\rgot: \"%s\"\n\rwant: \"%s\"",
 				testCase.ID, api.URL, testCase.OutputAPI.URL)
+		case api.Enterprise != testCase.OutputAPI.Enterprise:
+			t.Errorf("\n\nTC %d : API enterprise was incorrect,"+
+				"\n\rgot: \"%s\"\n\rwant: \"%s\"",
+				testCase.ID, api.Enterprise, testCase.OutputAPI.Enterprise)
 		}
 	}
 }
@@ -67,6 +77,7 @@ func TestCheckCloudDcStatus(t *testing.T) {
 			&API{
 				wrongAPIToken,
 				rightAPIURL,
+				enterpriseSlug,
 				&http.Client{},
 			},
 			FakeResourceResourceer{},
@@ -76,6 +87,7 @@ func TestCheckCloudDcStatus(t *testing.T) {
 			&API{
 				rightAPIToken,
 				wrongAPIURL,
+				enterpriseSlug,
 				&http.Client{},
 			},
 			FakeResourceResourceer{},
@@ -85,6 +97,7 @@ func TestCheckCloudDcStatus(t *testing.T) {
 			&API{
 				wrongAPIToken,
 				wrongAPIURL,
+				enterpriseSlug,
 				&http.Client{},
 			},
 			FakeResourceResourceer{},
@@ -94,6 +107,7 @@ func TestCheckCloudDcStatus(t *testing.T) {
 			&API{
 				rightAPIToken,
 				rightAPIURL,
+				enterpriseSlug,
 				&http.Client{},
 			},
 			FakeResourceResourceer{},
@@ -102,7 +116,7 @@ func TestCheckCloudDcStatus(t *testing.T) {
 	}
 	fakeAPItools := APITooler{}
 	fakeClientTooler := &ClientTooler{
-		Client: HTTPClienter{},
+		Client: HTTPClienterDummy{},
 	}
 	fakeResourceTooler := &ResourceTooler{}
 	for _, testCase := range testCases {
@@ -122,6 +136,85 @@ func TestCheckCloudDcStatus(t *testing.T) {
 			t.Errorf("\n\nTC %d : Check API error was incorrect,"+
 				"\n\rgot: \"%s\"\n\rwant: \"%s\"",
 				testCase.ID, err.Error(), testCase.Err.Error())
+		}
+	}
+}
+
+func TestGetClouddcEnvMeta(t *testing.T) {
+	testCases := []struct {
+		ID            int
+		InputAPI      *API
+		TcClienter    Clienter
+		OutputAPIMeta *APIMeta
+		Err           error
+	}{
+		{
+			1,
+			&API{
+				wrongAPIToken,
+				rightAPIURL,
+				enterpriseSlug,
+				&http.Client{},
+			},
+			HTTPClienterDummy{},
+			&APIMeta{},
+			nil,
+		},
+		{
+			2,
+			&API{
+				wrongAPIToken,
+				rightAPIURL,
+				enterpriseSlug,
+				&http.Client{},
+			},
+			getListSuccessHTTPClienterFake{},
+			&APIMeta{
+				nonCriticalResourceMetaDataList,
+				criticalResourceMetaDataList,
+				otherResourceMetaDataList},
+			nil,
+		},
+		{
+			3,
+			&API{
+				wrongAPIToken,
+				rightAPIURL,
+				enterpriseSlug,
+				&http.Client{},
+			},
+			getJSONListFailureHTTPClienterFake{},
+			nil,
+			errEmptyResourcesList,
+		},
+	}
+	fakeAPItools := &APITooler{}
+	fakeClientTooler := &ClientTooler{}
+	for _, testCase := range testCases {
+		fakeClientTooler.Client = testCase.TcClienter
+		apiMeta, err := fakeAPItools.GetClouddcEnvMeta(testCase.InputAPI,
+			fakeClientTooler)
+		diffs := cmp.Diff(apiMeta, testCase.OutputAPIMeta)
+		switch {
+		case (err == nil || testCase.Err == nil):
+			if !(err == nil && testCase.Err == nil) {
+				t.Errorf("\n\nTC %d : GetClouddcEnvMeta error was incorrect,"+
+					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
+					testCase.ID, err, testCase.Err)
+			} else {
+				switch {
+				case diffs != "":
+					t.Errorf("\n\nTC %d : Wrong GetClouddcEnvMeta returned structure (-got +want) \n%s",
+						testCase.ID, diffs)
+				}
+			}
+		case err.Error() != testCase.Err.Error():
+			t.Errorf("\n\nTC %d : GetClouddcEnvMeta error was incorrect,"+
+				"\n\rgot: \"%s\"\n\rwant: \"%s\"",
+				testCase.ID, err.Error(), testCase.Err.Error())
+		case diffs != "":
+			t.Errorf("\n\nTC %d : Wrong GetClouddcEnvMeta returned structure (-got +want) \n%s",
+				testCase.ID, diffs)
 		}
 	}
 }

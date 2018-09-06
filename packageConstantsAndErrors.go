@@ -65,13 +65,16 @@ const (
 	readOperation                  = "Read"
 	updateOperation                = "Update"
 	deleteOperation                = "Delete"
+	entrepriseSlugHTTPReqParam     = "/?enterprise__slug="
 )
 
 var (
-	errDoRequest         = errors.New("do(request) error")
-	errEmptyResp         = errors.New("empty API response")
-	errEmptyRespBody     = errors.New("empty API response body")
-	errEmptyTemplateList = errors.New("empty template list")
+	errDoRequest          = errors.New("do(request) error")
+	errEmptyResp          = errors.New("empty API response")
+	errEmptyRespBody      = errors.New("empty API response body")
+	errEmptyJSON          = errors.New("empty json")
+	errEmptyResourcesList = errors.New("empty resource list")
+	errEmptyTemplateList  = errors.New("empty template list")
 	//ErrResourceNotExist provide message for unexisting resource case
 	ErrResourceNotExist                 = errors.New("resource does not exists")
 	errUninitializedExpectedCode        = errors.New("expected code not initialized")
