@@ -88,9 +88,9 @@ func getJSONList(clientTooler *ClientTooler,
 	return jsonList.([]interface{}), nil
 }
 
-// handleResponse formats a reponse body to the "expectedBodyFormat", tests the
+// handleResponse formats a response body to the "expectedBodyFormat", tests the
 // response status code against the "expectedCode".
-// Handled reponse body format : "application/json", "text/html", ""
+// Handled response body format : "application/json", "text/html", ""
 func (client HTTPClienter) handleResponse(resp *http.Response,
 	expectedCode int,
 	expectedBodyFormat string) (interface{}, error) {

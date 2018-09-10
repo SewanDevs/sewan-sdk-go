@@ -41,7 +41,8 @@ func TestGetPhysicalResourcesMeta(t *testing.T) {
 	clientTooler.Client = HTTPClienter{}
 	fakeClientTooler := ClientTooler{}
 	apiTooler := APITooler{}
-	api := apiTooler.New(rightAPIToken, rightAPIURL, enterpriseSlug)
+	apiTooler.Initialyser = Initialyser{}
+	api := apiTooler.Initialyser.New(rightAPIToken, rightAPIURL, unitTestEnterprise)
 	for _, testCase := range testCases {
 		fakeClientTooler.Client = testCase.TCClienter
 		resourcesMetaList,
@@ -113,7 +114,8 @@ func TestGetTemplatesList(t *testing.T) {
 	clientTooler.Client = HTTPClienter{}
 	fakeClientTooler := ClientTooler{}
 	apiTooler := APITooler{}
-	api := apiTooler.New(rightAPIURL, rightAPIURL, enterpriseSlug)
+	apiTooler.Initialyser = Initialyser{}
+	api := apiTooler.Initialyser.New(rightAPIURL, rightAPIURL, unitTestEnterprise)
 	for _, testCase := range testCases {
 		fakeClientTooler.Client = testCase.TCClienter
 		templatesList, err := clientTooler.Client.getTemplatesList(&fakeClientTooler,

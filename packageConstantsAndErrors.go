@@ -8,6 +8,8 @@ import (
 
 // Exported constants are resource field names
 const (
+	ResourceCosField               = "cos"
+	MonoResourceType               = "Mono"
 	NameField                      = "name"
 	EnterpriseField                = "enterprise"
 	DatacenterField                = "datacenter"
@@ -76,7 +78,7 @@ var (
 	errEmptyResourcesList = errors.New("empty resource list")
 	errEmptyTemplateList  = errors.New("empty template list")
 	//ErrResourceNotExist provide message for unexisting resource case
-	ErrResourceNotExist                 = errors.New("resource does not exists")
+	ErrResourceNotExist                 = errResourceNotExist("")
 	errUninitializedExpectedCode        = errors.New("expected code not initialized")
 	errNilResponse                      = errors.New("response is nil")
 	errZeroStatusCode                   = errors.New("response status code is zero")
@@ -85,6 +87,10 @@ var (
 	errUnexpectedvalidateStatusResponse = errors.New("unexpected response to validate status request")
 	errCheckRedirectFailure             = errors.New("CheckRedirectReqFailure")
 )
+
+func errResourceNotExist(resourceName string) error {
+	return errors.New(resourceName + " resource does not exists")
+}
 
 func errRespStatusCodeBuilder(resp *http.Response,
 	expectedCode int,

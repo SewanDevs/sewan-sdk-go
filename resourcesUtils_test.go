@@ -111,11 +111,22 @@ func TestResourceInstanceCreate(t *testing.T) {
 	}
 	fakeClientTooler := ClientTooler{}
 	fakeTemplatesTooler := TemplatesTooler{}
-	sewan := &API{Token: "42", URL: "42", Client: &http.Client{}}
+	sewan := &API{
+		Token:      rightAPIToken,
+		URL:        rightAPIURL,
+		Enterprise: unitTestEnterprise,
+		Meta: APIMeta{
+			NonCriticalResourceList: nonCriticalResourceMetaDataList,
+			CriticalResourceList:    criticalResourceMetaDataList,
+			OtherResourceList:       otherResourceMetaDataList,
+		},
+		Client: &http.Client{},
+	}
 	for _, testCase := range testCases {
 		fakeClientTooler.Client = testCase.Clienter
 		fakeTemplatesTooler.TemplatesTools = testCase.Templater
-		instance, err := fakeResourceTooler.Resource.resourceInstanceCreate(testCase.D,
+		instance,
+			err := fakeResourceTooler.Resource.resourceInstanceCreate(testCase.D,
 			&fakeClientTooler,
 			&fakeTemplatesTooler,
 			testCase.ResourceType,
@@ -161,7 +172,8 @@ func TestGetResourceCreationURLetResourceURL(t *testing.T) {
 			API{
 				rightAPIToken,
 				rightAPIURL,
-				enterpriseSlug,
+				unitTestEnterprise,
+				APIMeta{},
 				&http.Client{},
 			},
 			"42",
@@ -171,7 +183,8 @@ func TestGetResourceCreationURLetResourceURL(t *testing.T) {
 			API{
 				rightAPIToken,
 				rightAPIURL,
-				enterpriseSlug,
+				unitTestEnterprise,
+				APIMeta{},
 				&http.Client{},
 			},
 			"PATATE",
@@ -203,7 +216,8 @@ func TestGetResourceCreationURL(t *testing.T) {
 			API{
 				rightAPIToken,
 				rightAPIURL,
-				enterpriseSlug,
+				unitTestEnterprise,
+				APIMeta{},
 				&http.Client{},
 			},
 			rightVMCreationAPIURL,
@@ -236,7 +250,8 @@ func TestValidateStatus(t *testing.T) {
 			API{
 				rightAPIToken,
 				rightAPIURL,
-				enterpriseSlug,
+				unitTestEnterprise,
+				APIMeta{},
 				&http.Client{},
 			},
 			VMReadSuccessHTTPClienterFake{},
@@ -247,7 +262,8 @@ func TestValidateStatus(t *testing.T) {
 			API{
 				rightAPIToken,
 				rightAPIURL,
-				enterpriseSlug,
+				unitTestEnterprise,
+				APIMeta{},
 				&http.Client{},
 			},
 			CheckRedirectReqFailureHTTPClienterFake{},

@@ -79,7 +79,7 @@ var (
 		NameField:       "VM schema update unit test",
 		TemplateField:   "template1",
 		RAMField:        2,
-		EnterpriseField: "unit test enterprise",
+		EnterpriseField: unitTestEnterprise,
 		NicsField: []interface{}{
 			map[string]interface{}{
 				VlanNameField:  "vm additional unit test vlan1",
@@ -92,7 +92,7 @@ var (
 		NameField:       "VM schema update unit test",
 		TemplateField:   "template1",
 		RAMField:        2,
-		EnterpriseField: "unit test enterprise",
+		EnterpriseField: unitTestEnterprise,
 		NicsField: []interface{}{
 			map[string]interface{}{
 				VlanNameField:  "vm additional unit test vlan1",
@@ -106,7 +106,7 @@ var (
 		TemplateField:   "template1",
 		CPUField:        1,
 		RAMField:        2,
-		EnterpriseField: "unit test enterprise",
+		EnterpriseField: unitTestEnterprise,
 		NicsField: []interface{}{
 			map[string]interface{}{
 				VlanNameField:  "unit test vlan1",
@@ -130,7 +130,7 @@ var (
 		NameField:       "createVMTemplateOverrideConfig Unit test",
 		RAMField:        1,
 		CPUField:        1,
-		EnterpriseField: "unit test enterprise",
+		EnterpriseField: unitTestEnterprise,
 		TemplateField:   "template1",
 		OsField:         "Debian",
 		DisksField: []interface{}{
@@ -156,7 +156,7 @@ var (
 		InstanceNumberField: 42,
 		RAMField:            1,
 		CPUField:            1,
-		EnterpriseField:     "unit test enterprise",
+		EnterpriseField:     unitTestEnterprise,
 		TemplateField:       "template1",
 		OsField:             "Debian",
 		DisksField: []interface{}{
@@ -180,7 +180,7 @@ var (
 	vmCreationFromTemplate1SchemaPreCreationWrongNicsInitMap = map[string]interface{}{
 		RAMField:        1,
 		CPUField:        1,
-		EnterpriseField: "unit test enterprise",
+		EnterpriseField: unitTestEnterprise,
 		NameField:       "template1",
 		OsField:         "Debian",
 		DisksField: []interface{}{
@@ -225,23 +225,23 @@ var (
 		EnterpriseField: "enterprise",
 		VdcResourceField: []interface{}{
 			map[string]interface{}{
-				ResourceField: "enterprise-mono-ram",
+				ResourceField: "unit-test-enterprise-mono-ram",
 				TotalField:    20,
 			},
 			map[string]interface{}{
-				ResourceField: "enterprise-mono-cpu",
+				ResourceField: "unit-test-enterprise-mono-cpu",
 				TotalField:    1,
 			},
 			map[string]interface{}{
-				ResourceField: "enterprise-mono-storage_enterprise",
+				ResourceField: "unit-test-enterprise-mono-storage_enterprise",
 				TotalField:    10,
 			},
 			map[string]interface{}{
-				ResourceField: "enterprise-mono-storage_performance",
+				ResourceField: "unit-test-enterprise-mono-storage_performance",
 				TotalField:    10,
 			},
 			map[string]interface{}{
-				ResourceField: "enterprise-mono-storage_high_performance",
+				ResourceField: "unit-test-enterprise-mono-storage_high_performance",
 				TotalField:    10,
 			},
 		},
@@ -284,37 +284,37 @@ var (
 	}
 	vdcReadResponseMap = map[string]interface{}{
 		NameField:       "Unit test vdc",
-		EnterpriseField: "unit test enterprise",
+		EnterpriseField: unitTestEnterprise,
 		VdcResourceField: []interface{}{
 			map[string]interface{}{
-				ResourceField: RAMField,
+				ResourceField: "unit-test-enterprise-mono-ram",
 				UsedField:     0,
 				TotalField:    20,
-				SlugField:     "unit test enterprise-mono-ram",
+				SlugField:     "unit-test-enterprise-unit-test-enterprise-mono-ram",
 			},
 			map[string]interface{}{
-				ResourceField: CPUField,
+				ResourceField: "unit-test-enterprise-mono-cpu",
 				UsedField:     0,
 				TotalField:    1,
-				SlugField:     "unit test enterprise-mono-cpu",
+				SlugField:     "unit-test-enterprise-unit-test-enterprise-mono-cpu",
 			},
 			map[string]interface{}{
-				ResourceField: "storage_enterprise",
+				ResourceField: "unit-test-enterprise-mono-storage_enterprise",
 				UsedField:     0,
 				TotalField:    10,
-				SlugField:     "unit test enterprise-mono-storage_enterprise",
+				SlugField:     "unit-test-enterprise-unit-test-enterprise-mono-storage_enterprise",
 			},
 			map[string]interface{}{
-				ResourceField: "storage_performance",
+				ResourceField: "unit-test-enterprise-mono-storage_performance",
 				UsedField:     0,
 				TotalField:    10,
-				SlugField:     "unit test enterprise-mono-storage_performance",
+				SlugField:     "unit-test-enterprise-unit-test-enterprise-mono-storage_performance",
 			},
 			map[string]interface{}{
-				ResourceField: "storage_high_performance",
+				ResourceField: "unit-test-enterprise-mono-storage_high_performance",
 				UsedField:     0,
 				TotalField:    10,
-				SlugField:     "unit test enterprise-dc1-mono-storage_high_performance",
+				SlugField:     "unit-test-enterprise-unit-test-enterprise-mono-storage_high_performance",
 			},
 		},
 		SlugField:    "unit test enterprise-dc1-vdc_te",
@@ -358,7 +358,7 @@ var (
 	}
 	existingTemplateNoAdditionalDiskVMMap = map[string]interface{}{
 		NameField:         "Unit test template no disc add on vm resource",
-		EnterpriseField:   "unit test enterprise",
+		EnterpriseField:   unitTestEnterprise,
 		TemplateField:     "template1",
 		StateField:        "UP",
 		VdcField:          "vdc unit test",
@@ -371,7 +371,7 @@ var (
 	instanceNumberFieldUnitTestVMInstance = map[string]interface{}{
 		NameField:           "instanceNumberFieldUnitTest",
 		InstanceNumberField: 42,
-		EnterpriseField:     "unit test enterprise",
+		EnterpriseField:     unitTestEnterprise,
 		TemplateField:       "template1",
 		StateField:          "UP",
 		VdcField:            "vdc unit test",
@@ -383,7 +383,7 @@ var (
 	}
 	existingTemplateWithAdditionalAndModifiedDisksAndNicsVMMap = map[string]interface{}{
 		NameField:       "existingTemplateWithAdditionalAndModifiedDisksAndNicsVMMap",
-		EnterpriseField: "unit test enterprise",
+		EnterpriseField: unitTestEnterprise,
 		TemplateField:   "template1",
 		StateField:      "UP",
 		OsField:         "Debian",
@@ -421,7 +421,7 @@ var (
 	}
 	nonExistingTemplateVMMap = map[string]interface{}{
 		NameField:         "windows95 vm",
-		EnterpriseField:   "unit test enterprise",
+		EnterpriseField:   unitTestEnterprise,
 		TemplateField:     "windows95",
 		StateField:        "UP",
 		RAMField:          8,
@@ -441,7 +441,7 @@ var (
 		RAMField:        1,
 		CPUField:        1,
 		OsField:         "CentOS",
-		EnterpriseField: "unit test enterprise",
+		EnterpriseField: unitTestEnterprise,
 		DisksField: []interface{}{
 			map[string]interface{}{
 				NameField:         "unit test disk goulouglouglou",
@@ -462,7 +462,7 @@ var (
 		RAMField:        1,
 		CPUField:        1,
 		OsField:         "Debian",
-		EnterpriseField: "unit test enterprise",
+		EnterpriseField: unitTestEnterprise,
 		DisksField: []interface{}{
 			map[string]interface{}{
 				NameField:         "disk-debian9-rd-1",
@@ -495,7 +495,7 @@ var (
 		CPUField:        1,
 		OsField:         "CentOS",
 		BootField:       "on disk",
-		EnterpriseField: "unit test enterprise",
+		EnterpriseField: unitTestEnterprise,
 		DisksField: []interface{}{
 			map[string]interface{}{
 				NameField:         "unit test disk template1",
@@ -526,7 +526,7 @@ var (
 		CPUField:        1,
 		OsField:         "CentOS",
 		BootField:       "on disk",
-		EnterpriseField: "unit test enterprise",
+		EnterpriseField: unitTestEnterprise,
 		DisksField: []interface{}{
 			map[string]interface{}{
 				NameField:         "unit test disk template1",
@@ -903,7 +903,7 @@ var (
 			RAMField:        1,
 			CPUField:        1,
 			OsField:         "Debian",
-			EnterpriseField: "unit test enterprise",
+			EnterpriseField: unitTestEnterprise,
 			DisksField: []interface{}{
 				map[string]interface{}{
 					NameField:         "unit test disk2",
@@ -924,7 +924,7 @@ var (
 			RAMField:        1,
 			CPUField:        1,
 			OsField:         "CentOS",
-			EnterpriseField: "unit test enterprise",
+			EnterpriseField: unitTestEnterprise,
 			DisksField: []interface{}{
 				map[string]interface{}{
 					NameField:         "unit test disk 1",
@@ -956,7 +956,7 @@ var (
 			RAMField:        1,
 			CPUField:        1,
 			OsField:         "Windows Serveur 64bits",
-			EnterpriseField: "unit test enterprise",
+			EnterpriseField: unitTestEnterprise,
 			DisksField: []interface{}{
 				map[string]interface{}{
 					NameField:         "disk-Template-Windows",
@@ -1303,34 +1303,34 @@ func resourceVM() *schema.Resource {
 func fakeVdcInstanceVdcCreationMap() vdcStruct {
 	return vdcStruct{
 		Name:       "Unit test vdc resource",
-		Enterprise: "enterprise",
+		Enterprise: "unit-test-enterprise",
 		VdcResources: []interface{}{
 			map[string]interface{}{
-				ResourceField: "enterprise-mono-ram",
+				ResourceField: "unit-test-enterprise-mono-ram",
 				UsedField:     0,
 				TotalField:    20,
 				SlugField:     "",
 			},
 			map[string]interface{}{
-				ResourceField: "enterprise-mono-cpu",
+				ResourceField: "unit-test-enterprise-mono-cpu",
 				UsedField:     0,
 				TotalField:    1,
 				SlugField:     "",
 			},
 			map[string]interface{}{
-				ResourceField: "enterprise-mono-storage_enterprise",
+				ResourceField: "unit-test-enterprise-mono-storage_enterprise",
 				UsedField:     0,
 				TotalField:    10,
 				SlugField:     "",
 			},
 			map[string]interface{}{
-				ResourceField: "enterprise-mono-storage_performance",
+				ResourceField: "unit-test-enterprise-mono-storage_performance",
 				UsedField:     0,
 				TotalField:    10,
 				SlugField:     "",
 			},
 			map[string]interface{}{
-				ResourceField: "enterprise-mono-storage_high_performance",
+				ResourceField: "unit-test-enterprise-mono-storage_high_performance",
 				UsedField:     0,
 				TotalField:    10,
 				SlugField:     "",
@@ -1373,11 +1373,12 @@ func vdcInstanceFake() vdcStruct {
 
 func vmInstanceNoTemplateVMMap() vmStruct {
 	return vmStruct{
-		Name:  "Unit test no template vm resource",
-		State: "UP",
-		OS:    "Debian",
-		RAM:   8,
-		CPU:   4,
+		Name:       "Unit test no template vm resource",
+		State:      "UP",
+		Enterprise: unitTestEnterprise,
+		OS:         "Debian",
+		RAM:        8,
+		CPU:        4,
 		Disks: []interface{}{
 			map[string]interface{}{
 				NameField:         "disk 1",
@@ -1416,7 +1417,7 @@ func vmInstanceNoTemplateVMMap() vmStruct {
 func fakeVMInstanceExistingTemplateNoAdditionalDiskVMMap() vmStruct {
 	return vmStruct{
 		Name:       "Unit test template no disc add on vm resource-0",
-		Enterprise: "unit test enterprise",
+		Enterprise: unitTestEnterprise,
 		Template:   "template1",
 		State:      "UP",
 		RAM:        1,
@@ -1444,7 +1445,7 @@ func fakeVMInstanceExistingTemplateNoAdditionalDiskVMMap() vmStruct {
 func fakeVMInstanceInstanceNumberFieldUnitTestVMInstanceMAP() vmStruct {
 	return vmStruct{
 		Name:       "instanceNumberFieldUnitTest-42",
-		Enterprise: "unit test enterprise",
+		Enterprise: unitTestEnterprise,
 		Template:   "template1",
 		State:      "UP",
 		RAM:        1,
@@ -1472,7 +1473,7 @@ func fakeVMInstanceInstanceNumberFieldUnitTestVMInstanceMAP() vmStruct {
 func fakeVMInstanceExistingTemplateWithAdditionalAndModifiedDisksAndNicsVMMap() vmStruct {
 	return vmStruct{
 		Name:       "existingTemplateWithAdditionalAndModifiedDisksAndNicsVMMap-0",
-		Enterprise: "unit test enterprise",
+		Enterprise: unitTestEnterprise,
 		Template:   "template1",
 		State:      "UP",
 		OS:         "Debian",

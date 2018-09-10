@@ -5,7 +5,7 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"reflect"
 	"strconv"
-	"strings"
+	//"strings"
 )
 
 // SchemaTooler contains implementation of Schemaer interface
@@ -20,7 +20,7 @@ type Schemaer interface {
 	DeleteTerraformResource(d *schema.ResourceData)
 	UpdateLocalResourceState(resourceState map[string]interface{},
 		d *schema.ResourceData, schemaTools *SchemaTooler) error
-	UpdateVdcResourcesNames(d *schema.ResourceData) error
+	//UpdateVdcResourcesNames(d *schema.ResourceData) error
 	ReadElement(key interface{}, value interface{}) (interface{}, error)
 }
 
@@ -70,24 +70,24 @@ func (schemaer SchemaSchemaer) UpdateLocalResourceState(resourceState map[string
 // UpdateVdcResourcesNames trims meaningless part of vdc resource name to store
 // a shorter name locally, example :
 // * "<enterprise name>-mono-ram" -> "ram"
-func (schemaer SchemaSchemaer) UpdateVdcResourcesNames(d *schema.ResourceData) error {
-	var (
-		vdcResourcesList       = d.Get(VdcResourceField).([]interface{})
-		vdcResourcesListUpdate = []interface{}{}
-		enterpriseName         = d.Get(EnterpriseField).(string)
-		resourceName           string
-	)
-	for _, resource := range vdcResourcesList {
-		resourceName = resource.(map[string]interface{})[ResourceField].(string)
-		resourceName = strings.Replace(resourceName,
-			enterpriseName, "", 1)
-		resourceName = strings.Replace(resourceName,
-			monoField, "", 1)
-		resource.(map[string]interface{})[ResourceField] = resourceName
-		vdcResourcesListUpdate = append(vdcResourcesListUpdate, resource)
-	}
-	return d.Set(VdcResourceField, vdcResourcesListUpdate)
-}
+//func (schemaer SchemaSchemaer) UpdateVdcResourcesNames(d *schema.ResourceData) error {
+//	var (
+//		vdcResourcesList       = d.Get(VdcResourceField).([]interface{})
+//		vdcResourcesListUpdate = []interface{}{}
+//		enterpriseName         = d.Get(EnterpriseField).(string)
+//		resourceName           string
+//	)
+//	for _, resource := range vdcResourcesList {
+//		resourceName = resource.(map[string]interface{})[ResourceField].(string)
+//		resourceName = strings.Replace(resourceName,
+//			enterpriseName, "", 1)
+//		resourceName = strings.Replace(resourceName,
+//			monoField, "", 1)
+//		resource.(map[string]interface{})[ResourceField] = resourceName
+//		vdcResourcesListUpdate = append(vdcResourcesListUpdate, resource)
+//	}
+//	return d.Set(VdcResourceField, vdcResourcesListUpdate)
+//}
 
 // ReadElement formats Element(key,value) value type to a type accepted by terraform :
 //
