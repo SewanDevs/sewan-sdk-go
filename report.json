@@ -1,88 +1,88 @@
-{"Time":"2018-09-11T16:30:41.544962534+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestNew"}
-{"Time":"2018-09-11T16:30:41.545277285+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestNew","Output":"=== RUN   TestNew\n"}
-{"Time":"2018-09-11T16:30:41.545318645+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestNew","Output":"--- PASS: TestNew (0.00s)\n"}
-{"Time":"2018-09-11T16:30:41.545338155+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestNew","Elapsed":0}
-{"Time":"2018-09-11T16:30:41.545361153+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestCheckCloudDcStatus"}
-{"Time":"2018-09-11T16:30:41.545375207+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestCheckCloudDcStatus","Output":"=== RUN   TestCheckCloudDcStatus\n"}
-{"Time":"2018-09-11T16:30:41.545393455+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestCheckCloudDcStatus","Output":"--- PASS: TestCheckCloudDcStatus (0.00s)\n"}
-{"Time":"2018-09-11T16:30:41.545409547+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestCheckCloudDcStatus","Elapsed":0}
-{"Time":"2018-09-11T16:30:41.545423832+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetClouddcEnvMeta"}
-{"Time":"2018-09-11T16:30:41.545436073+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetClouddcEnvMeta","Output":"=== RUN   TestGetClouddcEnvMeta\n"}
-{"Time":"2018-09-11T16:30:41.545739678+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetClouddcEnvMeta","Output":"--- PASS: TestGetClouddcEnvMeta (0.00s)\n"}
-{"Time":"2018-09-11T16:30:41.54582307+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetClouddcEnvMeta","Elapsed":0}
-{"Time":"2018-09-11T16:30:41.545848005+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestCreateResource"}
-{"Time":"2018-09-11T16:30:41.545862789+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestCreateResource","Output":"=== RUN   TestCreateResource\n"}
-{"Time":"2018-09-11T16:30:41.546958938+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestCreateResource","Output":"--- PASS: TestCreateResource (0.00s)\n"}
-{"Time":"2018-09-11T16:30:41.547059143+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestCreateResource","Elapsed":0}
-{"Time":"2018-09-11T16:30:41.547086066+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestReadResource"}
-{"Time":"2018-09-11T16:30:41.547100312+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestReadResource","Output":"=== RUN   TestReadResource\n"}
-{"Time":"2018-09-11T16:30:41.547912366+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestReadResource","Output":"--- PASS: TestReadResource (0.00s)\n"}
-{"Time":"2018-09-11T16:30:41.547999748+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestReadResource","Elapsed":0}
-{"Time":"2018-09-11T16:30:41.548028595+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestUpdateResource"}
-{"Time":"2018-09-11T16:30:41.548044936+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestUpdateResource","Output":"=== RUN   TestUpdateResource\n"}
-{"Time":"2018-09-11T16:30:41.548481409+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestUpdateResource","Output":"--- PASS: TestUpdateResource (0.00s)\n"}
-{"Time":"2018-09-11T16:30:41.548525955+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestUpdateResource","Elapsed":0}
-{"Time":"2018-09-11T16:30:41.548547219+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestDeleteResource"}
-{"Time":"2018-09-11T16:30:41.548562889+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestDeleteResource","Output":"=== RUN   TestDeleteResource\n"}
-{"Time":"2018-09-11T16:30:41.548659264+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestDeleteResource","Output":"--- PASS: TestDeleteResource (0.00s)\n"}
-{"Time":"2018-09-11T16:30:41.548736467+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestDeleteResource","Elapsed":0}
-{"Time":"2018-09-11T16:30:41.548764641+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestDo"}
-{"Time":"2018-09-11T16:30:41.54878027+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestDo","Output":"=== RUN   TestDo\n"}
-{"Time":"2018-09-11T16:30:41.548802494+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestDo","Output":"--- PASS: TestDo (0.00s)\n"}
-{"Time":"2018-09-11T16:30:41.548819419+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestDo","Elapsed":0}
-{"Time":"2018-09-11T16:30:41.548834125+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetPhysicalResourcesMeta"}
-{"Time":"2018-09-11T16:30:41.548856515+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetPhysicalResourcesMeta","Output":"=== RUN   TestGetPhysicalResourcesMeta\n"}
-{"Time":"2018-09-11T16:30:41.54887685+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetPhysicalResourcesMeta","Output":"--- PASS: TestGetPhysicalResourcesMeta (0.00s)\n"}
-{"Time":"2018-09-11T16:30:41.548891955+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetPhysicalResourcesMeta","Elapsed":0}
-{"Time":"2018-09-11T16:30:41.548905263+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetTemplatesList"}
-{"Time":"2018-09-11T16:30:41.548917253+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetTemplatesList","Output":"=== RUN   TestGetTemplatesList\n"}
-{"Time":"2018-09-11T16:30:41.549353694+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetTemplatesList","Output":"--- PASS: TestGetTemplatesList (0.00s)\n"}
-{"Time":"2018-09-11T16:30:41.549423113+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetTemplatesList","Elapsed":0}
-{"Time":"2018-09-11T16:30:41.549445121+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestHandleResponse"}
-{"Time":"2018-09-11T16:30:41.549458436+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestHandleResponse","Output":"=== RUN   TestHandleResponse\n"}
-{"Time":"2018-09-11T16:30:41.551044123+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestHandleResponse","Output":"--- PASS: TestHandleResponse (0.00s)\n"}
-{"Time":"2018-09-11T16:30:41.551159255+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestHandleResponse","Elapsed":0}
-{"Time":"2018-09-11T16:30:41.551185668+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestResourceInstanceCreate"}
-{"Time":"2018-09-11T16:30:41.55119924+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestResourceInstanceCreate","Output":"=== RUN   TestResourceInstanceCreate\n"}
-{"Time":"2018-09-11T16:30:41.555013889+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestResourceInstanceCreate","Output":"--- PASS: TestResourceInstanceCreate (0.00s)\n"}
-{"Time":"2018-09-11T16:30:41.555078533+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestResourceInstanceCreate","Elapsed":0}
-{"Time":"2018-09-11T16:30:41.555102326+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetResourceCreationURLetResourceURL"}
-{"Time":"2018-09-11T16:30:41.555121704+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetResourceCreationURLetResourceURL","Output":"=== RUN   TestGetResourceCreationURLetResourceURL\n"}
-{"Time":"2018-09-11T16:30:41.555139829+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetResourceCreationURLetResourceURL","Output":"--- PASS: TestGetResourceCreationURLetResourceURL (0.00s)\n"}
-{"Time":"2018-09-11T16:30:41.555159287+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetResourceCreationURLetResourceURL","Elapsed":0}
-{"Time":"2018-09-11T16:30:41.555185136+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetResourceCreationURL"}
-{"Time":"2018-09-11T16:30:41.555199609+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetResourceCreationURL","Output":"=== RUN   TestGetResourceCreationURL\n"}
-{"Time":"2018-09-11T16:30:41.555219621+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetResourceCreationURL","Output":"--- PASS: TestGetResourceCreationURL (0.00s)\n"}
-{"Time":"2018-09-11T16:30:41.555235257+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetResourceCreationURL","Elapsed":0}
-{"Time":"2018-09-11T16:30:41.555249273+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestValidateStatus"}
-{"Time":"2018-09-11T16:30:41.555261908+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestValidateStatus","Output":"=== RUN   TestValidateStatus\n"}
-{"Time":"2018-09-11T16:30:41.555277432+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestValidateStatus","Output":"--- PASS: TestValidateStatus (0.00s)\n"}
-{"Time":"2018-09-11T16:30:41.55529265+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestValidateStatus","Elapsed":0}
-{"Time":"2018-09-11T16:30:41.555306442+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestFetchTemplateFromList"}
-{"Time":"2018-09-11T16:30:41.555319708+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestFetchTemplateFromList","Output":"=== RUN   TestFetchTemplateFromList\n"}
-{"Time":"2018-09-11T16:30:41.555388949+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestFetchTemplateFromList","Output":"--- PASS: TestFetchTemplateFromList (0.00s)\n"}
-{"Time":"2018-09-11T16:30:41.555420487+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestFetchTemplateFromList","Elapsed":0}
-{"Time":"2018-09-11T16:30:41.555455205+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestValidateTemplate"}
-{"Time":"2018-09-11T16:30:41.555468427+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestValidateTemplate","Output":"=== RUN   TestValidateTemplate\n"}
-{"Time":"2018-09-11T16:30:41.555484751+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestValidateTemplate","Output":"--- PASS: TestValidateTemplate (0.00s)\n"}
-{"Time":"2018-09-11T16:30:41.555506158+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestValidateTemplate","Elapsed":0}
-{"Time":"2018-09-11T16:30:41.555519471+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestUpdateSchemaFromTemplateOnResourceCreation"}
-{"Time":"2018-09-11T16:30:41.555532859+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestUpdateSchemaFromTemplateOnResourceCreation","Output":"=== RUN   TestUpdateSchemaFromTemplateOnResourceCreation\n"}
-{"Time":"2018-09-11T16:30:41.555797193+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestUpdateSchemaFromTemplateOnResourceCreation","Output":"--- PASS: TestUpdateSchemaFromTemplateOnResourceCreation (0.00s)\n"}
-{"Time":"2018-09-11T16:30:41.555826378+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestUpdateSchemaFromTemplateOnResourceCreation","Elapsed":0}
-{"Time":"2018-09-11T16:30:41.555842293+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestCreateVMTemplateOverrideConfig"}
-{"Time":"2018-09-11T16:30:41.555855785+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestCreateVMTemplateOverrideConfig","Output":"=== RUN   TestCreateVMTemplateOverrideConfig\n"}
-{"Time":"2018-09-11T16:30:41.556892971+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestCreateVMTemplateOverrideConfig","Output":"--- PASS: TestCreateVMTemplateOverrideConfig (0.00s)\n"}
-{"Time":"2018-09-11T16:30:41.556935963+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestCreateVMTemplateOverrideConfig","Elapsed":0}
-{"Time":"2018-09-11T16:30:41.556967509+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestDeleteTerraformResource"}
-{"Time":"2018-09-11T16:30:41.556986061+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestDeleteTerraformResource","Output":"=== RUN   TestDeleteTerraformResource\n"}
-{"Time":"2018-09-11T16:30:41.557009728+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestDeleteTerraformResource","Output":"--- PASS: TestDeleteTerraformResource (0.00s)\n"}
-{"Time":"2018-09-11T16:30:41.557030852+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestDeleteTerraformResource","Elapsed":0}
-{"Time":"2018-09-11T16:30:41.557048233+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestUpdateLocalResourceState_AND_ReadElement"}
-{"Time":"2018-09-11T16:30:41.557064207+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestUpdateLocalResourceState_AND_ReadElement","Output":"=== RUN   TestUpdateLocalResourceState_AND_ReadElement\n"}
-{"Time":"2018-09-11T16:30:41.557938668+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestUpdateLocalResourceState_AND_ReadElement","Output":"--- PASS: TestUpdateLocalResourceState_AND_ReadElement (0.00s)\n"}
-{"Time":"2018-09-11T16:30:41.557985295+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestUpdateLocalResourceState_AND_ReadElement","Elapsed":0}
-{"Time":"2018-09-11T16:30:41.558006652+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Output":"PASS\n"}
-{"Time":"2018-09-11T16:30:41.559470672+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Output":"coverage: 91.9% of statements\n"}
-{"Time":"2018-09-11T16:30:41.566544856+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Output":"ok  \tgitlab.com/rd/sewan-sdk-go\t0.029s\tcoverage: 91.9% of statements\n"}
-{"Time":"2018-09-11T16:30:41.56659614+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Elapsed":0.029}
+{"Time":"2018-09-11T17:26:24.393531036+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestNew"}
+{"Time":"2018-09-11T17:26:24.393747797+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestNew","Output":"=== RUN   TestNew\n"}
+{"Time":"2018-09-11T17:26:24.39378478+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestNew","Output":"--- PASS: TestNew (0.00s)\n"}
+{"Time":"2018-09-11T17:26:24.393815685+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestNew","Elapsed":0}
+{"Time":"2018-09-11T17:26:24.393833155+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestCheckCloudDcStatus"}
+{"Time":"2018-09-11T17:26:24.393845861+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestCheckCloudDcStatus","Output":"=== RUN   TestCheckCloudDcStatus\n"}
+{"Time":"2018-09-11T17:26:24.393862147+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestCheckCloudDcStatus","Output":"--- PASS: TestCheckCloudDcStatus (0.00s)\n"}
+{"Time":"2018-09-11T17:26:24.393871757+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestCheckCloudDcStatus","Elapsed":0}
+{"Time":"2018-09-11T17:26:24.393880162+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetClouddcEnvMeta"}
+{"Time":"2018-09-11T17:26:24.393887345+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetClouddcEnvMeta","Output":"=== RUN   TestGetClouddcEnvMeta\n"}
+{"Time":"2018-09-11T17:26:24.394125339+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetClouddcEnvMeta","Output":"--- PASS: TestGetClouddcEnvMeta (0.00s)\n"}
+{"Time":"2018-09-11T17:26:24.394144959+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetClouddcEnvMeta","Elapsed":0}
+{"Time":"2018-09-11T17:26:24.394160196+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestCreateResource"}
+{"Time":"2018-09-11T17:26:24.3941731+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestCreateResource","Output":"=== RUN   TestCreateResource\n"}
+{"Time":"2018-09-11T17:26:24.395018746+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestCreateResource","Output":"--- PASS: TestCreateResource (0.00s)\n"}
+{"Time":"2018-09-11T17:26:24.395049787+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestCreateResource","Elapsed":0}
+{"Time":"2018-09-11T17:26:24.395065514+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestReadResource"}
+{"Time":"2018-09-11T17:26:24.395077953+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestReadResource","Output":"=== RUN   TestReadResource\n"}
+{"Time":"2018-09-11T17:26:24.39580962+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestReadResource","Output":"--- PASS: TestReadResource (0.00s)\n"}
+{"Time":"2018-09-11T17:26:24.395835052+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestReadResource","Elapsed":0}
+{"Time":"2018-09-11T17:26:24.395848578+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestUpdateResource"}
+{"Time":"2018-09-11T17:26:24.395860604+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestUpdateResource","Output":"=== RUN   TestUpdateResource\n"}
+{"Time":"2018-09-11T17:26:24.396164355+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestUpdateResource","Output":"--- PASS: TestUpdateResource (0.00s)\n"}
+{"Time":"2018-09-11T17:26:24.396187679+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestUpdateResource","Elapsed":0}
+{"Time":"2018-09-11T17:26:24.39620092+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestDeleteResource"}
+{"Time":"2018-09-11T17:26:24.396213067+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestDeleteResource","Output":"=== RUN   TestDeleteResource\n"}
+{"Time":"2018-09-11T17:26:24.396299573+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestDeleteResource","Output":"--- PASS: TestDeleteResource (0.00s)\n"}
+{"Time":"2018-09-11T17:26:24.396346128+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestDeleteResource","Elapsed":0}
+{"Time":"2018-09-11T17:26:24.39636769+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestDo"}
+{"Time":"2018-09-11T17:26:24.396379137+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestDo","Output":"=== RUN   TestDo\n"}
+{"Time":"2018-09-11T17:26:24.396393235+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestDo","Output":"--- PASS: TestDo (0.00s)\n"}
+{"Time":"2018-09-11T17:26:24.396406555+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestDo","Elapsed":0}
+{"Time":"2018-09-11T17:26:24.396419115+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetPhysicalResourcesMeta"}
+{"Time":"2018-09-11T17:26:24.396431742+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetPhysicalResourcesMeta","Output":"=== RUN   TestGetPhysicalResourcesMeta\n"}
+{"Time":"2018-09-11T17:26:24.3964496+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetPhysicalResourcesMeta","Output":"--- PASS: TestGetPhysicalResourcesMeta (0.00s)\n"}
+{"Time":"2018-09-11T17:26:24.396463337+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetPhysicalResourcesMeta","Elapsed":0}
+{"Time":"2018-09-11T17:26:24.396475505+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetTemplatesList"}
+{"Time":"2018-09-11T17:26:24.396486454+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetTemplatesList","Output":"=== RUN   TestGetTemplatesList\n"}
+{"Time":"2018-09-11T17:26:24.3969737+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetTemplatesList","Output":"--- PASS: TestGetTemplatesList (0.00s)\n"}
+{"Time":"2018-09-11T17:26:24.397014222+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetTemplatesList","Elapsed":0}
+{"Time":"2018-09-11T17:26:24.39703257+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestHandleResponse"}
+{"Time":"2018-09-11T17:26:24.397045096+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestHandleResponse","Output":"=== RUN   TestHandleResponse\n"}
+{"Time":"2018-09-11T17:26:24.398572522+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestHandleResponse","Output":"--- PASS: TestHandleResponse (0.00s)\n"}
+{"Time":"2018-09-11T17:26:24.398635352+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestHandleResponse","Elapsed":0}
+{"Time":"2018-09-11T17:26:24.39866473+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestResourceInstanceCreate"}
+{"Time":"2018-09-11T17:26:24.398679052+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestResourceInstanceCreate","Output":"=== RUN   TestResourceInstanceCreate\n"}
+{"Time":"2018-09-11T17:26:24.402938258+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestResourceInstanceCreate","Output":"--- PASS: TestResourceInstanceCreate (0.00s)\n"}
+{"Time":"2018-09-11T17:26:24.403019937+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestResourceInstanceCreate","Elapsed":0}
+{"Time":"2018-09-11T17:26:24.403042412+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetResourceCreationURLetResourceURL"}
+{"Time":"2018-09-11T17:26:24.403059321+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetResourceCreationURLetResourceURL","Output":"=== RUN   TestGetResourceCreationURLetResourceURL\n"}
+{"Time":"2018-09-11T17:26:24.403076677+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetResourceCreationURLetResourceURL","Output":"--- PASS: TestGetResourceCreationURLetResourceURL (0.00s)\n"}
+{"Time":"2018-09-11T17:26:24.403092457+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetResourceCreationURLetResourceURL","Elapsed":0}
+{"Time":"2018-09-11T17:26:24.403118279+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetResourceCreationURL"}
+{"Time":"2018-09-11T17:26:24.403132709+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetResourceCreationURL","Output":"=== RUN   TestGetResourceCreationURL\n"}
+{"Time":"2018-09-11T17:26:24.403152409+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetResourceCreationURL","Output":"--- PASS: TestGetResourceCreationURL (0.00s)\n"}
+{"Time":"2018-09-11T17:26:24.403168179+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestGetResourceCreationURL","Elapsed":0}
+{"Time":"2018-09-11T17:26:24.403181777+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestValidateStatus"}
+{"Time":"2018-09-11T17:26:24.403193408+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestValidateStatus","Output":"=== RUN   TestValidateStatus\n"}
+{"Time":"2018-09-11T17:26:24.403209013+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestValidateStatus","Output":"--- PASS: TestValidateStatus (0.00s)\n"}
+{"Time":"2018-09-11T17:26:24.403223687+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestValidateStatus","Elapsed":0}
+{"Time":"2018-09-11T17:26:24.403237508+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestFetchTemplateFromList"}
+{"Time":"2018-09-11T17:26:24.403250463+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestFetchTemplateFromList","Output":"=== RUN   TestFetchTemplateFromList\n"}
+{"Time":"2018-09-11T17:26:24.403427555+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestFetchTemplateFromList","Output":"--- PASS: TestFetchTemplateFromList (0.00s)\n"}
+{"Time":"2018-09-11T17:26:24.403458203+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestFetchTemplateFromList","Elapsed":0}
+{"Time":"2018-09-11T17:26:24.403475762+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestValidateTemplate"}
+{"Time":"2018-09-11T17:26:24.403488786+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestValidateTemplate","Output":"=== RUN   TestValidateTemplate\n"}
+{"Time":"2018-09-11T17:26:24.403507649+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestValidateTemplate","Output":"--- PASS: TestValidateTemplate (0.00s)\n"}
+{"Time":"2018-09-11T17:26:24.403523106+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestValidateTemplate","Elapsed":0}
+{"Time":"2018-09-11T17:26:24.403537191+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestUpdateSchemaFromTemplateOnResourceCreation"}
+{"Time":"2018-09-11T17:26:24.403550692+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestUpdateSchemaFromTemplateOnResourceCreation","Output":"=== RUN   TestUpdateSchemaFromTemplateOnResourceCreation\n"}
+{"Time":"2018-09-11T17:26:24.404019131+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestUpdateSchemaFromTemplateOnResourceCreation","Output":"--- PASS: TestUpdateSchemaFromTemplateOnResourceCreation (0.00s)\n"}
+{"Time":"2018-09-11T17:26:24.404060573+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestUpdateSchemaFromTemplateOnResourceCreation","Elapsed":0}
+{"Time":"2018-09-11T17:26:24.404079476+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestCreateVMTemplateOverrideConfig"}
+{"Time":"2018-09-11T17:26:24.404093764+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestCreateVMTemplateOverrideConfig","Output":"=== RUN   TestCreateVMTemplateOverrideConfig\n"}
+{"Time":"2018-09-11T17:26:24.405818354+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestCreateVMTemplateOverrideConfig","Output":"--- PASS: TestCreateVMTemplateOverrideConfig (0.00s)\n"}
+{"Time":"2018-09-11T17:26:24.405879515+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestCreateVMTemplateOverrideConfig","Elapsed":0}
+{"Time":"2018-09-11T17:26:24.405920409+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestDeleteTerraformResource"}
+{"Time":"2018-09-11T17:26:24.405937706+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestDeleteTerraformResource","Output":"=== RUN   TestDeleteTerraformResource\n"}
+{"Time":"2018-09-11T17:26:24.405963469+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestDeleteTerraformResource","Output":"--- PASS: TestDeleteTerraformResource (0.00s)\n"}
+{"Time":"2018-09-11T17:26:24.405981365+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestDeleteTerraformResource","Elapsed":0}
+{"Time":"2018-09-11T17:26:24.405996833+02:00","Action":"run","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestUpdateLocalResourceState_AND_ReadElement"}
+{"Time":"2018-09-11T17:26:24.406010988+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestUpdateLocalResourceState_AND_ReadElement","Output":"=== RUN   TestUpdateLocalResourceState_AND_ReadElement\n"}
+{"Time":"2018-09-11T17:26:24.407756232+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestUpdateLocalResourceState_AND_ReadElement","Output":"--- PASS: TestUpdateLocalResourceState_AND_ReadElement (0.00s)\n"}
+{"Time":"2018-09-11T17:26:24.407892016+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Test":"TestUpdateLocalResourceState_AND_ReadElement","Elapsed":0}
+{"Time":"2018-09-11T17:26:24.407929305+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Output":"PASS\n"}
+{"Time":"2018-09-11T17:26:24.408952161+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Output":"coverage: 91.9% of statements\n"}
+{"Time":"2018-09-11T17:26:24.411397511+02:00","Action":"output","Package":"gitlab.com/rd/sewan-sdk-go","Output":"ok  \tgitlab.com/rd/sewan-sdk-go\t0.025s\tcoverage: 91.9% of statements\n"}
+{"Time":"2018-09-11T17:26:24.411457482+02:00","Action":"pass","Package":"gitlab.com/rd/sewan-sdk-go","Elapsed":0.025}

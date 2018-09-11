@@ -41,8 +41,8 @@ func TestNew(t *testing.T) {
 		},
 	}
 	fakeAPItools := APITooler{
-		APIImplementer: FakeAirDrumResourceAPIer{},
-		Initialyser:    Initialyser{},
+		Implementer: FakeAirDrumResourceAPIer{},
+		Initialyser: Initialyser{},
 	}
 	for _, testCase := range testCases {
 		api := fakeAPItools.Initialyser.New(
@@ -126,7 +126,7 @@ func TestCheckCloudDcStatus(t *testing.T) {
 	}
 	fakeResourceTooler := &ResourceTooler{}
 	for _, testCase := range testCases {
-		fakeAPItools.APIImplementer = FakeAirDrumResourceAPIer{}
+		fakeAPItools.Implementer = FakeAirDrumResourceAPIer{}
 		fakeResourceTooler.Resource = testCase.TCResourceTooler
 		err := fakeAPItools.Initialyser.CheckCloudDcStatus(testCase.InputAPI,
 			fakeClientTooler,
@@ -444,7 +444,7 @@ func TestReadResource(t *testing.T) {
 			map[string]interface{}{},
 		},
 	}
-	APIImplementerer := AirDrumResourcesAPI{}
+	Implementerer := AirDrumResourcesAPI{}
 	fakeClientTooler := ClientTooler{}
 	fakeResourceTooler := ResourceTooler{
 		Resource: ResourceResourceer{},
@@ -455,7 +455,7 @@ func TestReadResource(t *testing.T) {
 		d.SetId("UnitTest resource1")
 		d.Set(NameField, resourceName)
 		fakeClientTooler.Client = testCase.TcClienter
-		respCreationMap, err := APIImplementerer.ReadResource(d,
+		respCreationMap, err := Implementerer.ReadResource(d,
 			&fakeClientTooler,
 			&fakeResourceTooler,
 			testCase.ResourceType,
@@ -520,7 +520,7 @@ func TestUpdateResource(t *testing.T) {
 				errEmptyResp),
 		},
 	}
-	APIImplementerer := AirDrumResourcesAPI{}
+	Implementerer := AirDrumResourcesAPI{}
 	sewan := &API{Token: "42", URL: "42", Client: &http.Client{}}
 	fakeClientTooler := ClientTooler{}
 	fakeTemplatesTooler := TemplatesTooler{
@@ -535,7 +535,7 @@ func TestUpdateResource(t *testing.T) {
 		d.SetId("UnitTest resource1")
 		d.Set(NameField, resourceName)
 		fakeClientTooler.Client = testCase.TcClienter
-		err := APIImplementerer.UpdateResource(d,
+		err := Implementerer.UpdateResource(d,
 			&fakeClientTooler,
 			&fakeTemplatesTooler,
 			&fakeResourceTooler,
@@ -584,7 +584,7 @@ func TestDeleteResource(t *testing.T) {
 				errEmptyResp),
 		},
 	}
-	APIImplementerer := AirDrumResourcesAPI{}
+	Implementerer := AirDrumResourcesAPI{}
 	sewan := &API{Token: "42", URL: "42", Client: &http.Client{}}
 	fakeClientTooler := ClientTooler{}
 	fakeResourceTooler := ResourceTooler{
@@ -596,7 +596,7 @@ func TestDeleteResource(t *testing.T) {
 		d.SetId("UnitTest resource1")
 		d.Set(NameField, resourceName)
 		fakeClientTooler.Client = testCase.TcClienter
-		err := APIImplementerer.DeleteResource(d,
+		err := Implementerer.DeleteResource(d,
 			&fakeClientTooler,
 			&fakeResourceTooler,
 			testCase.ResourceType,

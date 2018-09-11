@@ -19,23 +19,32 @@
 
 \begin{center}
   \begin{tikzpicture}
-    \begin{umlpackage}{sewan-sdk-go}
-      \umlbasiccomponent[x=0,y=0]{<<APIImplementerer>>}
-      \umlbasiccomponent[x=7,y=0]{<<Templater>>}
-      \umlbasiccomponent[x=3.5,y=-4]{<<Resourceer>>}
-      \umlbasiccomponent[x=7,y=-4]{<<Schemaer>>}
-      \umlbasiccomponent[x=0,y=-4]{<<Clienter>>}
-      \umlassemblyconnector[interface=consume]{<<APIImplementerer>>-south-port}{<<Schemaer>>-north-port}
-      \umlassemblyconnector[interface=consume]{<<APIImplementerer>>-east-port}{<<Templater>>}
-      \umlassemblyconnector[interface=consume]{<<APIImplementerer>>-south-port}{<<Clienter>>-north-port}
-      \umlassemblyconnector[interface=consume]{<<APIImplementerer>>-south-port}{<<Resourceer>>-north-port}
+    \begin{umlpackage}[fill=white]{sewan-sdk-go}
+      \begin{umlpackage}[x=0,y=0]{API}
+	\umlbasiccomponent[x=0,y=0]{<<Initialyser>>}
+	\umlbasiccomponent[x=5,y=0,fill=white]{MetaData}
+	\umlbasiccomponent[x=0,y=-3]{<<Implementer>>}
+      \end{umlpackage}
+      \umlbasiccomponent[x=9,y=-3]{<<Templater>>}
+      \umlbasiccomponent[x=3.5,y=-7]{<<Resourceer>>}
+      \umlbasiccomponent[x=7,y=-7]{<<Schemaer>>}
+      \umlbasiccomponent[x=0,y=-7]{<<Clienter>>}
+      \umlassemblyconnector[interface=creates]{<<Initialyser>>-east-port}{MetaData-west-port}
+      \umlassemblyconnector[interface=reads]{<<Implementer>>-east-port}{MetaData-west-port}
+      \umlassemblyconnector[interface=consume]{<<Implementer>>-south-port}{<<Schemaer>>-north-port}
+      \umlassemblyconnector[interface=consume]{<<Implementer>>-east-port}{<<Templater>>}
+      \umlassemblyconnector[interface=consume]{<<Implementer>>-south-port}{<<Clienter>>-north-port}
+      \umlassemblyconnector[interface=consume]{<<Implementer>>-south-port}{<<Resourceer>>-north-port}
       \umlassemblyconnector[interface=consume]{<<Templater>>-south-port}{<<Schemaer>>-north-port}
-      \umlnote[x=-5,y=0,width=13em]{<<APIImplementerer>>}{Responsibilities :\newline
+      \umlnote[x=-6,y=0,width=13em]{<<Initialyser>>}{Responsibilities :\newline
+      * get Clouddc enterprise environment meta data\newline
+      * validate Clouddc enterprise environment status	}
+      \umlnote[x=-6,y=-3,width=13em]{<<Implementer>>}{Responsibilities :\newline
       * resources CRUD operations\newline}
-	\umlnote[x=13,y=0,width=13em]{<<Templater>>}{Responsibilities :\newline
+      \umlnote[x=13,y=2,width=13em]{<<Templater>>}{Responsibilities :\newline
       * handle vm resource template logic (getTemplateList, create vm from template, 
       create configuration override file etc.)}
-      \umlnote[x=13,y=-7,width=13em]{<<Schemaer>>}{Responsibilities :\newline
+      \umlnote[x=13,y=-8,width=13em]{<<Schemaer>>}{Responsibilities :\newline
       * hashicorp/helper/schema object handle (this object store the status of a resource 
       after a read on configuration plan file or CRUD operation on distant resource, 
       it is too used as a media before updating resource state file.tfstate)\newline
@@ -43,8 +52,8 @@
       \umlnote[x=3.5,y=-10,width=13em]{<<Resourceer>>}{Responsibilities :\newline
       * validate api state\newline
       * handle api URLs}
-      \umlnote[x=0,y=-7,width=13em]{<<Clienter>>}{Responsibilities :\newline
-      * HTTP request and response creation/emission/reception}
+      \umlnote[x=-6,y=-7,width=13em]{<<Clienter>>}{Responsibilities :\newline
+      * HTTP request and response creation/emission/reception/handling}
     \end{umlpackage}
   \end{tikzpicture}  
 \end{center}

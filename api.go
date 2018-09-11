@@ -22,8 +22,8 @@ type API struct {
 
 // APITooler contains implementation of APIer and APIInitialyser interfaces
 type APITooler struct {
-	APIImplementer APIer
-	Initialyser    APIInitialyser
+	Implementer APIer
+	Initialyser APIInitialyser
 }
 
 // APIMeta stores specific meta data about a clouddc environment
