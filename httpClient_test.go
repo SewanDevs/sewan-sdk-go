@@ -11,52 +11,115 @@ func TestDo(t *testing.T) {
 	//Not tested, ref=TD-35489-UT-35737-1
 }
 
-func TestGetTemplatesList(t *testing.T) {
+func TestGetPhysicalResourcesMeta(t *testing.T) {
 	testCases := []struct {
-		ID             int
-		TCClienter     Clienter
-		EnterpriseSlug string
-		TemplateList   []interface{}
-		Error          error
+		ID                int
+		TCClienter        Clienter
+		ResourcesMetaList []interface{}
+		Error             error
 	}{
 		{
 			1,
-			getTemplatesListSuccessHTTPClienterFake{},
-			"unit test enterprise",
-			templatesList,
+			HTTPClienterDummy{},
 			nil,
+			errEmptyResourcesList,
 		},
 		{
 			2,
-			getTemplatesListFailureHTTPClienterFake{},
-			"unit test enterprise",
-			nil,
-			errors.New("handleResponse() error"),
-		},
-		{
-			3,
 			ErrorResponseHTTPClienterFake{},
-			"unit test enterprise",
 			nil,
 			errDoRequest,
 		},
 		{
-			4,
-			handleResponseEmptyReturnTemplateListHTTPClienterFake,
-			"unit test enterprise",
+			3,
+			getJSONListFailureHTTPClienterFake{},
 			nil,
-			errEmptyTemplateList,
+			errEmptyResourcesList,
 		},
 	}
 	clientTooler := ClientTooler{}
 	clientTooler.Client = HTTPClienter{}
 	fakeClientTooler := ClientTooler{}
 	apiTooler := APITooler{}
-	api := apiTooler.New(TokenField, "url")
+	apiTooler.Initialyser = Initialyser{}
+	api := apiTooler.Initialyser.New(rightAPIToken, rightAPIURL, unitTestEnterprise)
+	for _, testCase := range testCases {
+		fakeClientTooler.Client = testCase.TCClienter
+		resourcesMetaList,
+			err := clientTooler.Client.getPhysicalResourcesMeta(&fakeClientTooler,
+			api)
+		diffs := cmp.Diff(resourcesMetaList, testCase.ResourcesMetaList)
+		switch {
+		case err == nil || testCase.Error == nil:
+			if !(err == nil && testCase.Error == nil) {
+				t.Errorf("\n\nTC %d : getPhysicalResourcesMeta() error was incorrect,"+
+					"\n\rgot: \"%s\"\n\rwant: \"%s\"", testCase.ID, err, testCase.Error)
+			} else {
+				switch {
+				case diffs != "":
+					t.Errorf("\n\nTC %d : Wrong resources meta data list content "+
+						"(-got +want) :\n%s",
+						testCase.ID, diffs)
+				}
+			}
+		case err != nil && testCase.Error != nil:
+			if err.Error() != testCase.Error.Error() {
+				t.Errorf("\n\nTC %d : Wrong getPhysicalResourcesMeta() error,"+
+					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
+					testCase.ID, err.Error(), testCase.Error.Error())
+			}
+		}
+	}
+}
+
+func TestGetTemplatesList(t *testing.T) {
+	testCases := []struct {
+		ID           int
+		TCClienter   Clienter
+		TemplateList []interface{}
+		Error        error
+	}{
+		{
+			1,
+			getListSuccessHTTPClienterFake{},
+			templatesList,
+			nil,
+		},
+		{
+			2,
+			getJSONListFailureHTTPClienterFake{},
+			nil,
+			errEmptyTemplateList,
+		},
+		{
+			3,
+			ErrorResponseHTTPClienterFake{},
+			nil,
+			errDoRequest,
+		},
+		{
+			4,
+			handleResponseEmptyReturnTemplateListHTTPClienterFake,
+			nil,
+			errEmptyTemplateList,
+		},
+		{
+			5,
+			HandleRespErrHTTPClienterFake{},
+			nil,
+			errHandleResponse,
+		},
+	}
+	clientTooler := ClientTooler{}
+	clientTooler.Client = HTTPClienter{}
+	fakeClientTooler := ClientTooler{}
+	apiTooler := APITooler{}
+	apiTooler.Initialyser = Initialyser{}
+	api := apiTooler.Initialyser.New(rightAPIURL, rightAPIURL, unitTestEnterprise)
 	for _, testCase := range testCases {
 		fakeClientTooler.Client = testCase.TCClienter
 		templatesList, err := clientTooler.Client.getTemplatesList(&fakeClientTooler,
-			testCase.EnterpriseSlug, api)
+			api)
 		switch {
 		case err == nil || testCase.Error == nil:
 			if !(err == nil && testCase.Error == nil) {
@@ -176,6 +239,14 @@ func TestHandleResponse(t *testing.T) {
 			nil,
 			errors.New(errorAPIUnhandledImageType +
 				errValidateAPIURL),
+		},
+		{
+			10,
+			nil,
+			http.StatusOK,
+			httpJSONContentType,
+			nil,
+			errEmptyResp,
 		},
 	}
 	clienter := HTTPClienter{}

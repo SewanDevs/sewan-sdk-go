@@ -22,5 +22,6 @@ const (
 	vdcDestroyFailureMsg       = "Destroying the VDC now"
 	vmDestroyFailureMsg        = "Destroying the VM now"
 	wrongResourceType          = "a non supported ResourceType"
-	enterpriseSlug             = "unit test enterprise"
+	unitTestEnterprise         = "unit-test-enterprise"
+	wrongEnterpriseSlug        = "unit tes enterprise wrong name"
 )

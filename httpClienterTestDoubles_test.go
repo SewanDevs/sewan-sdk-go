@@ -3,7 +3,6 @@ package sewansdk
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"io/ioutil"
 	"net/http"
 )
@@ -15,7 +14,11 @@ func (client HTTPClienterDummy) do(api *API,
 	return nil, nil
 }
 func (client HTTPClienterDummy) getTemplatesList(clientTooler *ClientTooler,
-	enterpriseSlug string, api *API) ([]interface{}, error) {
+	api *API) ([]interface{}, error) {
+	return nil, nil
+}
+func (client HTTPClienterDummy) getPhysicalResourcesMeta(clientTooler *ClientTooler,
+	api *API) ([]interface{}, error) {
 	return nil, nil
 }
 func (client HTTPClienterDummy) handleResponse(resp *http.Response,
@@ -40,7 +43,11 @@ func (client ErrorResponseHTTPClienterFake) do(api *API,
 	return nil, errDoRequest
 }
 func (client ErrorResponseHTTPClienterFake) getTemplatesList(clientTooler *ClientTooler,
-	enterpriseSlug string, api *API) ([]interface{}, error) {
+	api *API) ([]interface{}, error) {
+	return nil, nil
+}
+func (client ErrorResponseHTTPClienterFake) getPhysicalResourcesMeta(clientTooler *ClientTooler,
+	api *API) ([]interface{}, error) {
 	return nil, nil
 }
 func (client ErrorResponseHTTPClienterFake) handleResponse(resp *http.Response,
@@ -49,33 +56,41 @@ func (client ErrorResponseHTTPClienterFake) handleResponse(resp *http.Response,
 	return nil, nil
 }
 
-type getTemplatesListFailureHTTPClienterFake struct{}
+type getJSONListFailureHTTPClienterFake struct{}
 
-func (client getTemplatesListFailureHTTPClienterFake) do(api *API,
+func (client getJSONListFailureHTTPClienterFake) do(api *API,
 	req *http.Request) (*http.Response, error) {
 	return nil, nil
 }
-func (client getTemplatesListFailureHTTPClienterFake) getTemplatesList(clientTooler *ClientTooler,
-	enterpriseSlug string, api *API) ([]interface{}, error) {
-	return nil, errors.New("getTemplatesList() error")
+func (client getJSONListFailureHTTPClienterFake) getTemplatesList(clientTooler *ClientTooler,
+	api *API) ([]interface{}, error) {
+	return nil, errEmptyTemplateList
 }
-func (client getTemplatesListFailureHTTPClienterFake) handleResponse(resp *http.Response,
+func (client getJSONListFailureHTTPClienterFake) getPhysicalResourcesMeta(clientTooler *ClientTooler,
+	api *API) ([]interface{}, error) {
+	return nil, errEmptyResourcesList
+}
+func (client getJSONListFailureHTTPClienterFake) handleResponse(resp *http.Response,
 	expectedCode int,
 	expectedBodyFormat string) (interface{}, error) {
-	return nil, errors.New("handleResponse() error")
+	return nil, nil
 }
 
-type getTemplatesListSuccessHTTPClienterFake struct{}
+type getListSuccessHTTPClienterFake struct{}
 
-func (client getTemplatesListSuccessHTTPClienterFake) do(api *API,
+func (client getListSuccessHTTPClienterFake) do(api *API,
 	req *http.Request) (*http.Response, error) {
 	return nil, nil
 }
-func (client getTemplatesListSuccessHTTPClienterFake) getTemplatesList(clientTooler *ClientTooler,
-	enterpriseSlug string, api *API) ([]interface{}, error) {
+func (client getListSuccessHTTPClienterFake) getTemplatesList(clientTooler *ClientTooler,
+	api *API) ([]interface{}, error) {
 	return templatesList, nil
 }
-func (client getTemplatesListSuccessHTTPClienterFake) handleResponse(resp *http.Response,
+func (client getListSuccessHTTPClienterFake) getPhysicalResourcesMeta(clientTooler *ClientTooler,
+	api *API) ([]interface{}, error) {
+	return resourceMetaDataList, nil
+}
+func (client getListSuccessHTTPClienterFake) handleResponse(resp *http.Response,
 	expectedCode int,
 	expectedBodyFormat string) (interface{}, error) {
 	return templatesList, nil
@@ -88,7 +103,11 @@ func (client HandleRespErrHTTPClienterFake) do(api *API,
 	return nil, nil
 }
 func (client HandleRespErrHTTPClienterFake) getTemplatesList(clientTooler *ClientTooler,
-	enterpriseSlug string, api *API) ([]interface{}, error) {
+	api *API) ([]interface{}, error) {
+	return nil, nil
+}
+func (client HandleRespErrHTTPClienterFake) getPhysicalResourcesMeta(clientTooler *ClientTooler,
+	api *API) ([]interface{}, error) {
 	return nil, nil
 }
 func (client HandleRespErrHTTPClienterFake) handleResponse(resp *http.Response,
@@ -112,7 +131,11 @@ func (client Error404HTTPClienterFake) do(api *API,
 	return &resp, nil
 }
 func (client Error404HTTPClienterFake) getTemplatesList(clientTooler *ClientTooler,
-	enterpriseSlug string, api *API) ([]interface{}, error) {
+	api *API) ([]interface{}, error) {
+	return nil, nil
+}
+func (client Error404HTTPClienterFake) getPhysicalResourcesMeta(clientTooler *ClientTooler,
+	api *API) ([]interface{}, error) {
 	return nil, nil
 }
 func (client Error404HTTPClienterFake) handleResponse(resp *http.Response,
@@ -128,7 +151,11 @@ func (client VMCreationSuccessHTTPClienterFake) do(api *API,
 	return nil, nil
 }
 func (client VMCreationSuccessHTTPClienterFake) getTemplatesList(clientTooler *ClientTooler,
-	enterpriseSlug string, api *API) ([]interface{}, error) {
+	api *API) ([]interface{}, error) {
+	return nil, nil
+}
+func (client VMCreationSuccessHTTPClienterFake) getPhysicalResourcesMeta(clientTooler *ClientTooler,
+	api *API) ([]interface{}, error) {
 	return nil, nil
 }
 func (client VMCreationSuccessHTTPClienterFake) handleResponse(resp *http.Response,
@@ -144,7 +171,11 @@ func (client VMReadSuccessHTTPClienterFake) do(api *API,
 	return nil, nil
 }
 func (client VMReadSuccessHTTPClienterFake) getTemplatesList(clientTooler *ClientTooler,
-	enterpriseSlug string, api *API) ([]interface{}, error) {
+	api *API) ([]interface{}, error) {
+	return nil, nil
+}
+func (client VMReadSuccessHTTPClienterFake) getPhysicalResourcesMeta(clientTooler *ClientTooler,
+	api *API) ([]interface{}, error) {
 	return nil, nil
 }
 func (client VMReadSuccessHTTPClienterFake) handleResponse(resp *http.Response,
@@ -160,7 +191,11 @@ func (client VdcReadSuccessHTTPClienterFake) do(api *API,
 	return nil, nil
 }
 func (client VdcReadSuccessHTTPClienterFake) getTemplatesList(clientTooler *ClientTooler,
-	enterpriseSlug string, api *API) ([]interface{}, error) {
+	api *API) ([]interface{}, error) {
+	return nil, nil
+}
+func (client VdcReadSuccessHTTPClienterFake) getPhysicalResourcesMeta(clientTooler *ClientTooler,
+	api *API) ([]interface{}, error) {
 	return nil, nil
 }
 func (client VdcReadSuccessHTTPClienterFake) handleResponse(resp *http.Response,
@@ -176,7 +211,11 @@ func (client ResourceDeletionFailureHTTPClienterFake) do(api *API,
 	return nil, errEmptyResp
 }
 func (client ResourceDeletionFailureHTTPClienterFake) getTemplatesList(clientTooler *ClientTooler,
-	enterpriseSlug string, api *API) ([]interface{}, error) {
+	api *API) ([]interface{}, error) {
+	return nil, nil
+}
+func (client ResourceDeletionFailureHTTPClienterFake) getPhysicalResourcesMeta(clientTooler *ClientTooler,
+	api *API) ([]interface{}, error) {
 	return nil, nil
 }
 func (client ResourceDeletionFailureHTTPClienterFake) handleResponse(resp *http.Response,
@@ -193,7 +232,11 @@ func (client CheckRedirectReqFailureHTTPClienterFake) do(api *API,
 	return &resp, errCheckRedirectFailure
 }
 func (client CheckRedirectReqFailureHTTPClienterFake) getTemplatesList(clientTooler *ClientTooler,
-	enterpriseSlug string, api *API) ([]interface{}, error) {
+	api *API) ([]interface{}, error) {
+	return nil, nil
+}
+func (client CheckRedirectReqFailureHTTPClienterFake) getPhysicalResourcesMeta(clientTooler *ClientTooler,
+	api *API) ([]interface{}, error) {
 	return nil, nil
 }
 func (client CheckRedirectReqFailureHTTPClienterFake) handleResponse(resp *http.Response,

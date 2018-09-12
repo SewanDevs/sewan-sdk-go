@@ -9,49 +9,60 @@ import (
 
 func TestNew(t *testing.T) {
 	testCases := []struct {
-		ID         int
-		InputToken string
-		InputURL   string
-		OutputAPI  API
+		ID                  int
+		InputToken          string
+		InputURL            string
+		InputEnterpriseSlug string
+		OutputAPI           API
 	}{
 		{1,
 			wrongAPIToken,
 			rightAPIURL,
-			API{wrongAPIToken, rightAPIURL, nil},
+			unitTestEnterprise,
+			API{wrongAPIToken, rightAPIURL, unitTestEnterprise, APIMeta{}, nil},
 		},
 		{2,
 			rightAPIToken,
 			wrongAPIURL,
-			API{rightAPIToken, wrongAPIURL, nil},
+			unitTestEnterprise,
+			API{rightAPIToken, wrongAPIURL, unitTestEnterprise, APIMeta{}, nil},
 		},
 		{3,
 			wrongAPIToken,
 			wrongAPIURL,
-			API{wrongAPIToken, wrongAPIURL, nil},
+			unitTestEnterprise,
+			API{wrongAPIToken, wrongAPIURL, unitTestEnterprise, APIMeta{}, nil},
 		},
 		{4,
 			rightAPIToken,
 			rightAPIURL,
-			API{rightAPIToken, rightAPIURL, nil},
+			unitTestEnterprise,
+			API{rightAPIToken, rightAPIURL, unitTestEnterprise, APIMeta{}, nil},
 		},
 	}
 	fakeAPItools := APITooler{
-		APIImplementer: FakeAirDrumResourceAPIer{},
+		Implementer: FakeAirDrumResourceAPIer{},
+		Initialyser: Initialyser{},
 	}
 	for _, testCase := range testCases {
-		api := fakeAPItools.New(
+		api := fakeAPItools.Initialyser.New(
 			testCase.InputToken,
 			testCase.InputURL,
+			testCase.InputEnterpriseSlug,
 		)
 		switch {
 		case api.Token != testCase.OutputAPI.Token:
-			t.Errorf("\n\nTC %d : API token error was incorrect,"+
+			t.Errorf("\n\nTC %d : API token was incorrect,"+
 				"\n\rgot: \"%s\"\n\rwant: \"%s\"",
 				testCase.ID, api.Token, testCase.OutputAPI.Token)
 		case api.URL != testCase.OutputAPI.URL:
-			t.Errorf("\n\nTC %d : API token error was incorrect,"+
+			t.Errorf("\n\nTC %d : API URL was incorrect,"+
 				"\n\rgot: \"%s\"\n\rwant: \"%s\"",
 				testCase.ID, api.URL, testCase.OutputAPI.URL)
+		case api.Enterprise != testCase.OutputAPI.Enterprise:
+			t.Errorf("\n\nTC %d : API enterprise was incorrect,"+
+				"\n\rgot: \"%s\"\n\rwant: \"%s\"",
+				testCase.ID, api.Enterprise, testCase.OutputAPI.Enterprise)
 		}
 	}
 }
@@ -67,6 +78,8 @@ func TestCheckCloudDcStatus(t *testing.T) {
 			&API{
 				wrongAPIToken,
 				rightAPIURL,
+				unitTestEnterprise,
+				APIMeta{},
 				&http.Client{},
 			},
 			FakeResourceResourceer{},
@@ -76,6 +89,8 @@ func TestCheckCloudDcStatus(t *testing.T) {
 			&API{
 				rightAPIToken,
 				wrongAPIURL,
+				unitTestEnterprise,
+				APIMeta{},
 				&http.Client{},
 			},
 			FakeResourceResourceer{},
@@ -85,6 +100,8 @@ func TestCheckCloudDcStatus(t *testing.T) {
 			&API{
 				wrongAPIToken,
 				wrongAPIURL,
+				unitTestEnterprise,
+				APIMeta{},
 				&http.Client{},
 			},
 			FakeResourceResourceer{},
@@ -94,6 +111,8 @@ func TestCheckCloudDcStatus(t *testing.T) {
 			&API{
 				rightAPIToken,
 				rightAPIURL,
+				unitTestEnterprise,
+				APIMeta{},
 				&http.Client{},
 			},
 			FakeResourceResourceer{},
@@ -101,14 +120,15 @@ func TestCheckCloudDcStatus(t *testing.T) {
 		},
 	}
 	fakeAPItools := APITooler{}
+	fakeAPItools.Initialyser = Initialyser{}
 	fakeClientTooler := &ClientTooler{
-		Client: HTTPClienter{},
+		Client: HTTPClienterDummy{},
 	}
 	fakeResourceTooler := &ResourceTooler{}
 	for _, testCase := range testCases {
-		fakeAPItools.APIImplementer = FakeAirDrumResourceAPIer{}
+		fakeAPItools.Implementer = FakeAirDrumResourceAPIer{}
 		fakeResourceTooler.Resource = testCase.TCResourceTooler
-		err := fakeAPItools.CheckCloudDcStatus(testCase.InputAPI,
+		err := fakeAPItools.Initialyser.CheckCloudDcStatus(testCase.InputAPI,
 			fakeClientTooler,
 			fakeResourceTooler)
 		switch {
@@ -122,6 +142,89 @@ func TestCheckCloudDcStatus(t *testing.T) {
 			t.Errorf("\n\nTC %d : Check API error was incorrect,"+
 				"\n\rgot: \"%s\"\n\rwant: \"%s\"",
 				testCase.ID, err.Error(), testCase.Err.Error())
+		}
+	}
+}
+
+func TestGetClouddcEnvMeta(t *testing.T) {
+	testCases := []struct {
+		ID            int
+		InputAPI      *API
+		TcClienter    Clienter
+		OutputAPIMeta *APIMeta
+		Err           error
+	}{
+		{
+			1,
+			&API{
+				wrongAPIToken,
+				rightAPIURL,
+				unitTestEnterprise,
+				APIMeta{},
+				&http.Client{},
+			},
+			HTTPClienterDummy{},
+			&APIMeta{},
+			nil,
+		},
+		{
+			2,
+			&API{
+				wrongAPIToken,
+				rightAPIURL,
+				unitTestEnterprise,
+				APIMeta{},
+				&http.Client{},
+			},
+			getListSuccessHTTPClienterFake{},
+			&APIMeta{
+				nonCriticalResourceMetaDataList,
+				criticalResourceMetaDataList,
+				otherResourceMetaDataList},
+			nil,
+		},
+		{
+			3,
+			&API{
+				wrongAPIToken,
+				rightAPIURL,
+				unitTestEnterprise,
+				APIMeta{},
+				&http.Client{},
+			},
+			getJSONListFailureHTTPClienterFake{},
+			nil,
+			errEmptyResourcesList,
+		},
+	}
+	fakeAPItools := &APITooler{}
+	fakeAPItools.Initialyser = Initialyser{}
+	fakeClientTooler := &ClientTooler{}
+	for _, testCase := range testCases {
+		fakeClientTooler.Client = testCase.TcClienter
+		apiMeta, err := fakeAPItools.Initialyser.GetClouddcEnvMeta(testCase.InputAPI,
+			fakeClientTooler)
+		diffs := cmp.Diff(apiMeta, testCase.OutputAPIMeta)
+		switch {
+		case (err == nil || testCase.Err == nil):
+			if !(err == nil && testCase.Err == nil) {
+				t.Errorf("\n\nTC %d : GetClouddcEnvMeta error was incorrect,"+
+					"\n\rgot: \"%s\"\n\rwant: \"%s\"",
+					testCase.ID, err, testCase.Err)
+			} else {
+				switch {
+				case diffs != "":
+					t.Errorf("\n\nTC %d : Wrong GetClouddcEnvMeta returned structure (-got +want) \n%s",
+						testCase.ID, diffs)
+				}
+			}
+		case err.Error() != testCase.Err.Error():
+			t.Errorf("\n\nTC %d : GetClouddcEnvMeta error was incorrect,"+
+				"\n\rgot: \"%s\"\n\rwant: \"%s\"",
+				testCase.ID, err.Error(), testCase.Err.Error())
+		case diffs != "":
+			t.Errorf("\n\nTC %d : Wrong GetClouddcEnvMeta returned structure (-got +want) \n%s",
+				testCase.ID, diffs)
 		}
 	}
 }
@@ -218,6 +321,7 @@ func TestReadResource(t *testing.T) {
 	testCases := []struct {
 		ID           int
 		TcClienter   Clienter
+		TcAPI        *API
 		ResourceType string
 		ReadError    error
 		ReadResource map[string]interface{}
@@ -225,6 +329,16 @@ func TestReadResource(t *testing.T) {
 		{
 			1,
 			VMReadSuccessHTTPClienterFake{},
+			&API{
+				Token: rightAPIToken,
+				URL:   rightAPIURL,
+				Meta: APIMeta{
+					NonCriticalResourceList: nonCriticalResourceMetaDataList,
+					CriticalResourceList:    criticalResourceMetaDataList,
+					OtherResourceList:       otherResourceMetaDataList,
+				},
+				Client: &http.Client{},
+			},
 			VMResourceType,
 			nil,
 			noTemplateVMMap,
@@ -232,6 +346,16 @@ func TestReadResource(t *testing.T) {
 		{
 			2,
 			VdcReadSuccessHTTPClienterFake{},
+			&API{
+				Token: rightAPIToken,
+				URL:   rightAPIURL,
+				Meta: APIMeta{
+					NonCriticalResourceList: nonCriticalResourceMetaDataList,
+					CriticalResourceList:    criticalResourceMetaDataList,
+					OtherResourceList:       otherResourceMetaDataList,
+				},
+				Client: &http.Client{},
+			},
 			VdcResourceType,
 			nil,
 			vdcReadResponseMap,
@@ -239,6 +363,16 @@ func TestReadResource(t *testing.T) {
 		{
 			3,
 			HTTPClienterDummy{},
+			&API{
+				Token: rightAPIToken,
+				URL:   rightAPIURL,
+				Meta: APIMeta{
+					NonCriticalResourceList: nonCriticalResourceMetaDataList,
+					CriticalResourceList:    criticalResourceMetaDataList,
+					OtherResourceList:       otherResourceMetaDataList,
+				},
+				Client: &http.Client{},
+			},
 			wrongResourceType,
 			errWrongResourceTypeBuilder(wrongResourceType),
 			map[string]interface{}{},
@@ -246,6 +380,16 @@ func TestReadResource(t *testing.T) {
 		{
 			4,
 			ResourceReadFailureHTTPClienterFake,
+			&API{
+				Token: rightAPIToken,
+				URL:   rightAPIURL,
+				Meta: APIMeta{
+					NonCriticalResourceList: nonCriticalResourceMetaDataList,
+					CriticalResourceList:    criticalResourceMetaDataList,
+					OtherResourceList:       otherResourceMetaDataList,
+				},
+				Client: &http.Client{},
+			},
 			VdcResourceType,
 			errDoCrudRequestsBuilder(readOperation,
 				resourceName,
@@ -255,6 +399,16 @@ func TestReadResource(t *testing.T) {
 		{
 			5,
 			Error404HTTPClienterFake{},
+			&API{
+				Token: rightAPIToken,
+				URL:   rightAPIURL,
+				Meta: APIMeta{
+					NonCriticalResourceList: nonCriticalResourceMetaDataList,
+					CriticalResourceList:    criticalResourceMetaDataList,
+					OtherResourceList:       otherResourceMetaDataList,
+				},
+				Client: &http.Client{},
+			},
 			VdcResourceType,
 			ErrResourceNotExist,
 			map[string]interface{}{},
@@ -262,13 +416,35 @@ func TestReadResource(t *testing.T) {
 		{
 			6,
 			HandleRespErrHTTPClienterFake{},
+			&API{
+				Token: rightAPIToken,
+				URL:   rightAPIURL,
+				Meta: APIMeta{
+					NonCriticalResourceList: nonCriticalResourceMetaDataList,
+					CriticalResourceList:    criticalResourceMetaDataList,
+					OtherResourceList:       otherResourceMetaDataList,
+				},
+				Client: &http.Client{},
+			},
 			VMResourceType,
 			errHandleResponse,
 			map[string]interface{}{},
 		},
+		{
+			7,
+			VdcReadSuccessHTTPClienterFake{},
+			&API{
+				Token:  rightAPIToken,
+				URL:    rightAPIURL,
+				Meta:   APIMeta{},
+				Client: &http.Client{},
+			},
+			VdcResourceType,
+			errResourceNotExist(RAMField),
+			map[string]interface{}{},
+		},
 	}
-	APIImplementerer := AirDrumResourcesAPI{}
-	sewan := &API{Token: "42", URL: "42", Client: &http.Client{}}
+	Implementerer := AirDrumResourcesAPI{}
 	fakeClientTooler := ClientTooler{}
 	fakeResourceTooler := ResourceTooler{
 		Resource: ResourceResourceer{},
@@ -279,11 +455,11 @@ func TestReadResource(t *testing.T) {
 		d.SetId("UnitTest resource1")
 		d.Set(NameField, resourceName)
 		fakeClientTooler.Client = testCase.TcClienter
-		respCreationMap, err := APIImplementerer.ReadResource(d,
+		respCreationMap, err := Implementerer.ReadResource(d,
 			&fakeClientTooler,
 			&fakeResourceTooler,
 			testCase.ResourceType,
-			sewan)
+			testCase.TcAPI)
 		diffs := cmp.Diff(respCreationMap, testCase.ReadResource)
 		switch {
 		case err == nil || testCase.ReadError == nil:
@@ -344,7 +520,7 @@ func TestUpdateResource(t *testing.T) {
 				errEmptyResp),
 		},
 	}
-	APIImplementerer := AirDrumResourcesAPI{}
+	Implementerer := AirDrumResourcesAPI{}
 	sewan := &API{Token: "42", URL: "42", Client: &http.Client{}}
 	fakeClientTooler := ClientTooler{}
 	fakeTemplatesTooler := TemplatesTooler{
@@ -359,7 +535,7 @@ func TestUpdateResource(t *testing.T) {
 		d.SetId("UnitTest resource1")
 		d.Set(NameField, resourceName)
 		fakeClientTooler.Client = testCase.TcClienter
-		err := APIImplementerer.UpdateResource(d,
+		err := Implementerer.UpdateResource(d,
 			&fakeClientTooler,
 			&fakeTemplatesTooler,
 			&fakeResourceTooler,
@@ -408,7 +584,7 @@ func TestDeleteResource(t *testing.T) {
 				errEmptyResp),
 		},
 	}
-	APIImplementerer := AirDrumResourcesAPI{}
+	Implementerer := AirDrumResourcesAPI{}
 	sewan := &API{Token: "42", URL: "42", Client: &http.Client{}}
 	fakeClientTooler := ClientTooler{}
 	fakeResourceTooler := ResourceTooler{
@@ -420,7 +596,7 @@ func TestDeleteResource(t *testing.T) {
 		d.SetId("UnitTest resource1")
 		d.Set(NameField, resourceName)
 		fakeClientTooler.Client = testCase.TcClienter
-		err := APIImplementerer.DeleteResource(d,
+		err := Implementerer.DeleteResource(d,
 			&fakeClientTooler,
 			&fakeResourceTooler,
 			testCase.ResourceType,

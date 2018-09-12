@@ -102,7 +102,7 @@ func (templaterFake existingTemplateNoAdditionalDiskVMMapTemplaterFake) FetchTem
 		RAMField:        1,
 		CPUField:        1,
 		OsField:         "CentOS",
-		EnterpriseField: "unit test enterprise",
+		EnterpriseField: unitTestEnterprise,
 		DisksField: []interface{}{
 			map[string]interface{}{NameField: "template1 disk1",
 				SizeField:         20,
@@ -131,7 +131,7 @@ func (templaterFake existingTemplateNoAdditionalDiskVMMapTemplaterFake) validate
 func (templaterFake existingTemplateNoAdditionalDiskVMMapTemplaterFake) updateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
 	template map[string]interface{}) error {
 	d.Set(NameField, "Unit test template no disc add on vm resource")
-	d.Set(EnterpriseField, "unit test enterprise")
+	d.Set(EnterpriseField, unitTestEnterprise)
 	d.Set(TemplateField, "template1")
 	d.Set(RAMField, 1)
 	d.Set(CPUField, 1)
@@ -163,7 +163,7 @@ func (templaterFake instanceNumberFieldUnitTestVMInstanceMAPTemplaterFake) Fetch
 		RAMField:        1,
 		CPUField:        1,
 		OsField:         "CentOS",
-		EnterpriseField: "unit test enterprise",
+		EnterpriseField: unitTestEnterprise,
 		DisksField: []interface{}{
 			map[string]interface{}{NameField: "template1 disk1",
 				SizeField:         20,
@@ -192,7 +192,7 @@ func (templaterFake instanceNumberFieldUnitTestVMInstanceMAPTemplaterFake) valid
 func (templaterFake instanceNumberFieldUnitTestVMInstanceMAPTemplaterFake) updateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
 	template map[string]interface{}) error {
 	d.Set(NameField, "instanceNumberFieldUnitTest")
-	d.Set(EnterpriseField, "unit test enterprise")
+	d.Set(EnterpriseField, unitTestEnterprise)
 	d.Set(TemplateField, "template1")
 	d.Set(RAMField, 1)
 	d.Set(CPUField, 1)
@@ -224,7 +224,7 @@ func (templaterFake existingTemplateWithAdditionalAndModifiedDisksAndNicsVMMapTe
 		RAMField:        1,
 		CPUField:        1,
 		OsField:         "CentOS",
-		EnterpriseField: "unit test enterprise",
+		EnterpriseField: unitTestEnterprise,
 		DisksField: []interface{}{
 			map[string]interface{}{NameField: "template1 disk1",
 				SizeField:         20,
@@ -253,7 +253,7 @@ func (templaterFake existingTemplateWithAdditionalAndModifiedDisksAndNicsVMMapTe
 func (templaterFake existingTemplateWithAdditionalAndModifiedDisksAndNicsVMMapTemplaterFake) updateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
 	template map[string]interface{}) error {
 	d.Set(NameField, "existingTemplateWithAdditionalAndModifiedDisksAndNicsVMMap")
-	d.Set(EnterpriseField, "unit test enterprise")
+	d.Set(EnterpriseField, unitTestEnterprise)
 	d.Set(TemplateField, "template1")
 	d.Set(RAMField, 8)
 	d.Set(CPUField, 4)

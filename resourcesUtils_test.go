@@ -21,7 +21,7 @@ func TestResourceInstanceCreate(t *testing.T) {
 		{
 			1,
 			vmSchemaInit(noTemplateVMMap),
-			getTemplatesListSuccessHTTPClienterFake{},
+			getListSuccessHTTPClienterFake{},
 			TemplaterDummy{},
 			VMResourceType,
 			nil,
@@ -30,7 +30,7 @@ func TestResourceInstanceCreate(t *testing.T) {
 		{
 			2,
 			vmSchemaInit(existingTemplateNoAdditionalDiskVMMap),
-			getTemplatesListSuccessHTTPClienterFake{},
+			getListSuccessHTTPClienterFake{},
 			existingTemplateNoAdditionalDiskVMMapTemplaterFake{},
 			VMResourceType,
 			nil,
@@ -39,7 +39,7 @@ func TestResourceInstanceCreate(t *testing.T) {
 		{
 			3,
 			vmSchemaInit(existingTemplateWithAdditionalAndModifiedDisksAndNicsVMMap),
-			getTemplatesListSuccessHTTPClienterFake{},
+			getListSuccessHTTPClienterFake{},
 			existingTemplateWithAdditionalAndModifiedDisksAndNicsVMMapTemplaterFake{},
 			VMResourceType,
 			nil,
@@ -48,7 +48,7 @@ func TestResourceInstanceCreate(t *testing.T) {
 		{
 			4,
 			vmSchemaInit(nonExistingTemplateVMMap),
-			getTemplatesListSuccessHTTPClienterFake{},
+			getListSuccessHTTPClienterFake{},
 			UnexistingTemplateTemplaterFake{},
 			VMResourceType,
 			errors.New("Unavailable template : windows95"),
@@ -66,7 +66,7 @@ func TestResourceInstanceCreate(t *testing.T) {
 		{
 			6,
 			vdcSchemaInit(vdcCreationMap),
-			getTemplatesListSuccessHTTPClienterFake{},
+			getListSuccessHTTPClienterFake{},
 			TemplaterDummy{},
 			wrongResourceType,
 			errWrongResourceTypeBuilder(wrongResourceType),
@@ -75,16 +75,16 @@ func TestResourceInstanceCreate(t *testing.T) {
 		{
 			7,
 			vmSchemaInit(nonExistingTemplateVMMap),
-			getTemplatesListFailureHTTPClienterFake{},
+			getJSONListFailureHTTPClienterFake{},
 			UnexistingTemplateTemplaterFake{},
 			VMResourceType,
-			errors.New("getTemplatesList() error"),
+			errEmptyTemplateList,
 			vmStruct{},
 		},
 		{
 			8,
 			vmSchemaInit(existingTemplateNoAdditionalDiskVMMap),
-			getTemplatesListSuccessHTTPClienterFake{},
+			getListSuccessHTTPClienterFake{},
 			TemplateFormatErrorTemplaterFake{},
 			VMResourceType,
 			errors.New("Template missing fields : " + "\"" + NameField + "\" " +
@@ -99,7 +99,7 @@ func TestResourceInstanceCreate(t *testing.T) {
 		{
 			9,
 			vmSchemaInit(instanceNumberFieldUnitTestVMInstance),
-			getTemplatesListSuccessHTTPClienterFake{},
+			getListSuccessHTTPClienterFake{},
 			instanceNumberFieldUnitTestVMInstanceMAPTemplaterFake{},
 			VMResourceType,
 			nil,
@@ -111,11 +111,22 @@ func TestResourceInstanceCreate(t *testing.T) {
 	}
 	fakeClientTooler := ClientTooler{}
 	fakeTemplatesTooler := TemplatesTooler{}
-	sewan := &API{Token: "42", URL: "42", Client: &http.Client{}}
+	sewan := &API{
+		Token:      rightAPIToken,
+		URL:        rightAPIURL,
+		Enterprise: unitTestEnterprise,
+		Meta: APIMeta{
+			NonCriticalResourceList: nonCriticalResourceMetaDataList,
+			CriticalResourceList:    criticalResourceMetaDataList,
+			OtherResourceList:       otherResourceMetaDataList,
+		},
+		Client: &http.Client{},
+	}
 	for _, testCase := range testCases {
 		fakeClientTooler.Client = testCase.Clienter
 		fakeTemplatesTooler.TemplatesTools = testCase.Templater
-		instance, err := fakeResourceTooler.Resource.resourceInstanceCreate(testCase.D,
+		instance,
+			err := fakeResourceTooler.Resource.resourceInstanceCreate(testCase.D,
 			&fakeClientTooler,
 			&fakeTemplatesTooler,
 			testCase.ResourceType,
@@ -161,6 +172,8 @@ func TestGetResourceCreationURLetResourceURL(t *testing.T) {
 			API{
 				rightAPIToken,
 				rightAPIURL,
+				unitTestEnterprise,
+				APIMeta{},
 				&http.Client{},
 			},
 			"42",
@@ -170,6 +183,8 @@ func TestGetResourceCreationURLetResourceURL(t *testing.T) {
 			API{
 				rightAPIToken,
 				rightAPIURL,
+				unitTestEnterprise,
+				APIMeta{},
 				&http.Client{},
 			},
 			"PATATE",
@@ -201,6 +216,8 @@ func TestGetResourceCreationURL(t *testing.T) {
 			API{
 				rightAPIToken,
 				rightAPIURL,
+				unitTestEnterprise,
+				APIMeta{},
 				&http.Client{},
 			},
 			rightVMCreationAPIURL,
@@ -233,6 +250,8 @@ func TestValidateStatus(t *testing.T) {
 			API{
 				rightAPIToken,
 				rightAPIURL,
+				unitTestEnterprise,
+				APIMeta{},
 				&http.Client{},
 			},
 			VMReadSuccessHTTPClienterFake{},
@@ -243,6 +262,8 @@ func TestValidateStatus(t *testing.T) {
 			API{
 				rightAPIToken,
 				rightAPIURL,
+				unitTestEnterprise,
+				APIMeta{},
 				&http.Client{},
 			},
 			CheckRedirectReqFailureHTTPClienterFake{},

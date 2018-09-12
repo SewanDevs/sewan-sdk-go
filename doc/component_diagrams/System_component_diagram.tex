@@ -37,15 +37,15 @@
       \end{umlpackage}
     \end{umlpackage}
     \begin{umlpackage}[x=11,y=0]{sewan-sdk-go}
-      \umlbasiccomponent[x=0,y=0]{<<APIImplementerer>>}
+      \umlbasiccomponent[x=0,y=0]{<<API>>}
       \umlbasiccomponent[x=7,y=0]{<<Templater>>}
       \umlbasiccomponent[x=3.5,y=-4]{<<Resourceer>>}
       \umlbasiccomponent[x=7,y=-4]{<<Schemaer>>}
       \umlbasiccomponent[x=0,y=-4]{<<Clienter>>}
-      \umlassemblyconnector[interface=consume]{<<APIImplementerer>>-south-port}{<<Schemaer>>-north-port}
-      \umlassemblyconnector[interface=consume]{<<APIImplementerer>>-east-port}{<<Templater>>}
-      \umlassemblyconnector[interface=consume]{<<APIImplementerer>>-south-port}{<<Clienter>>-north-port}
-      \umlassemblyconnector[interface=consume]{<<APIImplementerer>>-south-port}{<<Resourceer>>-north-port}
+      \umlassemblyconnector[interface=consume]{<<API>>-south-port}{<<Schemaer>>-north-port}
+      \umlassemblyconnector[interface=consume]{<<API>>-east-port}{<<Templater>>}
+      \umlassemblyconnector[interface=consume]{<<API>>-south-port}{<<Clienter>>-north-port}
+      \umlassemblyconnector[interface=consume]{<<API>>-south-port}{<<Resourceer>>-north-port}
       \umlassemblyconnector[interface=consume]{<<Templater>>-south-port}{<<Schemaer>>-north-port}
     \end{umlpackage}
     \begin{umlpackage}[x=12,y=-9]{SewanCloudDataCenter}
@@ -60,7 +60,7 @@
     \umltrans[pos=0.4,arg=read,anchor1=40]{terraform}{resourceN-west-port}
     \umltrans[pos=0.4,arg=update(schema),anchor1=-90,anchor2=90]{terraform-provider-sewan}{terraform-tfstate}
     \umltrans[pos=0.7,arg=use]{terraform-provider-sewan}{/helper/schema}
-    \umlassemblyconnector[interface=consume,anchor1=0,anchor2=180]{terraform-provider-sewan}{<<APIImplementerer>>}
+    \umlassemblyconnector[interface=consume,anchor1=0,anchor2=180]{terraform-provider-sewan}{<<API>>}
     \umltrans[pos=0.8,arg=HTTP,geometry=|-|]{<<Clienter>>}{AirdrumAPI}
     \umltrans[pos=0.8,arg=manage]{AirdrumAPI}{hostedResourceN}
     \umlnote[x=6,y=-6,width=10em]{terraform-provider-sewan}{This plugin is used only with Sewan clouddc (CloudDataCenter) hosted resources}
