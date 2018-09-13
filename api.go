@@ -28,9 +28,14 @@ type APITooler struct {
 
 // APIMeta stores specific meta data about a clouddc environment
 type APIMeta struct {
-	NonCriticalResourceList []interface{}
-	CriticalResourceList    []interface{}
-	OtherResourceList       []interface{}
+	EnterpriseResourceList []interface{}
+	DataCenterList         []interface{}
+	TemplatesList          []interface{}
+	VlansList              []interface{}
+	SnapshotsList          []interface{}
+	DiskImageList          []interface{}
+	OvaList                []interface{}
+	BackupPlanList         []interface{}
 }
 
 // APIer interface is responsible of CRUD operations on Sewan's clouddc resources,
@@ -103,35 +108,29 @@ func (initialyser Initialyser) CheckCloudDcStatus(api *API,
 func (initialyser Initialyser) GetClouddcEnvMeta(api *API,
 	clientTooler *ClientTooler) (*APIMeta, error) {
 	var (
-		apiMeta                 APIMeta
-		nonCriticalResourceList []interface{}
-		criticalResourceList    []interface{}
-		otherResourceList       []interface{}
+		apiMeta APIMeta
 	)
 	resourceMetaDataList,
-		err := clientTooler.Client.getPhysicalResourcesMeta(clientTooler,
-		api)
-	if err != nil {
-		return nil, err
+		err1 := clientTooler.Client.getEnvResourceList(clientTooler,
+		api, clouddcEnvironmentResource)
+	if err1 != nil {
+		return nil, err1
 	}
-	for _, resource := range resourceMetaDataList {
-		switch resource.(map[string]interface{})["cos"] {
-		case "Mono":
-			nonCriticalResourceList = append(nonCriticalResourceList,
-				resource.(map[string]interface{}))
-		case "HA":
-			criticalResourceList = append(criticalResourceList,
-				resource.(map[string]interface{}))
-		default:
-			otherResourceList = append(otherResourceList,
-				resource.(map[string]interface{}))
-		}
+	templateList, err2 := clientTooler.Client.getEnvResourceList(clientTooler,
+		api, clouddcEnvironmentTemplate)
+	if err2 != nil {
+		return nil, err2
 	}
-	apiMeta.NonCriticalResourceList = nonCriticalResourceList
-	apiMeta.CriticalResourceList = criticalResourceList
-	apiMeta.OtherResourceList = otherResourceList
+	apiMeta.EnterpriseResourceList = resourceMetaDataList //resource/
+	apiMeta.DataCenterList = nil                          //datacenter/
+	apiMeta.TemplatesList = templateList                  //template/
+	apiMeta.VlansList = nil                               //vlan/
+	apiMeta.SnapshotsList = nil                           //snapshot/
+	apiMeta.DiskImageList = nil                           //disk-image/ (=iso)
+	apiMeta.OvaList = nil                                 //ova/
+	apiMeta.BackupPlanList = nil                          //backup-plan/
 	// redmine ticket #37823 : resource's lists validation lack
-	return &apiMeta, err
+	return &apiMeta, nil
 }
 
 // CreateResource creates Sewan clouddc resource
@@ -154,7 +153,7 @@ func (apier AirDrumResourcesAPI) CreateResource(d *schema.ResourceData,
 		resourceType,
 		sewan)
 	if err1 != nil {
-		return map[string]interface{}{}, err1.(error)
+		return map[string]interface{}{}, err1
 	}
 	resourceJSON, err2 := json.Marshal(resourceInstance)
 	if err2 != nil {
@@ -242,7 +241,8 @@ func updateSchemaReadVdcResource(d *schema.ResourceData,
 		resourcesList []interface{}
 	)
 	for _, resource := range readResource[VdcResourceField].([]interface{}) {
-		resourceName, err := getResourceName(resource.(map[string]interface{})[ResourceField].(string),
+		resourceName,
+			err := getResourceName(resource.(map[string]interface{})[ResourceField].(string),
 			api.Meta)
 		if err != nil {
 			return err
@@ -255,14 +255,14 @@ func updateSchemaReadVdcResource(d *schema.ResourceData,
 
 // getResourceName extracts from APIMeta and returns corresponding resource's name
 func getResourceName(resourceSlug string, meta APIMeta) (string, error) {
-	for _, resource := range meta.NonCriticalResourceList {
+	for _, resource := range meta.EnterpriseResourceList {
 		resourceExistsInMeta := (resource.(map[string]interface{})[SlugField] == resourceSlug)
 		isResourceMonoTyped := resource.(map[string]interface{})[ResourceCosField] == MonoResourceType
 		if resourceExistsInMeta && isResourceMonoTyped {
 			return resource.(map[string]interface{})[NameField].(string), nil
 		}
 	}
-	return "", errResourceNotExist(resourceSlug)
+	return "", errResourceNotExist(resourceSlug, "")
 }
 
 // UpdateResource update Sewan clouddc resource's

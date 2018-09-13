@@ -12,7 +12,7 @@ const (
 	MonoResourceType               = "Mono"
 	NameField                      = "name"
 	EnterpriseField                = "enterprise"
-	DatacenterField                = "datacenter"
+	DataCenterField                = "datacenter"
 	VdcResourceField               = "vdc_resources"
 	ResourceField                  = "resource"
 	TotalField                     = "total"
@@ -71,14 +71,12 @@ const (
 )
 
 var (
-	errDoRequest          = errors.New("do(request) error")
-	errEmptyResp          = errors.New("empty API response")
-	errEmptyRespBody      = errors.New("empty API response body")
-	errEmptyJSON          = errors.New("empty json")
-	errEmptyResourcesList = errors.New("empty resource list")
-	errEmptyTemplateList  = errors.New("empty template list")
+	errDoRequest     = errors.New("do(request) error")
+	errEmptyResp     = errors.New("empty API response")
+	errEmptyRespBody = errors.New("empty API response body")
+	errEmptyJSON     = errors.New("empty json")
 	//ErrResourceNotExist provide message for unexisting resource case
-	ErrResourceNotExist                 = errResourceNotExist("")
+	ErrResourceNotExist                 = errResourceNotExist("", "")
 	errUninitializedExpectedCode        = errors.New("expected code not initialized")
 	errNilResponse                      = errors.New("response is nil")
 	errZeroStatusCode                   = errors.New("response status code is zero")
@@ -86,10 +84,40 @@ var (
 	errHandleResponse                   = errors.New("handle response error")
 	errUnexpectedvalidateStatusResponse = errors.New("unexpected response to validate status request")
 	errCheckRedirectFailure             = errors.New("CheckRedirectReqFailure")
+	clouddcEnvironmentResource          = "resource"
+	clouddcEnvironmentDatacenter        = "datacenter"
+	clouddcEnvironmentTemplate          = "template"
+	clouddcEnvironmentVlan              = "vlan"
+	clouddcEnvironmentSnapshot          = "snapshot"
+	clouddcEnvironmentDiskImage         = "disk-image"
+	clouddcEnvironmentOva               = "ova"
+	clouddcEnvironmentBackupPlan        = "backup-plan"
+	resourceSlice                       = []string{
+		clouddcEnvironmentResource,
+		clouddcEnvironmentDatacenter,
+		clouddcEnvironmentTemplate,
+		clouddcEnvironmentVlan,
+		clouddcEnvironmentSnapshot,
+		clouddcEnvironmentDiskImage,
+		clouddcEnvironmentOva,
+		clouddcEnvironmentBackupPlan,
+	}
 )
 
-func errResourceNotExist(resourceName string) error {
-	return errors.New(resourceName + " resource does not exists")
+func errEmptyResourcesList(resourceType string) error {
+	return errors.New("empty " + resourceType + " list")
+}
+
+func errNotInList(elem string, list string) error {
+	return errors.New(elem + " is not in :" + list)
+}
+
+func errResourceNotExist(resourceName string, availableResources string) error {
+	if availableResources == "" {
+		return errors.New("\"" + resourceName + "\" resource does not exists")
+	}
+	return errors.New("\"" + resourceName +
+		"\" resource does not exists, available resources : " + availableResources)
 }
 
 func errRespStatusCodeBuilder(resp *http.Response,

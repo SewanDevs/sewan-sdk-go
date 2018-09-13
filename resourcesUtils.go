@@ -96,6 +96,96 @@ type vmStruct struct {
 	Outsourcing  string        `json:"outsourcing"`
 }
 
+func isElemInList(elem string, list []interface{}) error {
+	var (
+		isInList  bool
+		elemsList strings.Builder
+	)
+	for _, listElem := range list {
+		listElemSlug := listElem.(map[string]interface{})[SlugField].(string)
+		elemsList.WriteString(" \"")
+		elemsList.WriteString(listElemSlug)
+		elemsList.WriteString("\"")
+		if elem == listElemSlug {
+			isInList = true
+		}
+	}
+	if isInList {
+		return nil
+	}
+	return errNotInList(elem, elemsList.String())
+}
+
+func getDataCenterCos(dataCenter string, api *API) string {
+	for _, listDataCenter := range api.Meta.DataCenterList {
+		listDataCenterSlug := listDataCenter.(map[string]interface{})[SlugField].(string)
+		if dataCenter == listDataCenterSlug {
+			return listDataCenter.(map[string]interface{})[ResourceCosField].(string)
+		}
+	}
+	return ""
+}
+
+// validateDatacenter validates datacenter is in available dataCenter list in api.
+func validateDatacenter(datacenter string, api *API) error {
+	return isElemInList(datacenter, api.Meta.DataCenterList)
+}
+
+// validateDatacenter validates VDC resources exists in clouddc environment
+// resources list.
+func validateVdcResources(d *schema.ResourceData,
+	api *API, cos string) error {
+	for _, resource := range d.Get(VdcResourceField).([]interface{}) {
+		var (
+			resourceExists        bool
+			availableResourceList strings.Builder
+		)
+		for _, apiResource := range api.Meta.EnterpriseResourceList {
+			isRightCos := (apiResource.(map[string]interface{})[ResourceCosField] == cos)
+			isResourceExistingInMeta := (apiResource.(map[string]interface{})[NameField] == resource.(map[string]interface{})[ResourceField])
+			if isRightCos {
+				availableResourceList.WriteString(" \"")
+				availableResourceList.WriteString(apiResource.(map[string]interface{})[NameField].(string))
+				availableResourceList.WriteString("\"")
+				if isResourceExistingInMeta {
+					resourceExists = true
+				}
+			}
+		}
+		if !resourceExists {
+			return errResourceNotExist(resource.(map[string]interface{})[ResourceField].(string),
+				availableResourceList.String())
+		}
+	}
+	return nil
+}
+
+// validateResourceFieldsValue validates all resources values match on of
+// of the available value in clouddc environment resources list
+func validateResourceFieldsValue(d *schema.ResourceData,
+	api *API,
+	resourceType string) error {
+	switch resourceType {
+	case VdcResourceType:
+		dataCenter := d.Get(DataCenterField).(string)
+		err1 := validateDatacenter(dataCenter, api)
+		if err1 != nil {
+			return err1
+		}
+		err2 := validateVdcResources(d, api, getDataCenterCos(dataCenter, api))
+		if err2 != nil {
+			return err2
+		}
+	case VMResourceType:
+		//validate template
+		//validate vlans
+		//validate snapshot
+		//validate disk image
+		//validate ovaList
+	}
+	return nil
+}
+
 // resourceInstanceCreate creates a resource structure initialized with
 // fields values got from schema.
 // Accepted resource types : "vm", "vdc"
@@ -106,8 +196,16 @@ func (resource ResourceResourceer) resourceInstanceCreate(d *schema.ResourceData
 	api *API) (interface{}, error) {
 	switch resourceType {
 	case VdcResourceType:
+		err1 := validateResourceFieldsValue(d, api, VdcResourceType)
+		if err1 != nil {
+			return vdcStruct{}, err1
+		}
 		return vdcInstanceCreate(d, api)
 	case VMResourceType:
+		err2 := validateResourceFieldsValue(d, api, VMResourceType)
+		if err2 != nil {
+			return vmStruct{}, err2
+		}
 		return vmInstanceCreate(d,
 			clientTooler,
 			templatesTooler,
@@ -180,7 +278,7 @@ func vdcInstanceCreate(d *schema.ResourceData, api *API) (vdcStruct, error) {
 	vdc := vdcStruct{
 		Name:         d.Get(NameField).(string),
 		Enterprise:   api.Enterprise,
-		Datacenter:   d.Get(DatacenterField).(string),
+		Datacenter:   d.Get(DataCenterField).(string),
 		VdcResources: d.Get(VdcResourceField).([]interface{}),
 		Slug:         d.Get(SlugField).(string),
 		DynamicField: d.Get(DynamicField).(string),
@@ -193,26 +291,18 @@ func vdcInstanceCreate(d *schema.ResourceData, api *API) (vdcStruct, error) {
 		}
 		vdc.VdcResources[index].(map[string]interface{})[ResourceField] = resourceSlug
 	}
-	logger := LoggerCreate("vdcCreation.log")
-	logger.Println("vdc = ", vdc)
-	logger.Println("api.Meta = ", api.Meta)
 	return vdc, nil
 }
 
 func getResourceSlug(resourceName string, meta APIMeta) (string, error) {
-	logger := LoggerCreate("getResourceSlug" + resourceName + ".log")
-	for index, resource := range meta.NonCriticalResourceList {
-		logger.Println("index = ", index)
-		logger.Println("resource = ", resource)
-		logger.Println(resource.(map[string]interface{})[NameField])
-		logger.Println(resource.(map[string]interface{})[ResourceCosField])
+	for _, resource := range meta.EnterpriseResourceList {
 		resourceExistsInMeta := (resource.(map[string]interface{})[NameField] == resourceName)
 		isResourceMonoTyped := resource.(map[string]interface{})[ResourceCosField] == MonoResourceType
 		if resourceExistsInMeta && isResourceMonoTyped {
 			return resource.(map[string]interface{})[SlugField].(string), nil
 		}
 	}
-	return "", errResourceNotExist(resourceName)
+	return "", errResourceNotExist(resourceName, "")
 }
 
 func getTemplateAndUpdateSchema(templateName string,
@@ -220,8 +310,8 @@ func getTemplateAndUpdateSchema(templateName string,
 	clientTooler *ClientTooler,
 	templatesTooler *TemplatesTooler,
 	api *API) (map[string]interface{}, error) {
-	templateList, err1 := clientTooler.Client.getTemplatesList(clientTooler,
-		api)
+	templateList, err1 := clientTooler.Client.getEnvResourceList(clientTooler,
+		api, clouddcEnvironmentTemplate)
 	if err1 != nil {
 		return map[string]interface{}{}, err1
 	}

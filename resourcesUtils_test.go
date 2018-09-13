@@ -78,7 +78,7 @@ func TestResourceInstanceCreate(t *testing.T) {
 			getJSONListFailureHTTPClienterFake{},
 			UnexistingTemplateTemplaterFake{},
 			VMResourceType,
-			errEmptyTemplateList,
+			errEmptyResourcesList(clouddcEnvironmentTemplate),
 			vmStruct{},
 		},
 		{
@@ -93,7 +93,7 @@ func TestResourceInstanceCreate(t *testing.T) {
 				"\"" + CPUField + "\" " +
 				"\"" + EnterpriseField + "\" " +
 				"\"" + DisksField + "\" " +
-				"\"" + DatacenterField + "\" "),
+				"\"" + DataCenterField + "\" "),
 			vmStruct{},
 		},
 		{
@@ -104,6 +104,17 @@ func TestResourceInstanceCreate(t *testing.T) {
 			VMResourceType,
 			nil,
 			fakeVMInstanceInstanceNumberFieldUnitTestVMInstanceMAP(),
+		},
+		{
+			10,
+			vdcSchemaInit(vdcCreationMapResourceNotExists),
+			nil,
+			TemplaterDummy{},
+			VdcResourceType,
+			errors.New("\"not_existing_storage\" resource does not exists, " +
+				"available resources :  \"ram\" \"cpu\" \"storage_enterprise\" " +
+				"\"storage_performance\" \"storage_high_performance\""),
+			vdcStruct{},
 		},
 	}
 	fakeResourceTooler := ResourceTooler{
@@ -116,9 +127,13 @@ func TestResourceInstanceCreate(t *testing.T) {
 		URL:        rightAPIURL,
 		Enterprise: unitTestEnterprise,
 		Meta: APIMeta{
-			NonCriticalResourceList: nonCriticalResourceMetaDataList,
-			CriticalResourceList:    criticalResourceMetaDataList,
-			OtherResourceList:       otherResourceMetaDataList,
+			EnterpriseResourceList: enterpriseResourceMetaDataList,
+			DataCenterList:         dataCenterMetaDataList,
+			TemplatesList:          []interface{}{},
+			VlansList:              []interface{}{},
+			SnapshotsList:          []interface{}{},
+			DiskImageList:          []interface{}{},
+			OvaList:                []interface{}{},
 		},
 		Client: &http.Client{},
 	}

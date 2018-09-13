@@ -3,6 +3,7 @@ package sewansdk
 import (
 	"errors"
 	"github.com/google/go-cmp/cmp"
+	"github.com/hashicorp/terraform/helper/schema"
 	"net/http"
 	"testing"
 )
@@ -178,9 +179,14 @@ func TestGetClouddcEnvMeta(t *testing.T) {
 			},
 			getListSuccessHTTPClienterFake{},
 			&APIMeta{
-				nonCriticalResourceMetaDataList,
-				criticalResourceMetaDataList,
-				otherResourceMetaDataList},
+				EnterpriseResourceList: enterpriseResourceMetaDataList,
+				DataCenterList:         nil,
+				TemplatesList:          nil,
+				VlansList:              nil,
+				SnapshotsList:          nil,
+				DiskImageList:          nil,
+				OvaList:                nil,
+			},
 			nil,
 		},
 		{
@@ -194,7 +200,7 @@ func TestGetClouddcEnvMeta(t *testing.T) {
 			},
 			getJSONListFailureHTTPClienterFake{},
 			nil,
-			errEmptyResourcesList,
+			errEmptyResourcesList(""),
 		},
 	}
 	fakeAPItools := &APITooler{}
@@ -234,6 +240,7 @@ func TestCreateResource(t *testing.T) {
 	testCases := []struct {
 		ID              int
 		TcClienter      Clienter
+		TCSchema        *schema.ResourceData
 		ResourceType    string
 		CreationErr     error
 		CreatedResource map[string]interface{}
@@ -241,6 +248,7 @@ func TestCreateResource(t *testing.T) {
 		{
 			1,
 			VMCreationSuccessHTTPClienterFake{},
+			unitTestVMSchema(resourceName),
 			VMResourceType,
 			nil,
 			noTemplateVMMap,
@@ -248,6 +256,7 @@ func TestCreateResource(t *testing.T) {
 		{
 			2,
 			HTTPClienterDummy{},
+			unitTestVMSchema(resourceName),
 			wrongResourceType,
 			errWrongResourceTypeBuilder(wrongResourceType),
 			map[string]interface{}{},
@@ -255,6 +264,7 @@ func TestCreateResource(t *testing.T) {
 		{
 			3,
 			ResourceCreationFailureHTTPClienterFake,
+			unitTestVDCSchema(resourceName),
 			VdcResourceType,
 			errDoCrudRequestsBuilder(creationOperation,
 				resourceName,
@@ -264,13 +274,36 @@ func TestCreateResource(t *testing.T) {
 		{
 			4,
 			HandleRespErrHTTPClienterFake{},
+			unitTestVMSchema(resourceName),
 			VMResourceType,
 			errHandleResponse,
 			map[string]interface{}{},
 		},
+		{
+			5,
+			ResourceCreationFailureHTTPClienterFake,
+			unitTestVDCWrongDataCenterSchema(resourceName),
+			VdcResourceType,
+			errors.New("wrongDatacenter is not in : \"dc2\" \"dc1\" \"ha\""),
+			map[string]interface{}{},
+		},
 	}
 	apier := AirDrumResourcesAPI{}
-	sewan := &API{Token: "42", URL: "42", Client: &http.Client{}}
+	sewan := &API{
+		Token:      rightAPIToken,
+		URL:        rightAPIURL,
+		Enterprise: unitTestEnterprise,
+		Meta: APIMeta{
+			EnterpriseResourceList: enterpriseResourceMetaDataList,
+			DataCenterList:         dataCenterMetaDataList,
+			TemplatesList:          []interface{}{},
+			VlansList:              []interface{}{},
+			SnapshotsList:          []interface{}{},
+			DiskImageList:          []interface{}{},
+			OvaList:                []interface{}{},
+		},
+		Client: &http.Client{},
+	}
 	fakeClientTooler := ClientTooler{}
 	fakeTemplatesTooler := TemplatesTooler{
 		TemplatesTools: TemplateTemplater{},
@@ -279,12 +312,8 @@ func TestCreateResource(t *testing.T) {
 		Resource: ResourceResourceer{},
 	}
 	for _, testCase := range testCases {
-		resourceResponse := resource(testCase.ResourceType)
-		d := resourceResponse.TestResourceData()
-		d.SetId("UnitTest resource1")
-		d.Set(NameField, resourceName)
 		fakeClientTooler.Client = testCase.TcClienter
-		respCreationMap, err := apier.CreateResource(d,
+		respCreationMap, err := apier.CreateResource(testCase.TCSchema,
 			&fakeClientTooler,
 			&fakeTemplatesTooler,
 			&fakeResourceTooler,
@@ -321,6 +350,7 @@ func TestReadResource(t *testing.T) {
 	testCases := []struct {
 		ID           int
 		TcClienter   Clienter
+		TCSchema     *schema.ResourceData
 		TcAPI        *API
 		ResourceType string
 		ReadError    error
@@ -329,13 +359,18 @@ func TestReadResource(t *testing.T) {
 		{
 			1,
 			VMReadSuccessHTTPClienterFake{},
+			unitTestVMSchema(resourceName),
 			&API{
 				Token: rightAPIToken,
 				URL:   rightAPIURL,
 				Meta: APIMeta{
-					NonCriticalResourceList: nonCriticalResourceMetaDataList,
-					CriticalResourceList:    criticalResourceMetaDataList,
-					OtherResourceList:       otherResourceMetaDataList,
+					EnterpriseResourceList: enterpriseResourceMetaDataList,
+					DataCenterList:         []interface{}{},
+					TemplatesList:          []interface{}{},
+					VlansList:              []interface{}{},
+					SnapshotsList:          []interface{}{},
+					DiskImageList:          []interface{}{},
+					OvaList:                []interface{}{},
 				},
 				Client: &http.Client{},
 			},
@@ -346,13 +381,18 @@ func TestReadResource(t *testing.T) {
 		{
 			2,
 			VdcReadSuccessHTTPClienterFake{},
+			unitTestVDCSchema(resourceName),
 			&API{
 				Token: rightAPIToken,
 				URL:   rightAPIURL,
 				Meta: APIMeta{
-					NonCriticalResourceList: nonCriticalResourceMetaDataList,
-					CriticalResourceList:    criticalResourceMetaDataList,
-					OtherResourceList:       otherResourceMetaDataList,
+					EnterpriseResourceList: enterpriseResourceMetaDataList,
+					DataCenterList:         []interface{}{},
+					TemplatesList:          []interface{}{},
+					VlansList:              []interface{}{},
+					SnapshotsList:          []interface{}{},
+					DiskImageList:          []interface{}{},
+					OvaList:                []interface{}{},
 				},
 				Client: &http.Client{},
 			},
@@ -363,13 +403,18 @@ func TestReadResource(t *testing.T) {
 		{
 			3,
 			HTTPClienterDummy{},
+			unitTestVMSchema(resourceName),
 			&API{
 				Token: rightAPIToken,
 				URL:   rightAPIURL,
 				Meta: APIMeta{
-					NonCriticalResourceList: nonCriticalResourceMetaDataList,
-					CriticalResourceList:    criticalResourceMetaDataList,
-					OtherResourceList:       otherResourceMetaDataList,
+					EnterpriseResourceList: enterpriseResourceMetaDataList,
+					DataCenterList:         []interface{}{},
+					TemplatesList:          []interface{}{},
+					VlansList:              []interface{}{},
+					SnapshotsList:          []interface{}{},
+					DiskImageList:          []interface{}{},
+					OvaList:                []interface{}{},
 				},
 				Client: &http.Client{},
 			},
@@ -380,13 +425,18 @@ func TestReadResource(t *testing.T) {
 		{
 			4,
 			ResourceReadFailureHTTPClienterFake,
+			unitTestVMSchema(resourceName),
 			&API{
 				Token: rightAPIToken,
 				URL:   rightAPIURL,
 				Meta: APIMeta{
-					NonCriticalResourceList: nonCriticalResourceMetaDataList,
-					CriticalResourceList:    criticalResourceMetaDataList,
-					OtherResourceList:       otherResourceMetaDataList,
+					EnterpriseResourceList: enterpriseResourceMetaDataList,
+					DataCenterList:         []interface{}{},
+					TemplatesList:          []interface{}{},
+					VlansList:              []interface{}{},
+					SnapshotsList:          []interface{}{},
+					DiskImageList:          []interface{}{},
+					OvaList:                []interface{}{},
 				},
 				Client: &http.Client{},
 			},
@@ -399,13 +449,18 @@ func TestReadResource(t *testing.T) {
 		{
 			5,
 			Error404HTTPClienterFake{},
+			unitTestVMSchema(resourceName),
 			&API{
 				Token: rightAPIToken,
 				URL:   rightAPIURL,
 				Meta: APIMeta{
-					NonCriticalResourceList: nonCriticalResourceMetaDataList,
-					CriticalResourceList:    criticalResourceMetaDataList,
-					OtherResourceList:       otherResourceMetaDataList,
+					EnterpriseResourceList: enterpriseResourceMetaDataList,
+					DataCenterList:         []interface{}{},
+					TemplatesList:          []interface{}{},
+					VlansList:              []interface{}{},
+					SnapshotsList:          []interface{}{},
+					DiskImageList:          []interface{}{},
+					OvaList:                []interface{}{},
 				},
 				Client: &http.Client{},
 			},
@@ -416,13 +471,18 @@ func TestReadResource(t *testing.T) {
 		{
 			6,
 			HandleRespErrHTTPClienterFake{},
+			unitTestVMSchema(resourceName),
 			&API{
 				Token: rightAPIToken,
 				URL:   rightAPIURL,
 				Meta: APIMeta{
-					NonCriticalResourceList: nonCriticalResourceMetaDataList,
-					CriticalResourceList:    criticalResourceMetaDataList,
-					OtherResourceList:       otherResourceMetaDataList,
+					EnterpriseResourceList: enterpriseResourceMetaDataList,
+					DataCenterList:         []interface{}{},
+					TemplatesList:          []interface{}{},
+					VlansList:              []interface{}{},
+					SnapshotsList:          []interface{}{},
+					DiskImageList:          []interface{}{},
+					OvaList:                []interface{}{},
 				},
 				Client: &http.Client{},
 			},
@@ -433,6 +493,7 @@ func TestReadResource(t *testing.T) {
 		{
 			7,
 			VdcReadSuccessHTTPClienterFake{},
+			unitTestVMSchema(resourceName),
 			&API{
 				Token:  rightAPIToken,
 				URL:    rightAPIURL,
@@ -440,7 +501,7 @@ func TestReadResource(t *testing.T) {
 				Client: &http.Client{},
 			},
 			VdcResourceType,
-			errResourceNotExist(RAMField),
+			errResourceNotExist(RAMField, ""),
 			map[string]interface{}{},
 		},
 	}
@@ -450,12 +511,8 @@ func TestReadResource(t *testing.T) {
 		Resource: ResourceResourceer{},
 	}
 	for _, testCase := range testCases {
-		resourceResponse := resource(testCase.ResourceType)
-		d := resourceResponse.TestResourceData()
-		d.SetId("UnitTest resource1")
-		d.Set(NameField, resourceName)
 		fakeClientTooler.Client = testCase.TcClienter
-		respCreationMap, err := Implementerer.ReadResource(d,
+		respCreationMap, err := Implementerer.ReadResource(testCase.TCSchema,
 			&fakeClientTooler,
 			&fakeResourceTooler,
 			testCase.ResourceType,
@@ -496,32 +553,57 @@ func TestUpdateResource(t *testing.T) {
 	testCases := []struct {
 		ID           int
 		TcClienter   Clienter
+		TCSchema     *schema.ResourceData
 		ResourceType string
 		UpdateErr    error
 	}{
 		{
 			1,
 			ResourceUpdateSuccessHTTPClienterFake,
+			unitTestVMSchema(resourceName),
 			VMResourceType,
 			nil,
 		},
 		{
 			2,
 			HTTPClienterDummy{},
+			unitTestVMSchema(resourceName),
 			wrongResourceType,
 			errWrongResourceTypeBuilder(wrongResourceType),
 		},
 		{
 			3,
 			ResourceUpdateFailureHTTPClienterFake,
+			unitTestVDCSchema(resourceName),
 			VdcResourceType,
 			errDoCrudRequestsBuilder(updateOperation,
 				resourceName,
 				errEmptyResp),
 		},
+		{
+			4,
+			ResourceUpdateFailureHTTPClienterFake,
+			unitTestVDCWrongDataCenterSchema(resourceName),
+			VdcResourceType,
+			errors.New("wrongDatacenter is not in : \"dc2\" \"dc1\" \"ha\""),
+		},
 	}
 	Implementerer := AirDrumResourcesAPI{}
-	sewan := &API{Token: "42", URL: "42", Client: &http.Client{}}
+	sewan := &API{
+		Token:      rightAPIToken,
+		URL:        rightAPIURL,
+		Enterprise: unitTestEnterprise,
+		Meta: APIMeta{
+			EnterpriseResourceList: enterpriseResourceMetaDataList,
+			DataCenterList:         dataCenterMetaDataList,
+			TemplatesList:          []interface{}{},
+			VlansList:              []interface{}{},
+			SnapshotsList:          []interface{}{},
+			DiskImageList:          []interface{}{},
+			OvaList:                []interface{}{},
+		},
+		Client: &http.Client{},
+	}
 	fakeClientTooler := ClientTooler{}
 	fakeTemplatesTooler := TemplatesTooler{
 		TemplatesTools: TemplateTemplater{},
@@ -530,12 +612,8 @@ func TestUpdateResource(t *testing.T) {
 		Resource: ResourceResourceer{},
 	}
 	for _, testCase := range testCases {
-		resourceResponse := resource(testCase.ResourceType)
-		d := resourceResponse.TestResourceData()
-		d.SetId("UnitTest resource1")
-		d.Set(NameField, resourceName)
 		fakeClientTooler.Client = testCase.TcClienter
-		err := Implementerer.UpdateResource(d,
+		err := Implementerer.UpdateResource(testCase.TCSchema,
 			&fakeClientTooler,
 			&fakeTemplatesTooler,
 			&fakeResourceTooler,

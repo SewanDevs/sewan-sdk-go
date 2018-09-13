@@ -69,36 +69,3 @@ func TestUpdateLocalResourceState_AND_ReadElement(t *testing.T) {
 		}
 	}
 }
-
-//func TestUpdateVdcResourcesNames(t *testing.T) {
-//	testCases := []struct {
-//		ID        int
-//		DInit     *schema.ResourceData
-//		DFinalMap map[string]interface{}
-//		Err       error
-//	}{
-//		{
-//			1,
-//			vdcSchemaInit(vdcResourcesNamesPreUpdateMap),
-//			vdcResourcesNamesUpdatedMap,
-//			nil,
-//		},
-//	}
-//	var (
-//		diffs string
-//	)
-//	schemaTooler := SchemaTooler{
-//		SchemaTools: SchemaSchemaer{},
-//	}
-//	for _, testCase := range testCases {
-//		schemaTooler.SchemaTools.UpdateVdcResourcesNames(testCase.DInit)
-//		for key, value := range testCase.DFinalMap {
-//			diffs = cmp.Diff(value, testCase.DInit.Get(key))
-//			if diffs != "" {
-//				t.Errorf("\n\nTC %d : Update of %s field failed (-got +want) :\n%s",
-//					testCase.ID, key, diffs)
-//			}
-//		}
-//	}
-//}
-//

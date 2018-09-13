@@ -246,7 +246,7 @@ func updateSchemaFieldOnResourceCreation(d *schema.ResourceData,
 		case templateParamName == IDField:
 		case templateParamName == OsField:
 		case templateParamName == NameField:
-		case templateParamName == DatacenterField:
+		case templateParamName == DataCenterField:
 		case d.Get(templateParamName) == "":
 			d.Set(templateParamName, templateParamValue)
 		default:
