@@ -72,7 +72,7 @@ func TestDo(t *testing.T) {
 //	}
 //}
 
-//func TestGetTemplatesList(t *testing.T) {
+//func TestGetTemplateList(t *testing.T) {
 //	testCases := []struct {
 //		ID           int
 //		TCClienter   Clienter
@@ -82,7 +82,7 @@ func TestDo(t *testing.T) {
 //		{
 //			1,
 //			getListSuccessHTTPClienterFake{},
-//			templatesList,
+//			templateMetaDataList,
 //			nil,
 //		},
 //		{
@@ -118,12 +118,12 @@ func TestDo(t *testing.T) {
 //	api := apiTooler.Initialyser.New(rightAPIURL, rightAPIURL, unitTestEnterprise)
 //	for _, testCase := range testCases {
 //		fakeClientTooler.Client = testCase.TCClienter
-//		templatesList, err := clientTooler.Client.getTemplatesList(&fakeClientTooler,
+//		templatesList, err := clientTooler.Client.getTemplateList(&fakeClientTooler,
 //			api)
 //		switch {
 //		case err == nil || testCase.Error == nil:
 //			if !(err == nil && testCase.Error == nil) {
-//				t.Errorf("\n\nTC %d : getTemplatesList() error was incorrect,"+
+//				t.Errorf("\n\nTC %d : getTemplateList() error was incorrect,"+
 //					"\n\rgot: \"%s\"\n\rwant: \"%s\"", testCase.ID, err, testCase.Error)
 //			} else {
 //				diffs := cmp.Diff(testCase.TemplateList, templatesList)

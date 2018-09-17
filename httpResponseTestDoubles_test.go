@@ -24,7 +24,7 @@ func HTTPResponseFakeOKTemplateListJSON() *http.Response {
 	response.StatusCode = http.StatusOK
 	response.Header = map[string][]string{}
 	response.Header.Add(httpRespContentType, httpJSONContentType)
-	RespBodyJSON, _ := json.Marshal(templatesList)
+	RespBodyJSON, _ := json.Marshal(templateMetaDataList)
 	response.Body = ioutil.NopCloser(bytes.NewBuffer(RespBodyJSON))
 	return &response
 }

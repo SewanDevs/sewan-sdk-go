@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 // Exported constants are resource field names
@@ -84,9 +85,11 @@ var (
 	errHandleResponse                   = errors.New("handle response error")
 	errUnexpectedvalidateStatusResponse = errors.New("unexpected response to validate status request")
 	errCheckRedirectFailure             = errors.New("CheckRedirectReqFailure")
-	clouddcEnvironmentResource          = "resource"
-	clouddcEnvironmentDatacenter        = "datacenter"
-	clouddcEnvironmentTemplate          = "template"
+	clouddcEnvironmentResource          = ResourceField
+	clouddcEnvironmentVdc               = VdcField
+	clouddcEnvironmentDatacenter        = DataCenterField
+	clouddcEnvironmentTemplate          = TemplateField
+	clouddcGenericTemplateEnterprise    = ",sewanadmin"
 	clouddcEnvironmentVlan              = "vlan"
 	clouddcEnvironmentSnapshot          = "snapshot"
 	clouddcEnvironmentDiskImage         = "disk-image"
@@ -94,6 +97,7 @@ var (
 	clouddcEnvironmentBackupPlan        = "backup-plan"
 	resourceSlice                       = []string{
 		clouddcEnvironmentResource,
+		clouddcEnvironmentVdc,
 		clouddcEnvironmentDatacenter,
 		clouddcEnvironmentTemplate,
 		clouddcEnvironmentVlan,
@@ -109,7 +113,7 @@ func errEmptyResourcesList(resourceType string) error {
 }
 
 func errNotInList(elem string, list string) error {
-	return errors.New(elem + " is not in :" + list)
+	return errors.New("\"" + elem + "\"" + " is not in :" + list)
 }
 
 func errResourceNotExist(resourceName string, availableResources string) error {
@@ -184,4 +188,19 @@ func errWrongResourceTypeBuilder(resourceType string) error {
 		"list of accepted resource types :\n\r" +
 		"- \"" + VdcResourceType + "\"\n\r" +
 		"- \"" + VMResourceType + "\"")
+}
+
+func stringSliceContains(elem string, slice []string) error {
+	var (
+		isInSlice bool
+	)
+	for _, listElem := range slice {
+		if elem == listElem {
+			isInSlice = true
+		}
+	}
+	if isInSlice {
+		return nil
+	}
+	return errNotInList(elem, strings.Join(slice, ", "))
 }

@@ -25,7 +25,6 @@ type Resourceer interface {
 		resourceType string,
 		client ClientTooler) error
 	resourceInstanceCreate(d *schema.ResourceData,
-		clientTooler *ClientTooler,
 		templatesTooler *TemplatesTooler,
 		resourceType string,
 		api *API) (interface{}, error)
@@ -96,26 +95,9 @@ type vmStruct struct {
 	Outsourcing  string        `json:"outsourcing"`
 }
 
-func isElemInList(elem string, list []interface{}) error {
-	var (
-		isInList  bool
-		elemsList strings.Builder
-	)
-	for _, listElem := range list {
-		listElemSlug := listElem.(map[string]interface{})[SlugField].(string)
-		elemsList.WriteString(" \"")
-		elemsList.WriteString(listElemSlug)
-		elemsList.WriteString("\"")
-		if elem == listElemSlug {
-			isInList = true
-		}
-	}
-	if isInList {
-		return nil
-	}
-	return errNotInList(elem, elemsList.String())
-}
-
+// getDataCenterCos returns the cos field of a data center,
+// the cos field represents the resource type of DatCenter :
+// * mono or HA (high availability)
 func getDataCenterCos(dataCenter string, api *API) string {
 	for _, listDataCenter := range api.Meta.DataCenterList {
 		listDataCenterSlug := listDataCenter.(map[string]interface{})[SlugField].(string)
@@ -127,11 +109,27 @@ func getDataCenterCos(dataCenter string, api *API) string {
 }
 
 // validateDatacenter validates datacenter is in available dataCenter list in api.
-func validateDatacenter(datacenter string, api *API) error {
-	return isElemInList(datacenter, api.Meta.DataCenterList)
+func validateDatacenter(dataCenter string, api *API) error {
+	var (
+		isInSlice     bool
+		sliceElements strings.Builder
+	)
+	for _, sliceElem := range api.Meta.DataCenterList {
+		sliceElemSlug := sliceElem.(map[string]interface{})[SlugField].(string)
+		sliceElements.WriteString(" \"")
+		sliceElements.WriteString(sliceElemSlug)
+		sliceElements.WriteString("\"")
+		if dataCenter == sliceElemSlug {
+			isInSlice = true
+		}
+	}
+	if isInSlice {
+		return nil
+	}
+	return errNotInList(dataCenter, sliceElements.String())
 }
 
-// validateDatacenter validates VDC resources exists in clouddc environment
+// validateVdcResources validates VDC resources exists in clouddc environment
 // resources list.
 func validateVdcResources(d *schema.ResourceData,
 	api *API, cos string) error {
@@ -160,6 +158,82 @@ func validateVdcResources(d *schema.ResourceData,
 	return nil
 }
 
+// validateTemplate validates template is in available template list in api.
+func validateTemplate(d *schema.ResourceData,
+	api *API) error {
+	var (
+		isInSlice     bool
+		sliceElements strings.Builder
+		template      = d.Get(TemplateField).(string)
+	)
+	if template == "" {
+		return nil
+	}
+	for _, sliceElem := range api.Meta.TemplateList {
+		sliceElemSlug := sliceElem.(map[string]interface{})[SlugField].(string)
+		sliceElements.WriteString(" \"")
+		sliceElements.WriteString(sliceElemSlug)
+		sliceElements.WriteString("\"")
+		if template == sliceElemSlug {
+			isInSlice = true
+		}
+	}
+	if isInSlice {
+		return nil
+	}
+	return errNotInList(template, sliceElements.String())
+}
+
+// validateVMsVDC validates the vm's vdc is in available vdc list in api.
+func validateVMsVDC(d *schema.ResourceData,
+	api *API) error {
+	var (
+		isInSlice     bool
+		sliceElements strings.Builder
+		vdc           = d.Get(VdcField).(string)
+	)
+	for _, sliceElem := range api.Meta.EnterpriseVdcList {
+		sliceElemSlug := sliceElem.(map[string]interface{})[SlugField].(string)
+		sliceElements.WriteString(" \"")
+		sliceElements.WriteString(sliceElemSlug)
+		sliceElements.WriteString("\"")
+		if vdc == sliceElemSlug {
+			isInSlice = true
+		}
+	}
+	if isInSlice {
+		return nil
+	}
+	return errNotInList(vdc, sliceElements.String())
+}
+
+// validateNics validates the vm's nics are in available vlan list in api.
+func validateNics(d *schema.ResourceData,
+	api *API) error {
+	var (
+		isInSlice     bool
+		sliceElements strings.Builder
+		nicList       = d.Get(NicsField).([]interface{})
+	)
+	for _, nic := range nicList {
+		isInSlice = false
+		nicVlan := nic.(map[string]interface{})[VlanNameField].(string)
+		for _, sliceElem := range api.Meta.VlanList {
+			sliceElemSlug := sliceElem.(map[string]interface{})[SlugField].(string)
+			sliceElements.WriteString(" \"")
+			sliceElements.WriteString(sliceElemSlug)
+			sliceElements.WriteString("\"")
+			if nicVlan == sliceElemSlug {
+				isInSlice = true
+			}
+		}
+		if !isInSlice {
+			return errNotInList(nicVlan, sliceElements.String())
+		}
+	}
+	return nil
+}
+
 // validateResourceFieldsValue validates all resources values match on of
 // of the available value in clouddc environment resources list
 func validateResourceFieldsValue(d *schema.ResourceData,
@@ -177,11 +251,18 @@ func validateResourceFieldsValue(d *schema.ResourceData,
 			return err2
 		}
 	case VMResourceType:
-		//validate template
-		//validate vlans
-		//validate snapshot
-		//validate disk image
-		//validate ovaList
+		err3 := validateTemplate(d, api)
+		if err3 != nil {
+			return err3
+		}
+		err4 := validateNics(d, api)
+		if err4 != nil {
+			return err4
+		}
+		err5 := validateVMsVDC(d, api)
+		if err5 != nil {
+			return err5
+		}
 	}
 	return nil
 }
@@ -190,7 +271,6 @@ func validateResourceFieldsValue(d *schema.ResourceData,
 // fields values got from schema.
 // Accepted resource types : "vm", "vdc"
 func (resource ResourceResourceer) resourceInstanceCreate(d *schema.ResourceData,
-	clientTooler *ClientTooler,
 	templatesTooler *TemplatesTooler,
 	resourceType string,
 	api *API) (interface{}, error) {
@@ -207,7 +287,6 @@ func (resource ResourceResourceer) resourceInstanceCreate(d *schema.ResourceData
 			return vmStruct{}, err2
 		}
 		return vmInstanceCreate(d,
-			clientTooler,
 			templatesTooler,
 			api)
 	default:
@@ -285,7 +364,7 @@ func vdcInstanceCreate(d *schema.ResourceData, api *API) (vdcStruct, error) {
 	}
 	for index, resource := range vdc.VdcResources {
 		resourceSlug, err := getResourceSlug(resource.(map[string]interface{})[ResourceField].(string),
-			api.Meta)
+			*api.Meta)
 		if err != nil {
 			return vdcStruct{}, err
 		}
@@ -305,52 +384,44 @@ func getResourceSlug(resourceName string, meta APIMeta) (string, error) {
 	return "", errResourceNotExist(resourceName, "")
 }
 
-func getTemplateAndUpdateSchema(templateName string,
+func getTemplateAndUpdateSchema(templateSlug string,
 	d *schema.ResourceData,
-	clientTooler *ClientTooler,
 	templatesTooler *TemplatesTooler,
 	api *API) (map[string]interface{}, error) {
-	templateList, err1 := clientTooler.Client.getEnvResourceList(clientTooler,
-		api, clouddcEnvironmentTemplate)
+	template, err1 := templatesTooler.TemplatesTools.FetchTemplateFromList(templateSlug,
+		api.Meta.TemplateList)
 	if err1 != nil {
 		return map[string]interface{}{}, err1
 	}
-	template, err2 := templatesTooler.TemplatesTools.FetchTemplateFromList(templateName,
-		templateList)
+	err2 := templatesTooler.TemplatesTools.validateTemplate(template)
 	if err2 != nil {
 		return map[string]interface{}{}, err2
 	}
-	err3 := templatesTooler.TemplatesTools.validateTemplate(template)
+	err3 := templatesTooler.TemplatesTools.updateSchemaFromTemplateOnResourceCreation(d,
+		template)
 	if err3 != nil {
 		return map[string]interface{}{}, err3
-	}
-	err4 := templatesTooler.TemplatesTools.updateSchemaFromTemplateOnResourceCreation(d,
-		template)
-	if err4 != nil {
-		return map[string]interface{}{}, err4
 	}
 	return template, nil
 }
 
 func vmInstanceCreate(d *schema.ResourceData,
-	clientTooler *ClientTooler,
 	templatesTooler *TemplatesTooler,
 	api *API) (vmStruct, error) {
 	var (
 		templateError error
 		template      map[string]interface{}
-		templateName  = d.Get(TemplateField).(string)
+		templateSlug  = d.Get(TemplateField).(string)
 		vmName        strings.Builder
 	)
 	vmName.WriteString(d.Get(NameField).(string))
-	if templateName != "" && d.Id() == "" {
+	if templateSlug != "" && d.Id() == "" {
 		instanceNumber := d.Get(InstanceNumberField).(int)
 		vmName.WriteString(resourceNameCountSeparator)
 		vmName.WriteString(strconv.Itoa(instanceNumber))
 		template,
-			templateError = getTemplateAndUpdateSchema(templateName,
+			templateError = getTemplateAndUpdateSchema(templateSlug,
 			d,
-			clientTooler,
 			templatesTooler,
 			api)
 	}

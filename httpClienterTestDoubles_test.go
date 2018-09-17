@@ -56,7 +56,7 @@ func (client getJSONListFailureHTTPClienterFake) do(api *API,
 }
 func (client getJSONListFailureHTTPClienterFake) getEnvResourceList(clientTooler *ClientTooler,
 	api *API, resourceType string) ([]interface{}, error) {
-	return nil, errEmptyResourcesList("")
+	return nil, errEmptyResourcesList(clouddcUniTestResource)
 }
 func (client getJSONListFailureHTTPClienterFake) handleResponse(resp *http.Response,
 	expectedCode int,
@@ -72,12 +72,12 @@ func (client getListSuccessHTTPClienterFake) do(api *API,
 }
 func (client getListSuccessHTTPClienterFake) getEnvResourceList(clientTooler *ClientTooler,
 	api *API, resourceType string) ([]interface{}, error) {
-	return enterpriseResourceMetaDataList, nil
+	return unitTestMetaDataList, nil
 }
 func (client getListSuccessHTTPClienterFake) handleResponse(resp *http.Response,
 	expectedCode int,
 	expectedBodyFormat string) (interface{}, error) {
-	return templatesList, nil
+	return templateMetaDataList, nil
 }
 
 type HandleRespErrHTTPClienterFake struct{}

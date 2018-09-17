@@ -57,7 +57,7 @@ type templateCreatedVMOverride struct {
 // FetchTemplateFromList extracts a template from the received list
 // Known implementation limitation :
 //  * Redmine ticket #35489/#36874
-func (templater TemplateTemplater) FetchTemplateFromList(templateName string,
+func (templater TemplateTemplater) FetchTemplateFromList(templateSlug string,
 	templateList []interface{}) (map[string]interface{}, error) {
 	var (
 		template          map[string]interface{}
@@ -66,10 +66,8 @@ func (templater TemplateTemplater) FetchTemplateFromList(templateName string,
 	for i := 0; i < len(templateList); i++ {
 		switch reflect.TypeOf(templateList[i]).Kind() {
 		case reflect.Map:
-			var (
-				listTemplateName = templateList[i].(map[string]interface{})[NameField].(string)
-			)
-			if listTemplateName == templateName {
+			listTemplateSlug := templateList[i].(map[string]interface{})[SlugField].(string)
+			if listTemplateSlug == templateSlug {
 				template = templateList[i].(map[string]interface{})
 				break
 			}
@@ -82,7 +80,7 @@ func (templater TemplateTemplater) FetchTemplateFromList(templateName string,
 		}
 	}
 	if template == nil && templateListError == nil {
-		templateListError = errors.New("template \"" + templateName +
+		templateListError = errors.New("template \"" + templateSlug +
 			"\" does not exists, please validate it's name")
 	}
 	return template, templateListError

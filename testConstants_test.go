@@ -24,4 +24,5 @@ const (
 	wrongResourceType          = "a non supported ResourceType"
 	unitTestEnterprise         = "unit-test-enterprise"
 	wrongEnterpriseSlug        = "unit tes enterprise wrong name"
+	clouddcUniTestResource     = "unit-test-resource"
 )

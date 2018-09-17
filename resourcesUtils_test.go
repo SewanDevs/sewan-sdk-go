@@ -51,7 +51,10 @@ func TestResourceInstanceCreate(t *testing.T) {
 			getListSuccessHTTPClienterFake{},
 			UnexistingTemplateTemplaterFake{},
 			VMResourceType,
-			errors.New("Unavailable template : windows95"),
+			errors.New("\"windows95\" is not in : " +
+				"\"template2-slug\" \"template1 slug\" " +
+				"\"unit test template3 slug\" \"tpl-centos7-rd\" \"slug windows7\"" +
+				" \"lastTemplate-slug\""),
 			vmStruct{},
 		},
 		{
@@ -71,15 +74,6 @@ func TestResourceInstanceCreate(t *testing.T) {
 			wrongResourceType,
 			errWrongResourceTypeBuilder(wrongResourceType),
 			nil,
-		},
-		{
-			7,
-			vmSchemaInit(nonExistingTemplateVMMap),
-			getJSONListFailureHTTPClienterFake{},
-			UnexistingTemplateTemplaterFake{},
-			VMResourceType,
-			errEmptyResourcesList(clouddcEnvironmentTemplate),
-			vmStruct{},
 		},
 		{
 			8,
@@ -126,14 +120,15 @@ func TestResourceInstanceCreate(t *testing.T) {
 		Token:      rightAPIToken,
 		URL:        rightAPIURL,
 		Enterprise: unitTestEnterprise,
-		Meta: APIMeta{
+		Meta: &APIMeta{
 			EnterpriseResourceList: enterpriseResourceMetaDataList,
+			EnterpriseVdcList:      vdcMetaDataList,
 			DataCenterList:         dataCenterMetaDataList,
-			TemplatesList:          []interface{}{},
-			VlansList:              []interface{}{},
-			SnapshotsList:          []interface{}{},
-			DiskImageList:          []interface{}{},
-			OvaList:                []interface{}{},
+			TemplateList:           templateMetaDataList,
+			VlanList:               vlanMetaDataList,
+			SnapshotList:           snapshotMetaDataList,
+			DiskImageList:          diskImageMetaDataList,
+			OvaList:                ovaMetaDataList,
 		},
 		Client: &http.Client{},
 	}
@@ -142,7 +137,6 @@ func TestResourceInstanceCreate(t *testing.T) {
 		fakeTemplatesTooler.TemplatesTools = testCase.Templater
 		instance,
 			err := fakeResourceTooler.Resource.resourceInstanceCreate(testCase.D,
-			&fakeClientTooler,
 			&fakeTemplatesTooler,
 			testCase.ResourceType,
 			sewan)
@@ -188,7 +182,7 @@ func TestGetResourceCreationURLetResourceURL(t *testing.T) {
 				rightAPIToken,
 				rightAPIURL,
 				unitTestEnterprise,
-				APIMeta{},
+				&APIMeta{},
 				&http.Client{},
 			},
 			"42",
@@ -199,7 +193,7 @@ func TestGetResourceCreationURLetResourceURL(t *testing.T) {
 				rightAPIToken,
 				rightAPIURL,
 				unitTestEnterprise,
-				APIMeta{},
+				&APIMeta{},
 				&http.Client{},
 			},
 			"PATATE",
@@ -232,7 +226,7 @@ func TestGetResourceCreationURL(t *testing.T) {
 				rightAPIToken,
 				rightAPIURL,
 				unitTestEnterprise,
-				APIMeta{},
+				&APIMeta{},
 				&http.Client{},
 			},
 			rightVMCreationAPIURL,
@@ -266,7 +260,7 @@ func TestValidateStatus(t *testing.T) {
 				rightAPIToken,
 				rightAPIURL,
 				unitTestEnterprise,
-				APIMeta{},
+				&APIMeta{},
 				&http.Client{},
 			},
 			VMReadSuccessHTTPClienterFake{},
@@ -278,7 +272,7 @@ func TestValidateStatus(t *testing.T) {
 				rightAPIToken,
 				rightAPIURL,
 				unitTestEnterprise,
-				APIMeta{},
+				&APIMeta{},
 				&http.Client{},
 			},
 			CheckRedirectReqFailureHTTPClienterFake{},

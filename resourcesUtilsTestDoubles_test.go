@@ -27,7 +27,6 @@ func (resourceer FakeResourceResourceer) validateResourceType(resourceType strin
 }
 
 func (resourceer FakeResourceResourceer) resourceInstanceCreate(d *schema.ResourceData,
-	clientTooler *ClientTooler,
 	templatesTooler *TemplatesTooler,
 	resourceType string,
 	api *API) (interface{}, error) {

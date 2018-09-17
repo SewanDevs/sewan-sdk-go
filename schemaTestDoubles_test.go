@@ -27,5 +27,6 @@ func unitTestVMSchema(resourceName string) *schema.ResourceData {
 	d := resourceResponse.TestResourceData()
 	d.SetId("UnitTest vm")
 	d.Set(NameField, resourceName)
+	d.Set(VdcField, "unit-test-vdc-1-slug")
 	return d
 }

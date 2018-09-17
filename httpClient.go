@@ -44,16 +44,15 @@ func (client HTTPClienter) do(api *API, req *http.Request) (*http.Response, erro
 // * snapshot
 func (client HTTPClienter) getEnvResourceList(clientTooler *ClientTooler,
 	api *API, resourceType string) ([]interface{}, error) {
-	for _, resource := range resourceSlice {
-		if resourceType == resource {
-			return nil, errNotInList(resourceType, strings.Join(resourceSlice, ", "))
-		}
+	err1 := stringSliceContains(resourceType, resourceSlice)
+	if err1 != nil {
+		return nil, errNotInList(resourceType, strings.Join(resourceSlice, ", "))
 	}
-	resourceList, err := getJSONList(clientTooler, api, resourceType)
-	if err == errEmptyJSON {
+	resourceList, err2 := getJSONList(clientTooler, api, resourceType)
+	if err2 == errEmptyJSON {
 		return nil, errEmptyResourcesList(resourceType)
 	}
-	return resourceList, err
+	return resourceList, err2
 }
 
 // getJSONList returns a list of "listType" extracted from an Json got from
@@ -66,6 +65,9 @@ func getJSONList(clientTooler *ClientTooler,
 	listURL.WriteString(listType)
 	listURL.WriteString(entrepriseSlugHTTPReqParam)
 	listURL.WriteString(api.Enterprise)
+	if listType == clouddcEnvironmentTemplate {
+		listURL.WriteString(clouddcGenericTemplateEnterprise)
+	}
 	req, err1 := http.NewRequest("GET",
 		listURL.String(),
 		nil)
