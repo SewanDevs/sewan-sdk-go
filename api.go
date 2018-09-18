@@ -34,7 +34,7 @@ type APIMeta struct {
 	TemplateList           []interface{}
 	VlanList               []interface{}
 	SnapshotList           []interface{}
-	DiskImageList          []interface{}
+	IsoList                []interface{}
 	OvaList                []interface{}
 	BackupPlanList         []interface{}
 }
@@ -139,8 +139,8 @@ func (initialyser Initialyser) GetClouddcEnvMeta(api *API,
 	if err5 != nil {
 		return nil, err5
 	}
-	diskImageList, err6 := clientTooler.Client.getEnvResourceList(clientTooler,
-		api, clouddcEnvironmentDiskImage)
+	isoList, err6 := clientTooler.Client.getEnvResourceList(clientTooler,
+		api, clouddcEnvironmentIso)
 	if err6 != nil {
 		return nil, err6
 	}
@@ -173,8 +173,8 @@ func (initialyser Initialyser) GetClouddcEnvMeta(api *API,
 	logger.Println("vlanList =", vlanList)
 	apiMeta.SnapshotList = snapshotList
 	logger.Println("snapshotList =", snapshotList)
-	apiMeta.DiskImageList = diskImageList
-	logger.Println("diskImageList =", diskImageList)
+	apiMeta.IsoList = isoList
+	logger.Println("isoList =", isoList)
 	apiMeta.OvaList = ovaList
 	logger.Println("ovaList =", ovaList)
 	apiMeta.BackupPlanList = backupPlanList

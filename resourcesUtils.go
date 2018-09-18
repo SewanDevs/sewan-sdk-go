@@ -87,7 +87,7 @@ type vmStruct struct {
 	Slug         string        `json:"slug"`
 	Token        string        `json:"token"`
 	Backup       string        `json:"backup"`
-	DiskImage    string        `json:"disk_image"`
+	Iso          string        `json:"disk_image"`
 	PlatformName string        `json:"platform_name"`
 	BackupSize   int           `json:"backup_size"`
 	Comment      string        `json:"comment,omitempty"`
@@ -443,7 +443,7 @@ func vmInstanceCreate(d *schema.ResourceData,
 		Slug:         d.Get(SlugField).(string),
 		Token:        d.Get(TokenField).(string),
 		Backup:       d.Get(BackupField).(string),
-		DiskImage:    d.Get(DiskImageField).(string),
+		Iso:          d.Get(IsoField).(string),
 		PlatformName: d.Get(PlatformNameField).(string),
 		BackupSize:   d.Get(BackupSizeField).(int),
 		DynamicField: d.Get(DynamicField).(string),

@@ -370,7 +370,7 @@ var (
 		SlugField:         "42",
 		TokenField:        "424242",
 		BackupField:       "backup_no_backup",
-		DiskImageField:    "",
+		IsoField:          "",
 		PlatformNameField: "42",
 		BackupSizeField:   42,
 		CommentField:      "42",
@@ -431,7 +431,7 @@ var (
 		SlugField:         "42",
 		TokenField:        "424242",
 		BackupField:       "backup_no_backup",
-		DiskImageField:    "",
+		IsoField:          "",
 		PlatformNameField: "42",
 		BackupSizeField:   42,
 		CommentField:      "42",
@@ -449,7 +449,7 @@ var (
 		SlugField:         "42",
 		TokenField:        "424242",
 		BackupField:       "backup_no_backup",
-		DiskImageField:    "",
+		IsoField:          "",
 	}
 	template2Map = map[string]interface{}{
 		IDField:         40,
@@ -879,7 +879,7 @@ var (
 			"expiration_date": "20xx-xx-10T16:32:28Z",
 		},
 	}
-	diskImageMetaDataList = []interface{}{
+	isoMetaDataList = []interface{}{
 		map[string]interface{}{
 			"id":            1,
 			"slug":          "iso-slug-1",
@@ -1092,7 +1092,7 @@ var (
 		SlugField:         "42 update",
 		TokenField:        "424242 update",
 		BackupField:       "backup_no_backup update",
-		DiskImageField:    " update",
+		IsoField:          " update",
 		PlatformNameField: "",
 		BackupSizeField:   42,
 		CommentField:      "",
@@ -1133,7 +1133,7 @@ var (
 		SlugField:         "42 update",
 		TokenField:        "424242 update",
 		BackupField:       "backup_no_backup update",
-		DiskImageField:    " update",
+		IsoField:          " update",
 		PlatformNameField: "",
 		BackupSizeField:   43,
 		CommentField:      "",
@@ -1174,7 +1174,7 @@ var (
 		SlugField:         "42 update",
 		TokenField:        "424242 update",
 		BackupField:       "backup_no_backup update",
-		DiskImageField:    " update",
+		IsoField:          " update",
 		PlatformNameField: "",
 		BackupSizeField:   42,
 		CommentField:      "",
@@ -1343,7 +1343,7 @@ func resourceVM() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			DiskImageField: &schema.Schema{
+			IsoField: &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
@@ -1478,7 +1478,7 @@ func vmInstanceNoTemplateVMMap() vmStruct {
 		Slug:         "42",
 		Token:        "424242",
 		Backup:       "backup_no_backup",
-		DiskImage:    "",
+		Iso:          "",
 		PlatformName: "42",
 		BackupSize:   42,
 		Comment:      "",
@@ -1585,7 +1585,7 @@ func fakeVMInstanceExistingTemplateWithAdditionalAndModifiedDisksAndNicsVMMap() 
 		Slug:         "42",
 		Token:        "424242",
 		Backup:       "backup_no_backup",
-		DiskImage:    "",
+		Iso:          "",
 		PlatformName: "42",
 		BackupSize:   42,
 		Comment:      "",
@@ -1634,7 +1634,7 @@ func vmInstanceNoTemplateFake() vmStruct {
 		Slug:         "Unit Test value",
 		Token:        "Unit Test value",
 		Backup:       "Unit Test value",
-		DiskImage:    "Unit Test value",
+		Iso:          "Unit Test value",
 		PlatformName: "Unit Test value",
 		BackupSize:   42,
 		Comment:      "",

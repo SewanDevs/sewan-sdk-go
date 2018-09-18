@@ -35,13 +35,17 @@
 
       \begin{umlfragment}[type=loop, label=resource\_in\_resourcesList, name=loop, inner xsep=10,fill=blue!15]
 	\begin{umlcall}[op=3.\ createSchema(localResourceState), type=asynchron]{terraform}{schema}
-	  \begin{umlcall}[op=4.\ resourceRead(), type=synchron, return=distantResourceState]{terraform}{sdk}
+	  \begin{umlcall}[op=4.\ GetClouddcEnvMeta(), type=synchron, return=clouddcEnvMeta]{terraform}{sdk}
 	    \begin{umlcall}[op=5.\ HTTP\_GET(), type=synchron, return=HTTP.resp]{sdk}{api}
 	    \end{umlcall}
 	  \end{umlcall}
-	  \begin{umlcall}[op=6.\ update(distantResourceState), type=asynchron]{terraform}{schema}
+	  \begin{umlcall}[op=6.\ resourceRead(), type=synchron, return=distantResourceState]{terraform}{sdk}
+	    \begin{umlcall}[op=7.\ HTTP\_GET(), type=synchron, return=HTTP.resp]{sdk}{api}
+	    \end{umlcall}
 	  \end{umlcall}
-	  \begin{umlcall}[op=7.\ updateResource(schema), type=synchron, return=OK]{terraform}{localstate}
+	  \begin{umlcall}[op=8.\ update(distantResourceState), type=asynchron]{terraform}{schema}
+	  \end{umlcall}
+	  \begin{umlcall}[op=9.\ updateResource(schema), type=synchron, return=OK]{terraform}{localstate}
 	  \end{umlcall}
 	\end{umlcall}
       \end{umlfragment}
@@ -50,6 +54,25 @@
 
     \end{umlseqdiag}
   \end{tikzpicture}
+
+\paragraph{Additional explanations}
+
+
+\begin{flushleft}
+4. GetClouddcEnvMeta() gets full clouddc environment data with lists of available :
+template,
+vdc,
+vdc resources (ram, cpu, storages etc.),
+ova,
+iso,
+nic's vlan,
+snapshot,
+backup plan.
+\end{flushleft}
+
+
+
 \end{center}
+
 
 \end{document}

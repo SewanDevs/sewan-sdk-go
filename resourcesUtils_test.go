@@ -127,7 +127,7 @@ func TestResourceInstanceCreate(t *testing.T) {
 			TemplateList:           templateMetaDataList,
 			VlanList:               vlanMetaDataList,
 			SnapshotList:           snapshotMetaDataList,
-			DiskImageList:          diskImageMetaDataList,
+			IsoList:                isoMetaDataList,
 			OvaList:                ovaMetaDataList,
 		},
 		Client: &http.Client{},

@@ -35,7 +35,7 @@ const (
 	BootField                      = "boot"
 	TokenField                     = "token"
 	BackupField                    = "backup"
-	DiskImageField                 = "disk_image"
+	IsoField                       = "disk_image"
 	PlatformNameField              = "platform_name"
 	BackupSizeField                = "backup_size"
 	CommentField                   = "comment"
@@ -92,7 +92,7 @@ var (
 	clouddcGenericTemplateEnterprise    = ",sewanadmin"
 	clouddcEnvironmentVlan              = "vlan"
 	clouddcEnvironmentSnapshot          = "snapshot"
-	clouddcEnvironmentDiskImage         = "disk-image"
+	clouddcEnvironmentIso               = "disk-image"
 	clouddcEnvironmentOva               = "ova"
 	clouddcEnvironmentBackupPlan        = "backup-plan"
 	resourceSlice                       = []string{
@@ -102,7 +102,7 @@ var (
 		clouddcEnvironmentTemplate,
 		clouddcEnvironmentVlan,
 		clouddcEnvironmentSnapshot,
-		clouddcEnvironmentDiskImage,
+		clouddcEnvironmentIso,
 		clouddcEnvironmentOva,
 		clouddcEnvironmentBackupPlan,
 	}
