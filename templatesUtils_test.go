@@ -24,29 +24,29 @@ func TestFetchTemplateFromList(t *testing.T) {
 		},
 		{
 			2,
-			"template2",
-			templatesList,
+			"template2-slug",
+			templateMetaDataList,
 			template2Map,
 			nil,
 		},
 		{
 			3,
-			"lastTemplate",
-			templatesList,
-			lastTemplateInTemplatesList,
+			"lastTemplate-slug",
+			templateMetaDataList,
+			lastTemplateInTemplateList,
 			nil,
 		},
 		{
 			4,
 			"template 42",
-			templatesList,
+			templateMetaDataList,
 			map[string]interface{}(nil),
 			errors.New("template \"template 42\" does not exists, please validate it's name"),
 		},
 		{
 			5,
 			"template 42",
-			wrongTemplatesList,
+			wrongTemplateList,
 			map[string]interface{}(nil),
 			errors.New("One of the fetch template " +
 				"has a wrong format." +
@@ -179,7 +179,7 @@ func TestUpdateSchemaFromTemplateOnResourceCreation(t *testing.T) {
 		{
 			2,
 			vmSchemaInit(vmSchemaMapPreUpdateFromTemplate),
-			lastTemplateInTemplatesList,
+			lastTemplateInTemplateList,
 			vmSchemaMapPostUpdateFromTemplate,
 			nil,
 		},

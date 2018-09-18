@@ -75,11 +75,10 @@ var (
 		},
 	}
 	nonExistingErrorVMSchemaMap = map[string]interface{}{
-		IDField:         "an id, same behaviour if it's an int or float",
-		NameField:       "VM schema update unit test",
-		TemplateField:   "template1",
-		RAMField:        2,
-		EnterpriseField: unitTestEnterprise,
+		IDField:       "an id, same behaviour if it's an int or float",
+		NameField:     "VM schema update unit test",
+		TemplateField: "template1",
+		RAMField:      2,
 		NicsField: []interface{}{
 			map[string]interface{}{
 				VlanNameField:  "vm additional unit test vlan1",
@@ -89,10 +88,9 @@ var (
 		DynamicField: "",
 	}
 	vmSchemaMapPreUpdateFromTemplate = map[string]interface{}{
-		NameField:       "VM schema update unit test",
-		TemplateField:   "template1",
-		RAMField:        2,
-		EnterpriseField: unitTestEnterprise,
+		NameField:     "VM schema update unit test",
+		TemplateField: "template1",
+		RAMField:      2,
 		NicsField: []interface{}{
 			map[string]interface{}{
 				VlanNameField:  "vm additional unit test vlan1",
@@ -102,11 +100,10 @@ var (
 		DynamicField: "",
 	}
 	vmSchemaMapPostUpdateFromTemplate = map[string]interface{}{
-		NameField:       "VM schema update unit test",
-		TemplateField:   "template1",
-		CPUField:        1,
-		RAMField:        2,
-		EnterpriseField: unitTestEnterprise,
+		NameField:     "VM schema update unit test",
+		TemplateField: "template1",
+		CPUField:      1,
+		RAMField:      2,
 		NicsField: []interface{}{
 			map[string]interface{}{
 				VlanNameField:  "unit test vlan1",
@@ -130,8 +127,8 @@ var (
 		NameField:       "createVMTemplateOverrideConfig Unit test",
 		RAMField:        1,
 		CPUField:        1,
-		EnterpriseField: unitTestEnterprise,
 		TemplateField:   "template1",
+		EnterpriseField: unitTestEnterprise,
 		OsField:         "Debian",
 		DisksField: []interface{}{
 			map[string]interface{}{
@@ -156,7 +153,6 @@ var (
 		InstanceNumberField: 42,
 		RAMField:            1,
 		CPUField:            1,
-		EnterpriseField:     unitTestEnterprise,
 		TemplateField:       "template1",
 		OsField:             "Debian",
 		DisksField: []interface{}{
@@ -180,9 +176,9 @@ var (
 	vmCreationFromTemplate1SchemaPreCreationWrongNicsInitMap = map[string]interface{}{
 		RAMField:        1,
 		CPUField:        1,
-		EnterpriseField: unitTestEnterprise,
 		NameField:       "template1",
 		OsField:         "Debian",
+		EnterpriseField: unitTestEnterprise,
 		DisksField: []interface{}{
 			map[string]interface{}{
 				NameField:         "unit test disk template1",
@@ -196,7 +192,7 @@ var (
 	}
 	vdcCreationMap = map[string]interface{}{
 		NameField:       "Unit test vdc resource",
-		EnterpriseField: "enterprise",
+		DataCenterField: rightDatacenter,
 		VdcResourceField: []interface{}{
 			map[string]interface{}{
 				ResourceField: RAMField,
@@ -220,9 +216,34 @@ var (
 			},
 		},
 	}
-	vdcResourcesNamesPreUpdateMap = map[string]interface{}{
+	vdcCreationMapResourceNotExists = map[string]interface{}{
 		NameField:       "Unit test vdc resource",
-		EnterpriseField: "enterprise",
+		DataCenterField: rightDatacenter,
+		VdcResourceField: []interface{}{
+			map[string]interface{}{
+				ResourceField: RAMField,
+				TotalField:    20,
+			},
+			map[string]interface{}{
+				ResourceField: CPUField,
+				TotalField:    1,
+			},
+			map[string]interface{}{
+				ResourceField: "not_existing_storage",
+				TotalField:    10,
+			},
+			map[string]interface{}{
+				ResourceField: "storage_performance",
+				TotalField:    10,
+			},
+			map[string]interface{}{
+				ResourceField: "storage_high_performance",
+				TotalField:    10,
+			},
+		},
+	}
+	vdcResourcesNamesPreUpdateMap = map[string]interface{}{
+		NameField: "Unit test vdc resource",
 		VdcResourceField: []interface{}{
 			map[string]interface{}{
 				ResourceField: "unit-test-enterprise-mono-ram",
@@ -247,8 +268,7 @@ var (
 		},
 	}
 	vdcResourcesNamesUpdatedMap = map[string]interface{}{
-		NameField:       "Unit test vdc resource",
-		EnterpriseField: "enterprise",
+		NameField: "Unit test vdc resource",
 		VdcResourceField: []interface{}{
 			map[string]interface{}{
 				ResourceField: RAMField,
@@ -283,8 +303,7 @@ var (
 		},
 	}
 	vdcReadResponseMap = map[string]interface{}{
-		NameField:       "Unit test vdc",
-		EnterpriseField: unitTestEnterprise,
+		NameField: "Unit test vdc",
 		VdcResourceField: []interface{}{
 			map[string]interface{}{
 				ResourceField: "unit-test-enterprise-mono-ram",
@@ -345,23 +364,22 @@ var (
 				ConnectedField: true,
 			},
 		},
-		VdcField:          "vdc unit test",
+		VdcField:          "unit-test-vdc-1-slug",
 		BootField:         "on disk",
 		StorageClassField: "storage_enterprise",
 		SlugField:         "42",
 		TokenField:        "424242",
 		BackupField:       "backup_no_backup",
-		DiskImageField:    "",
+		IsoField:          "",
 		PlatformNameField: "42",
 		BackupSizeField:   42,
 		CommentField:      "42",
 	}
 	existingTemplateNoAdditionalDiskVMMap = map[string]interface{}{
 		NameField:         "Unit test template no disc add on vm resource",
-		EnterpriseField:   unitTestEnterprise,
-		TemplateField:     "template1",
+		TemplateField:     "template1 slug",
 		StateField:        "UP",
-		VdcField:          "vdc unit test",
+		VdcField:          "unit-test-vdc-1-slug",
 		BootField:         "on disk",
 		StorageClassField: "storage_enterprise",
 		SlugField:         "42",
@@ -371,10 +389,9 @@ var (
 	instanceNumberFieldUnitTestVMInstance = map[string]interface{}{
 		NameField:           "instanceNumberFieldUnitTest",
 		InstanceNumberField: 42,
-		EnterpriseField:     unitTestEnterprise,
-		TemplateField:       "template1",
+		TemplateField:       "template1 slug",
 		StateField:          "UP",
-		VdcField:            "vdc unit test",
+		VdcField:            "unit-test-vdc-1-slug",
 		BootField:           "on disk",
 		StorageClassField:   "storage_enterprise",
 		SlugField:           "42",
@@ -384,7 +401,7 @@ var (
 	existingTemplateWithAdditionalAndModifiedDisksAndNicsVMMap = map[string]interface{}{
 		NameField:       "existingTemplateWithAdditionalAndModifiedDisksAndNicsVMMap",
 		EnterpriseField: unitTestEnterprise,
-		TemplateField:   "template1",
+		TemplateField:   "template1 slug",
 		StateField:      "UP",
 		OsField:         "Debian",
 		RAMField:        8,
@@ -408,13 +425,13 @@ var (
 				ConnectedField: true,
 			},
 		},
-		VdcField:          "vdc unit test",
+		VdcField:          "unit-test-vdc-1-slug",
 		BootField:         "on disk",
 		StorageClassField: "storage_enterprise",
 		SlugField:         "42",
 		TokenField:        "424242",
 		BackupField:       "backup_no_backup",
-		DiskImageField:    "",
+		IsoField:          "",
 		PlatformNameField: "42",
 		BackupSizeField:   42,
 		CommentField:      "42",
@@ -426,18 +443,18 @@ var (
 		StateField:        "UP",
 		RAMField:          8,
 		CPUField:          4,
-		VdcField:          "vdc unit test",
+		VdcField:          "unit-test-vdc-1-slug",
 		BootField:         "on disk",
 		StorageClassField: "storage_enterprise",
 		SlugField:         "42",
 		TokenField:        "424242",
 		BackupField:       "backup_no_backup",
-		DiskImageField:    "",
+		IsoField:          "",
 	}
 	template2Map = map[string]interface{}{
 		IDField:         40,
 		NameField:       "template2",
-		SlugField:       "unit test disk goulouglougoulouglou",
+		SlugField:       "template2-slug",
 		RAMField:        1,
 		CPUField:        1,
 		OsField:         "CentOS",
@@ -455,7 +472,7 @@ var (
 		"password":   "",
 		DynamicField: "",
 	}
-	lastTemplateInTemplatesList = map[string]interface{}{
+	lastTemplateInTemplateList = map[string]interface{}{
 		IDField:         69,
 		NameField:       "lastTemplate",
 		SlugField:       "lastTemplate-slug",
@@ -547,10 +564,136 @@ var (
 		},
 		DynamicField: "",
 	}
-	nonCriticalResourceMetaDataList = []interface{}{
+	vdcMetaDataList = []interface{}{
+		map[string]interface{}{
+			"id":         42,
+			"name":       "unit-test-vdc-1",
+			"enterprise": unitTestEnterprise,
+			"datacenter": "dc1",
+			"vdc_resources": []interface{}{
+				map[string]interface{}{
+					"resource": "unit-test-enterprise-mono-ram",
+					"used":     6,
+					"total":    6,
+					"slug":     "ramSlug",
+				},
+				map[string]interface{}{
+					"resource": "unit-test-enterprise-mono-cpu",
+					"used":     5,
+					"total":    5,
+					"slug":     "cpuSlug",
+				},
+				map[string]interface{}{
+					"resource": "unit-test-enterprise-mono-storage_enterprise",
+					"used":     60,
+					"total":    60,
+					"slug":     "storageESlug",
+				},
+				map[string]interface{}{
+					"resource": "unit-test-enterprise-mono-storage_performance",
+					"used":     0,
+					"total":    0,
+					"slug":     "storagePSlug",
+				},
+				map[string]interface{}{
+					"resource": "unit-test-enterprise-mono-storage_high_performance",
+					"used":     0,
+					"total":    0,
+					"slug":     "storageHPSlug",
+				},
+			},
+			"slug":          "unit-test-vdc-1-slug",
+			"dynamic_field": nil,
+		},
+		map[string]interface{}{
+			"id":         43,
+			"name":       "unit-test-vdc-2",
+			"enterprise": unitTestEnterprise,
+			"datacenter": "dc2",
+			"vdc_resources": []interface{}{
+				map[string]interface{}{
+					"resource": "unit-test-enterprise-mono-ram",
+					"used":     6,
+					"total":    6,
+					"slug":     "ramSlug",
+				},
+				map[string]interface{}{
+					"resource": "unit-test-enterprise-mono-cpu",
+					"used":     5,
+					"total":    5,
+					"slug":     "cpuSlug",
+				},
+				map[string]interface{}{
+					"resource": "unit-test-enterprise-mono-storage_enterprise",
+					"used":     60,
+					"total":    60,
+					"slug":     "storageESlug",
+				},
+				map[string]interface{}{
+					"resource": "unit-test-enterprise-mono-storage_performance",
+					"used":     0,
+					"total":    0,
+					"slug":     "storagePSlug",
+				},
+				map[string]interface{}{
+					"resource": "unit-test-enterprise-mono-storage_high_performance",
+					"used":     0,
+					"total":    0,
+					"slug":     "storageHPSlug",
+				},
+			},
+			"slug":          "unit-test-vdc-2-slug",
+			"dynamic_field": nil,
+		},
+	}
+	rightDatacenter        = "dc2"
+	wrongDatacenter        = "wrongDatacenter"
+	dataCenterMetaDataList = []interface{}{
+		map[string]interface{}{
+			"id":       1,
+			"created":  "2017-06-29T12:10:33+02:00",
+			"modified": "2017-12-07T14:19:54+01:00",
+			"name":     "DC2",
+			"slug":     rightDatacenter,
+			"cos":      "Mono",
+			"weight":   1,
+			"manager":  3,
+		},
+		map[string]interface{}{
+			"id":       2,
+			"created":  "2017-06-29T12:10:33+02:00",
+			"modified": "2017-12-07T14:19:48+01:00",
+			"name":     "DC1",
+			"slug":     "dc1",
+			"cos":      "Mono",
+			"weight":   2,
+			"manager":  4,
+		},
+		map[string]interface{}{
+			"id":       3,
+			"created":  "2017-06-29T12:10:33+02:00",
+			"modified": "2018-04-24T11:37:01+02:00",
+			"name":     "HA",
+			"slug":     "ha",
+			"cos":      "HA",
+			"weight":   1,
+			"manager":  7,
+		},
+	}
+	unitTestMetaDataList = []interface{}{
+		map[string]interface{}{
+			"id":         4,
+			"enterprise": unitTestEnterprise,
+		},
+		map[string]interface{}{
+			"id":         1,
+			"enterprise": unitTestEnterprise,
+		},
+	}
+	enterpriseResourceMetaDataList = []interface{}{
 		map[string]interface{}{
 			"id":            4,
-			"enterprise":    "unit-test-enterprise",
+			"enterprise":    unitTestEnterprise,
 			"created":       "2017-06-29T12:10:35+02:00",
 			"modified":      "2018-05-28T12:28:42+02:00",
 			"cos":           "Mono",
@@ -563,7 +706,7 @@ var (
 		},
 		map[string]interface{}{
 			"id":            5,
-			"enterprise":    "unit-test-enterprise",
+			"enterprise":    unitTestEnterprise,
 			"created":       "2017-06-29T12:10:35+02:00",
 			"modified":      "2018-05-28T12:28:32+02:00",
 			"cos":           "Mono",
@@ -576,7 +719,7 @@ var (
 		},
 		map[string]interface{}{
 			"id":            6,
-			"enterprise":    "unit-test-enterprise",
+			"enterprise":    unitTestEnterprise,
 			"created":       "2017-06-29T12:10:35+02:00",
 			"modified":      "2018-02-14T17:32:15+01:00",
 			"cos":           "Mono",
@@ -589,7 +732,7 @@ var (
 		},
 		map[string]interface{}{
 			"id":            7,
-			"enterprise":    "unit-test-enterprise",
+			"enterprise":    unitTestEnterprise,
 			"created":       "2017-06-29T12:10:35+02:00",
 			"modified":      "2018-07-31T15:55:06+02:00",
 			"cos":           "Mono",
@@ -602,7 +745,7 @@ var (
 		},
 		map[string]interface{}{
 			"id":            8,
-			"enterprise":    "unit-test-enterprise",
+			"enterprise":    unitTestEnterprise,
 			"created":       "2017-06-29T12:10:35+02:00",
 			"modified":      "2018-02-06T11:02:17+01:00",
 			"cos":           "Mono",
@@ -613,11 +756,9 @@ var (
 			"dynamic_field": nil,
 			"service":       1,
 		},
-	}
-	criticalResourceMetaDataList = []interface{}{
 		map[string]interface{}{
 			"id":            305,
-			"enterprise":    "unit-test-enterprise",
+			"enterprise":    unitTestEnterprise,
 			"created":       "2017-10-10T12:19:51+02:00",
 			"modified":      "2017-10-10T12:19:51+02:00",
 			"cos":           "HA",
@@ -630,7 +771,7 @@ var (
 		},
 		map[string]interface{}{
 			"id":            306,
-			"enterprise":    "unit-test-enterprise",
+			"enterprise":    unitTestEnterprise,
 			"created":       "2017-10-10T12:20:11+02:00",
 			"modified":      "2017-10-10T12:20:11+02:00",
 			"cos":           "HA",
@@ -643,7 +784,7 @@ var (
 		},
 		map[string]interface{}{
 			"id":            314,
-			"enterprise":    "unit-test-enterprise",
+			"enterprise":    unitTestEnterprise,
 			"created":       "2018-04-03T16:09:32+02:00",
 			"modified":      "2018-04-24T15:50:56+02:00",
 			"cos":           "HA",
@@ -656,7 +797,7 @@ var (
 		},
 		map[string]interface{}{
 			"id":            315,
-			"enterprise":    "unit-test-enterprise",
+			"enterprise":    unitTestEnterprise,
 			"created":       "2018-04-24T12:35:55+02:00",
 			"modified":      "2018-04-24T15:51:04+02:00",
 			"cos":           "HA",
@@ -669,7 +810,7 @@ var (
 		},
 		map[string]interface{}{
 			"id":            316,
-			"enterprise":    "unit-test-enterprise",
+			"enterprise":    unitTestEnterprise,
 			"created":       "2018-04-24T12:36:15+02:00",
 			"modified":      "2018-04-24T15:51:13+02:00",
 			"cos":           "HA",
@@ -680,11 +821,9 @@ var (
 			"dynamic_field": nil,
 			"service":       1,
 		},
-	}
-	otherResourceMetaDataList = []interface{}{
 		map[string]interface{}{
 			"id":            55,
-			"enterprise":    "unit-test-enterprise",
+			"enterprise":    unitTestEnterprise,
 			"created":       "2017-06-29T12:10:35+02:00",
 			"modified":      "2017-08-10T05:01:03+02:00",
 			"cos":           "Global",
@@ -697,7 +836,7 @@ var (
 		},
 		map[string]interface{}{
 			"id":            196,
-			"enterprise":    "unit-test-enterprise",
+			"enterprise":    unitTestEnterprise,
 			"created":       "2017-06-29T12:10:35+02:00",
 			"modified":      "2018-02-21T12:45:28+01:00",
 			"cos":           "Global",
@@ -710,7 +849,7 @@ var (
 		},
 		map[string]interface{}{
 			"id":            313,
-			"enterprise":    "unit-test-enterprise",
+			"enterprise":    unitTestEnterprise,
 			"created":       "2018-02-15T18:39:17+01:00",
 			"modified":      "2018-02-16T15:50:16+01:00",
 			"cos":           "Global",
@@ -722,178 +861,118 @@ var (
 			"service":       1,
 		},
 	}
-	resourceMetaDataList = []interface{}{
+	snapshotMetaDataList = []interface{}{
 		map[string]interface{}{
-			"id":            4,
-			"enterprise":    "unit-test-enterprise",
-			"created":       "2017-06-29T12:10:35+02:00",
-			"modified":      "2018-05-28T12:28:42+02:00",
-			"cos":           "Mono",
-			"name":          "ram",
-			"used":          324,
-			"total":         350,
-			"slug":          "unit-test-enterprise-mono-ram",
-			"dynamic_field": nil,
-			"service":       1,
+			"id":              1,
+			"created":         "2018-09-03T17:32:07+01:00",
+			"slug":            "snapshotslug1",
+			"vm":              "unit-test-enterprise-vm-1",
+			"dynamic_field":   nil,
+			"expiration_date": "20xx-xx-10T16:32:07Z",
 		},
 		map[string]interface{}{
-			"id":            5,
-			"enterprise":    "unit-test-enterprise",
-			"created":       "2017-06-29T12:10:35+02:00",
-			"modified":      "2018-05-28T12:28:32+02:00",
-			"cos":           "Mono",
-			"name":          "cpu",
-			"used":          275,
-			"total":         300,
-			"slug":          "unit-test-enterprise-mono-cpu",
-			"dynamic_field": nil,
-			"service":       1,
-		},
-		map[string]interface{}{
-			"id":            6,
-			"enterprise":    "unit-test-enterprise",
-			"created":       "2017-06-29T12:10:35+02:00",
-			"modified":      "2018-02-14T17:32:15+01:00",
-			"cos":           "Mono",
-			"name":          "storage_enterprise",
-			"used":          7708,
-			"total":         8000,
-			"slug":          "unit-test-enterprise-mono-storage_enterprise",
-			"dynamic_field": nil,
-			"service":       1,
-		},
-		map[string]interface{}{
-			"id":            7,
-			"enterprise":    "unit-test-enterprise",
-			"created":       "2017-06-29T12:10:35+02:00",
-			"modified":      "2018-07-31T15:55:06+02:00",
-			"cos":           "Mono",
-			"name":          "storage_performance",
-			"used":          630,
-			"total":         700,
-			"slug":          "unit-test-enterprise-mono-storage_performance",
-			"dynamic_field": nil,
-			"service":       1,
-		},
-		map[string]interface{}{
-			"id":            8,
-			"enterprise":    "unit-test-enterprise",
-			"created":       "2017-06-29T12:10:35+02:00",
-			"modified":      "2018-02-06T11:02:17+01:00",
-			"cos":           "Mono",
-			"name":          "storage_high_performance",
-			"used":          10,
-			"total":         20,
-			"slug":          "unit-test-enterprise-mono-storage_high_performance",
-			"dynamic_field": nil,
-			"service":       1,
-		},
-		map[string]interface{}{
-			"id":            55,
-			"enterprise":    "unit-test-enterprise",
-			"created":       "2017-06-29T12:10:35+02:00",
-			"modified":      "2017-08-10T05:01:03+02:00",
-			"cos":           "Global",
-			"name":          "backup",
-			"used":          220,
-			"total":         220,
-			"slug":          "unit-test-enterprise-clouddc-backup",
-			"dynamic_field": nil,
-			"service":       1,
-		},
-		map[string]interface{}{
-			"id":            196,
-			"enterprise":    "unit-test-enterprise",
-			"created":       "2017-06-29T12:10:35+02:00",
-			"modified":      "2018-02-21T12:45:28+01:00",
-			"cos":           "Global",
-			"name":          "license_win_server",
-			"used":          7,
-			"total":         20,
-			"slug":          "unit-test-enterprise-global-license_win_server",
-			"dynamic_field": nil,
-			"service":       1,
-		},
-		map[string]interface{}{
-			"id":            305,
-			"enterprise":    "unit-test-enterprise",
-			"created":       "2017-10-10T12:19:51+02:00",
-			"modified":      "2017-10-10T12:19:51+02:00",
-			"cos":           "HA",
-			"name":          "cpu",
-			"used":          5,
-			"total":         10,
-			"slug":          "resource-cpu-rd-ha",
-			"dynamic_field": nil,
-			"service":       1,
-		},
-		map[string]interface{}{
-			"id":            306,
-			"enterprise":    "unit-test-enterprise",
-			"created":       "2017-10-10T12:20:11+02:00",
-			"modified":      "2017-10-10T12:20:11+02:00",
-			"cos":           "HA",
-			"name":          "ram",
-			"used":          5,
-			"total":         10,
-			"slug":          "ram-ha-rd",
-			"dynamic_field": nil,
-			"service":       1,
-		},
-		map[string]interface{}{
-			"id":            313,
-			"enterprise":    "unit-test-enterprise",
-			"created":       "2018-02-15T18:39:17+01:00",
-			"modified":      "2018-02-16T15:50:16+01:00",
-			"cos":           "Global",
-			"name":          "license_redhat",
-			"used":          2,
-			"total":         3,
-			"slug":          "sewan-rd-cloud-daatcenter-vdc-rd-licence-redhat",
-			"dynamic_field": nil,
-			"service":       1,
-		},
-		map[string]interface{}{
-			"id":            314,
-			"enterprise":    "unit-test-enterprise",
-			"created":       "2018-04-03T16:09:32+02:00",
-			"modified":      "2018-04-24T15:50:56+02:00",
-			"cos":           "HA",
-			"name":          "storage_enterprise",
-			"used":          60,
-			"total":         100,
-			"slug":          "storage_enterprise-ha",
-			"dynamic_field": nil,
-			"service":       1,
-		},
-		map[string]interface{}{
-			"id":            315,
-			"enterprise":    "unit-test-enterprise",
-			"created":       "2018-04-24T12:35:55+02:00",
-			"modified":      "2018-04-24T15:51:04+02:00",
-			"cos":           "HA",
-			"name":          "storage_performance",
-			"used":          55,
-			"total":         100,
-			"slug":          "unit-test-enterprise-ha-storage_performance",
-			"dynamic_field": nil,
-			"service":       1,
-		},
-		map[string]interface{}{
-			"id":            316,
-			"enterprise":    "unit-test-enterprise",
-			"created":       "2018-04-24T12:36:15+02:00",
-			"modified":      "2018-04-24T15:51:13+02:00",
-			"cos":           "HA",
-			"name":          "storage_high_performance",
-			"used":          0,
-			"total":         100,
-			"slug":          "unit-test-enterprise-ha-storage_high_performance",
-			"dynamic_field": nil,
-			"service":       1,
+			"id":              2,
+			"created":         "2018-09-03T17:32:42+01:00",
+			"slug":            "snapshotslug2",
+			"vm":              "unit-test-enterprise-vm-2",
+			"dynamic_field":   nil,
+			"expiration_date": "20xx-xx-10T16:32:28Z",
 		},
 	}
-	templatesList = []interface{}{
+	isoMetaDataList = []interface{}{
+		map[string]interface{}{
+			"id":            1,
+			"slug":          "iso-slug-1",
+			"enterprise":    unitTestEnterprise,
+			"size":          42, //bytes
+			"name":          "unitTest-iso1.iso",
+			"dynamic_field": nil,
+		},
+		map[string]interface{}{
+			"id":            2,
+			"slug":          "iso-slug-2",
+			"enterprise":    unitTestEnterprise,
+			"size":          42,
+			"name":          "unitTest-iso2.iso",
+			"dynamic_field": nil,
+		},
+	}
+	ovaMetaDataList = []interface{}{
+		map[string]interface{}{
+			"id":   60,
+			"slug": "uniTest-ova-slug1",
+			"ram":  1,
+			"cpu":  1,
+			"nics": 4,
+			"os":   "Linux 64 bits",
+			"disks": []interface{}{
+				map[string]interface{}{
+					"name": "disk0",
+					"size": 4,
+					"slug": "unitTest-slug-disk0",
+				},
+			},
+			"enterprise":    unitTestEnterprise,
+			"name":          "unitTest1.ova",
+			"dynamic_field": nil,
+		},
+		map[string]interface{}{
+			"id":   61,
+			"slug": "uniTest-ova-slug1",
+			"ram":  2,
+			"cpu":  1,
+			"nics": 1,
+			"os":   "Other",
+			"disks": []interface{}{
+				map[string]interface{}{
+					"name": "disk1",
+					"size": 14,
+					"slug": "unitTest-slug-disk1",
+				},
+			},
+			"enterprise":    unitTestEnterprise,
+			"name":          "unitTest2.ova",
+			"dynamic_field": nil,
+		},
+	}
+	vlanMetaDataList = []interface{}{
+		map[string]interface{}{
+			"name":       "unitTest vlan 1",
+			"enterprise": unitTestEnterprise,
+			"type":       "firewall",
+			"slug":       "slug1",
+			"firewall":   nil,
+		},
+		map[string]interface{}{
+			"name":       "unitTest vlan 2",
+			"enterprise": unitTestEnterprise,
+			"type":       "internal",
+			"slug":       "vlan 1 update",
+			"firewall":   nil,
+		},
+		map[string]interface{}{
+			"name":       "unitTest vlan 3",
+			"enterprise": unitTestEnterprise,
+			"type":       "internal",
+			"slug":       "non template vlan 1",
+			"firewall":   nil,
+		},
+		map[string]interface{}{
+			"name":       "unitTest vlan 4",
+			"enterprise": unitTestEnterprise,
+			"type":       "internal",
+			"slug":       "non template vlan 2",
+			"firewall":   nil,
+		},
+		map[string]interface{}{
+			"name":       "unitTest vlan 5",
+			"enterprise": unitTestEnterprise,
+			"type":       "internal",
+			"slug":       "vlan 2",
+			"firewall":   nil,
+		},
+	}
+	templateMetaDataList = []interface{}{
 		template2Map,
 		template1Map,
 		map[string]interface{}{
@@ -970,12 +1049,12 @@ var (
 			"password":   nil,
 			DynamicField: nil,
 		},
-		lastTemplateInTemplatesList,
+		lastTemplateInTemplateList,
 	}
-	wrongTemplatesList = []interface{}{
+	wrongTemplateList = []interface{}{
 		template2Map,
 		"Wrongly formated template",
-		lastTemplateInTemplatesList,
+		lastTemplateInTemplateList,
 	}
 	testUpdateVMMap = map[string]interface{}{
 		IDField:    "unit test vm",
@@ -1013,7 +1092,7 @@ var (
 		SlugField:         "42 update",
 		TokenField:        "424242 update",
 		BackupField:       "backup_no_backup update",
-		DiskImageField:    " update",
+		IsoField:          " update",
 		PlatformNameField: "",
 		BackupSizeField:   42,
 		CommentField:      "",
@@ -1054,7 +1133,7 @@ var (
 		SlugField:         "42 update",
 		TokenField:        "424242 update",
 		BackupField:       "backup_no_backup update",
-		DiskImageField:    " update",
+		IsoField:          " update",
 		PlatformNameField: "",
 		BackupSizeField:   43,
 		CommentField:      "",
@@ -1095,7 +1174,7 @@ var (
 		SlugField:         "42 update",
 		TokenField:        "424242 update",
 		BackupField:       "backup_no_backup update",
-		DiskImageField:    " update",
+		IsoField:          " update",
 		PlatformNameField: "",
 		BackupSizeField:   42,
 		CommentField:      "",
@@ -1132,11 +1211,7 @@ func resourceVdc() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			EnterpriseField: &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			DatacenterField: &schema.Schema{
+			DataCenterField: &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
@@ -1214,10 +1289,6 @@ func resourceVM() *schema.Resource {
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
-			EnterpriseField: &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-			},
 			TemplateField: &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -1232,11 +1303,11 @@ func resourceVM() *schema.Resource {
 			},
 			RAMField: &schema.Schema{
 				Type:     schema.TypeInt,
-				Optional: true,
+				Required: true,
 			},
 			CPUField: &schema.Schema{
 				Type:     schema.TypeInt,
-				Optional: true,
+				Required: true,
 			},
 			DisksField: &schema.Schema{
 				Type:     schema.TypeList,
@@ -1272,7 +1343,7 @@ func resourceVM() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			DiskImageField: &schema.Schema{
+			IsoField: &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 			},
@@ -1303,7 +1374,8 @@ func resourceVM() *schema.Resource {
 func fakeVdcInstanceVdcCreationMap() vdcStruct {
 	return vdcStruct{
 		Name:       "Unit test vdc resource",
-		Enterprise: "unit-test-enterprise",
+		Enterprise: unitTestEnterprise,
+		Datacenter: rightDatacenter,
 		VdcResources: []interface{}{
 			map[string]interface{}{
 				ResourceField: "unit-test-enterprise-mono-ram",
@@ -1400,13 +1472,13 @@ func vmInstanceNoTemplateVMMap() vmStruct {
 				ConnectedField: true,
 			},
 		},
-		Vdc:          "vdc unit test",
+		Vdc:          "unit-test-vdc-1-slug",
 		Boot:         "on disk",
 		StorageClass: "storage_enterprise",
 		Slug:         "42",
 		Token:        "424242",
 		Backup:       "backup_no_backup",
-		DiskImage:    "",
+		Iso:          "",
 		PlatformName: "42",
 		BackupSize:   42,
 		Comment:      "",
@@ -1432,7 +1504,7 @@ func fakeVMInstanceExistingTemplateNoAdditionalDiskVMMap() vmStruct {
 			},
 		},
 		Nics:         []interface{}{},
-		Vdc:          "vdc unit test",
+		Vdc:          "unit-test-vdc-1-slug",
 		Boot:         "on disk",
 		StorageClass: "storage_enterprise",
 		Slug:         "42",
@@ -1460,7 +1532,7 @@ func fakeVMInstanceInstanceNumberFieldUnitTestVMInstanceMAP() vmStruct {
 			},
 		},
 		Nics:         []interface{}{},
-		Vdc:          "vdc unit test",
+		Vdc:          "unit-test-vdc-1-slug",
 		Boot:         "on disk",
 		StorageClass: "storage_enterprise",
 		Slug:         "42",
@@ -1507,13 +1579,13 @@ func fakeVMInstanceExistingTemplateWithAdditionalAndModifiedDisksAndNicsVMMap() 
 				ConnectedField: true,
 			},
 		},
-		Vdc:          "vdc unit test",
+		Vdc:          "unit-test-vdc-1-slug",
 		Boot:         "on disk",
 		StorageClass: "storage_enterprise",
 		Slug:         "42",
 		Token:        "424242",
 		Backup:       "backup_no_backup",
-		DiskImage:    "",
+		Iso:          "",
 		PlatformName: "42",
 		BackupSize:   42,
 		Comment:      "",
@@ -1556,13 +1628,13 @@ func vmInstanceNoTemplateFake() vmStruct {
 				ConnectedField: false,
 			},
 		},
-		Vdc:          "Unit Test value",
+		Vdc:          "unit-test-vdc-1-slug",
 		Boot:         "Unit Test value",
 		StorageClass: "Unit Test value",
 		Slug:         "Unit Test value",
 		Token:        "Unit Test value",
 		Backup:       "Unit Test value",
-		DiskImage:    "Unit Test value",
+		Iso:          "Unit Test value",
 		PlatformName: "Unit Test value",
 		BackupSize:   42,
 		Comment:      "",
@@ -1590,7 +1662,6 @@ func vmSchemaInit(vm map[string]interface{}) *schema.ResourceData {
 }
 
 func resource(resourceType string) *schema.Resource {
-
 	resource := &schema.Resource{}
 	switch resourceType {
 	case VdcResourceType:
@@ -1627,7 +1698,7 @@ func JSONStub() map[string]interface{} {
 
 func JSONTemplateListFake() []interface{} {
 	var jsonFake interface{}
-	fakeJSON, _ := json.Marshal(templatesList)
+	fakeJSON, _ := json.Marshal(templateMetaDataList)
 	jsonBytes := ioutil.NopCloser(bytes.NewBuffer(fakeJSON))
 	readBytes, _ := ioutil.ReadAll(jsonBytes)
 	_ = json.Unmarshal(readBytes, &jsonFake)

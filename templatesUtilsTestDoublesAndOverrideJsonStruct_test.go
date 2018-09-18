@@ -80,7 +80,7 @@ func (templaterFake TemplateFormatErrorTemplaterFake) validateTemplate(template 
 		"\"" + CPUField + "\" " +
 		"\"" + EnterpriseField + "\" " +
 		"\"" + DisksField + "\" " +
-		"\"" + DatacenterField + "\" ")
+		"\"" + DataCenterField + "\" ")
 }
 func (templaterFake TemplateFormatErrorTemplaterFake) updateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
 	template map[string]interface{}) error {

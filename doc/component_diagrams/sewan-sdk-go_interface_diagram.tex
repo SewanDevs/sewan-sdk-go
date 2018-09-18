@@ -37,12 +37,13 @@
       \umlassemblyconnector[interface=consume]{<<Implementer>>-south-port}{<<Resourceer>>-north-port}
       \umlassemblyconnector[interface=consume]{<<Templater>>-south-port}{<<Schemaer>>-north-port}
       \umlnote[x=-6,y=0,width=13em]{<<Initialyser>>}{Responsibilities :\newline
-      * get Clouddc enterprise environment meta data\newline
+      * get Clouddc enterprise environment meta data (template,vdc,vdc resources (ram, cpu, storages etc.),
+      ova,iso,nic's vlan,snapshot,backup plan.)\newline
       * validate Clouddc enterprise environment status	}
-      \umlnote[x=-6,y=-3,width=13em]{<<Implementer>>}{Responsibilities :\newline
+      \umlnote[x=-6,y=-4,width=13em]{<<Implementer>>}{Responsibilities :\newline
       * resources CRUD operations\newline}
       \umlnote[x=13,y=2,width=13em]{<<Templater>>}{Responsibilities :\newline
-      * handle vm resource template logic (getTemplateList, create vm from template, 
+      * handle vm resource template logic (create vm from template, 
       create configuration override file etc.)}
       \umlnote[x=13,y=-8,width=13em]{<<Schemaer>>}{Responsibilities :\newline
       * hashicorp/helper/schema object handle (this object store the status of a resource 
