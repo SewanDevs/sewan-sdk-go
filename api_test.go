@@ -289,6 +289,14 @@ func TestCreateResource(t *testing.T) {
 			errors.New("\"wrongDatacenter\" is not in : \"dc2\" \"dc1\" \"ha\""),
 			map[string]interface{}{},
 		},
+		{
+			6,
+			VDCCreationSuccessHTTPClienterFake{},
+			unitTestVDCSchema(resourceName),
+			VdcResourceType,
+			nil,
+			vdcCreationResponseMap,
+		},
 	}
 	apier := AirDrumResourcesAPI{}
 	sewan := &API{

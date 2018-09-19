@@ -160,25 +160,15 @@ func (initialyser Initialyser) GetClouddcEnvMeta(api *API,
 	if err9 != nil {
 		return nil, err9
 	}
-	logger := LoggerCreate("GetClouddcEnvMeta.log")
 	apiMeta.EnterpriseResourceList = resourceMetaDataList
-	logger.Println("resourceMetaDataList =", resourceMetaDataList)
 	apiMeta.EnterpriseVdcList = vdcList
-	logger.Println("vdcList =", vdcList)
 	apiMeta.DataCenterList = dataCenterList
-	logger.Println(" dataCenterList =", dataCenterList)
 	apiMeta.TemplateList = templateList
-	logger.Println("templateList =", templateList)
 	apiMeta.VlanList = vlanList
-	logger.Println("vlanList =", vlanList)
 	apiMeta.SnapshotList = snapshotList
-	logger.Println("snapshotList =", snapshotList)
 	apiMeta.IsoList = isoList
-	logger.Println("isoList =", isoList)
 	apiMeta.OvaList = ovaList
-	logger.Println("ovaList =", ovaList)
 	apiMeta.BackupPlanList = backupPlanList
-	logger.Println("backupPlanList =", backupPlanList)
 	// redmine ticket #37823 : resource's lists validation lack
 	return &apiMeta, nil
 }
@@ -227,6 +217,10 @@ func (apier AirDrumResourcesAPI) CreateResource(d *schema.ResourceData,
 			httpJSONContentType)
 		if createdResource == nil {
 			return map[string]interface{}{}, err5
+		}
+		if resourceType == VdcResourceType {
+			sewan.Meta.EnterpriseVdcList = append(sewan.Meta.EnterpriseVdcList,
+				createdResource.(map[string]interface{}))
 		}
 		return createdResource.(map[string]interface{}), err5
 	}
@@ -359,6 +353,16 @@ func (apier AirDrumResourcesAPI) UpdateResource(d *schema.ResourceData,
 	}
 }
 
+// handleVdcDeletionNonStandardResponse handle non standard AirDrum Response
+// to vdc deletion request.
+// Related redmine bug ticket : #37337
+// This function must be deleted after #37337 fix.
+func handleVdcDeletionNonStandardResponse(clientTooler *ClientTooler,
+	resp *http.Response) error {
+	_, err := clientTooler.Client.handleResponse(resp, http.StatusNoContent, "")
+	return err
+}
+
 // DeleteResource deletes a Sewan clouddc resource
 //
 // * input data : schema.ResourceData (with existing id) (godoc.org/github.com/hashicorp/terraform/helper/schema#ResourceData)
@@ -389,6 +393,9 @@ func (apier AirDrumResourcesAPI) DeleteResource(d *schema.ResourceData,
 		_, err4 := clientTooler.Client.handleResponse(resp,
 			http.StatusNoContent,
 			httpJSONContentType)
+		if resourceType == VdcResourceType {
+			return handleVdcDeletionNonStandardResponse(clientTooler, resp)
+		}
 		return err4
 	}
 }
