@@ -136,6 +136,22 @@ func (client VMCreationSuccessHTTPClienterFake) handleResponse(resp *http.Respon
 	return noTemplateVMMap, nil
 }
 
+type VDCCreationSuccessHTTPClienterFake struct{}
+
+func (client VDCCreationSuccessHTTPClienterFake) do(api *API,
+	req *http.Request) (*http.Response, error) {
+	return nil, nil
+}
+func (client VDCCreationSuccessHTTPClienterFake) getEnvResourceList(clientTooler *ClientTooler,
+	api *API, resourceType string) ([]interface{}, error) {
+	return nil, nil
+}
+func (client VDCCreationSuccessHTTPClienterFake) handleResponse(resp *http.Response,
+	expectedCode int,
+	expectedBodyFormat string) (interface{}, error) {
+	return vdcCreationResponseMap, nil
+}
+
 type VMReadSuccessHTTPClienterFake struct{}
 
 func (client VMReadSuccessHTTPClienterFake) do(api *API,

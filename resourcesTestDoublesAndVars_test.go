@@ -302,6 +302,10 @@ var (
 			},
 		},
 	}
+	vdcCreationResponseMap = map[string]interface{}{
+		NameField:       "Unit test resource creation",
+		DataCenterField: rightDatacenter,
+	}
 	vdcReadResponseMap = map[string]interface{}{
 		NameField: "Unit test vdc",
 		VdcResourceField: []interface{}{
