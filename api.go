@@ -77,8 +77,6 @@ type APIInitialyser interface {
 		resourceTooler *ResourceTooler) error
 	GetClouddcEnvMeta(api *API,
 		clientTooler *ClientTooler) (*APIMeta, error)
-	// Add here fields validation
-	//ValidateResourceFieldsValue
 }
 
 // Initialyser implements APIInitialyser interface
@@ -393,7 +391,7 @@ func (apier AirDrumResourcesAPI) DeleteResource(d *schema.ResourceData,
 		_, err4 := clientTooler.Client.handleResponse(resp,
 			http.StatusNoContent,
 			httpJSONContentType)
-		if resourceType == VdcResourceType {
+		if resourceType == VdcResourceType && resp.StatusCode != http.StatusNotAcceptable {
 			return handleVdcDeletionNonStandardResponse(clientTooler, resp)
 		}
 		return err4
