@@ -118,6 +118,8 @@ func (templater TemplateTemplater) validateTemplate(template map[string]interfac
 	return templateError
 }
 
+// updateSchemaFromTemplateOnResourceCreation adds to schema additional
+// vm resource configuration field from template
 func (templater TemplateTemplater) updateSchemaFromTemplateOnResourceCreation(d *schema.ResourceData,
 	template map[string]interface{}) error {
 	if d.Id() != "" {
@@ -204,14 +206,16 @@ func (templater TemplateTemplater) createVMTemplateOverrideConfig(d *schema.Reso
 	}
 }
 
+// conformizeNicsSliceOnResourceCreation removes from nic map mac_adress field
+// from map
 func conformizeNicsSliceOnResourceCreation(d *schema.ResourceData,
 	templateParamName string,
-	value []interface{}) []interface{} {
+	nicSlice []interface{}) []interface{} {
 	var (
 		nicMap          map[string]interface{}
 		schemaNicsSlice []interface{}
 	)
-	for _, nic := range value {
+	for _, nic := range nicSlice {
 		nicMap = map[string]interface{}{}
 		for nicParamName, nicParamValue := range nic.(map[string]interface{}) {
 			switch nicParamName {
@@ -231,15 +235,22 @@ func conformizeNicsSliceOnResourceCreation(d *schema.ResourceData,
 	return schemaNicsSlice
 }
 
+// updateSchemaFieldOnResourceCreation updates a schema field from template field
+// it handles following specific case :
+// * set template field to nil as it used only for resource creation
+// * do not set any value to empty id, os, name fields as this information is
+//   stored in template, theses informations are fetched from template on clouddc side
+// * modify template nics data and set it to schema :
+//   default mac_adress of vlan is not accepted on creation, so it's removed from nics map
 func updateSchemaFieldOnResourceCreation(d *schema.ResourceData,
 	key string,
-	value interface{}) {
+	fieldValue interface{}) {
 	var (
 		templateParamName                 = reflect.ValueOf(key).String()
-		interfaceTemplateName interface{} = reflect.ValueOf(value).Interface()
-		templateParamValue                = reflect.ValueOf(value).String()
+		interfaceTemplateName interface{} = reflect.ValueOf(fieldValue).Interface()
+		templateParamValue                = reflect.ValueOf(fieldValue).String()
 	)
-	switch reflect.TypeOf(value).Kind() {
+	switch reflect.TypeOf(fieldValue).Kind() {
 	case reflect.String:
 		switch {
 		case templateParamName == IDField:
@@ -263,7 +274,7 @@ func updateSchemaFieldOnResourceCreation(d *schema.ResourceData,
 		case key == NicsField:
 			schemaNicsSlice := conformizeNicsSliceOnResourceCreation(d,
 				templateParamName,
-				value.([]interface{}))
+				fieldValue.([]interface{}))
 			d.Set(templateParamName, schemaNicsSlice)
 		default:
 		}
